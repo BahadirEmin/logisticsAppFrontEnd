@@ -1,0 +1,53 @@
+/* SideNavbar.css */
+.side-navbar {
+  width: 20%;
+  flex-shrink: 0;
+}
+
+.side-navbar .MuiDrawer-paper {
+  width: 20%;
+  box-sizing: border-box;
+  background-color: #1976d2;
+  color: white;
+}
+
+.nav-item {
+  margin: 0 16px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.selected {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-item.selected:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.nav-icon {
+  color: inherit;
+  min-width: 40px;
+}
+
+.nav-text {
+  font-weight: normal;
+}
+
+.nav-text.selected {
+  font-weight: bold;
+}
+
+.app-title {
+  font-weight: bold;
+  padding: 24px;
+}
+
+.divider {
+  background-color: rgba(255, 255, 255, 0.2);
+} 
+
