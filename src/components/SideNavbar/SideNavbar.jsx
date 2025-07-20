@@ -8,83 +8,139 @@ import {
   ListItemIcon, 
   ListItemText, 
   Typography,
-  Divider
+  Divider,
+  Button
 } from '@mui/material';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import HomeIcon from '@mui/icons-material/Home';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import PersonIcon from '@mui/icons-material/Person';
 import GroupIcon from '@mui/icons-material/Group';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import TimelineIcon from '@mui/icons-material/Timeline';
+import AddIcon from '@mui/icons-material/Add';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import LogoutIcon from '@mui/icons-material/Logout';
+import './SideNavbar.css';
 
 const drawerWidth = '20%';
 
-const menuItems = [
-  { text: 'Trucks', icon: <LocalShippingIcon />, path: '/trucks' },
-  { text: 'Drivers', icon: <PersonIcon />, path: '/drivers' },
-  { text: 'Personnels', icon: <GroupIcon />, path: '/personnels' },
-  { text: 'Trailers', icon: <DirectionsCarIcon />, path: '/trailers' },
-];
-
 const SideNavbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Get user data from localStorage
+  const userData = JSON.parse(localStorage.getItem('user') || '{}');
+  const userRole = userData.role;
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('isAuthenticated');
+    navigate('/login');
+  };
+
+  // Define menu items based on user role
+  const getMenuItems = () => {
+    switch (userRole) {
+      case 'admin':
+        return [
+          { text: 'Home', icon: <HomeIcon />, path: '/admin' },
+          { text: 'Trucks', icon: <LocalShippingIcon />, path: '/admin/trucks' },
+          { text: 'Drivers', icon: <PersonIcon />, path: '/admin/drivers' },
+          { text: 'Personnels', icon: <GroupIcon />, path: '/admin/personnels' },
+          { text: 'Trailers', icon: <DirectionsCarIcon />, path: '/admin/trailers' },
+        ];
+      case 'operator':
+        return [
+          { text: 'Dashboard', icon: <HomeIcon />, path: '/operator' },
+          { text: 'Hesabım', icon: <AccountCircleIcon />, path: '/operator/hesabim' },
+          { text: 'Onaylanan Teklifler', icon: <CheckCircleIcon />, path: '/operator/onaylanan-teklifler' },
+          { text: 'Sefer Takip Ekranı', icon: <TimelineIcon />, path: '/operator/sefer-takip' },
+        ];
+      case 'sales':
+        return [
+          { text: 'Dashboard', icon: <HomeIcon />, path: '/sales' },
+          { text: 'Teklif Ver', icon: <AddIcon />, path: '/sales/teklif-ver' },
+          { text: 'Tekliflerim', icon: <ListAltIcon />, path: '/sales/tekliflerim' },
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const menuItems = getMenuItems();
 
   return (
     <Drawer
       variant="permanent"
+      className="side-navbar"
       sx={{
         width: drawerWidth,
         flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: drawerWidth,
-          boxSizing: 'border-box',
-          backgroundColor: '#1976d2',
-          color: 'white',
-        },
       }}
     >
       <Box sx={{ p: 3 }}>
-        <Typography variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
+        <Typography variant="h5" component="div" className="app-title">
           Logistics App
         </Typography>
+        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mt: 1 }}>
+          {userData.name}
+        </Typography>
+        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+          {userRole === 'admin' ? 'Admin' : userRole === 'operator' ? 'Operasyoncu' : 'Satışçı'}
+        </Typography>
       </Box>
-      <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
-      <List sx={{ pt: 2 }}>
-        {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton
-              component={Link}
-              to={item.path}
-              selected={location.pathname === item.path}
-              sx={{
-                mx: 2,
-                borderRadius: 2,
-                mb: 1,
-                '&.Mui-selected': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                  },
-                },
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                },
-              }}
-            >
-              <ListItemIcon sx={{ color: 'inherit', minWidth: 40 }}>
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText 
-                primary={item.text} 
-                sx={{ 
-                  '& .MuiListItemText-primary': {
-                    fontWeight: location.pathname === item.path ? 'bold' : 'normal',
-                  }
+      <Divider className="divider" />
+      <List sx={{ pt: 2, flexGrow: 1 }}>
+        {menuItems.map((item) => {
+          const isSelected = location.pathname === item.path;
+          return (
+            <ListItem key={item.text} disablePadding>
+              <ListItemButton
+                component={Link}
+                to={item.path}
+                selected={isSelected}
+                className={`nav-item ${isSelected ? 'selected' : ''}`}
+                sx={{
+                  mx: 2,
+                  borderRadius: 2,
+                  mb: 1,
                 }}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
+              >
+                <ListItemIcon className="nav-icon">
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText 
+                  primary={item.text} 
+                  className={`nav-text ${isSelected ? 'selected' : ''}`}
+                />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
       </List>
+      
+      {/* Logout button at bottom */}
+      <Box sx={{ p: 2 }}>
+        <Button
+          fullWidth
+          variant="outlined"
+          startIcon={<LogoutIcon />}
+          onClick={handleLogout}
+          sx={{
+            color: 'white',
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+            '&:hover': {
+              borderColor: 'white',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            },
+          }}
+        >
+          Çıkış Yap
+        </Button>
+      </Box>
     </Drawer>
   );
 };

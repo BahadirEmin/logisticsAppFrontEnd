@@ -1,14 +1,16 @@
 /* SideNavbar.css */
 .side-navbar {
-  width: 20%;
+  width:16%;
   flex-shrink: 0;
 }
 
 .side-navbar .MuiDrawer-paper {
-  width: 20%;
+  width: 16%;
   box-sizing: border-box;
   background-color: #1976d2;
   color: white;
+  margin: 16px;
+  height: 96vh;
 }
 
 .nav-item {

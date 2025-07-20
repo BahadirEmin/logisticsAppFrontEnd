@@ -17,12 +17,12 @@ const HomePage = () => {
         </Typography>
       </Box>
 
-      <Grid container spacing={4}>
-        <Grid item xs={12} sm={6} md={6}>
+      <Grid container spacing={3}>
+        <Grid item xs={3}>
           <Paper 
             elevation={3} 
             sx={{ 
-              p: 4, 
+              p: 3, 
               textAlign: 'center',
               cursor: 'pointer',
               transition: 'transform 0.2s',
@@ -32,22 +32,22 @@ const HomePage = () => {
               }
             }}
           >
-            <LocalShippingIcon sx={{ fontSize: 60, color: '#1976d2', mb: 2 }} />
-            <Typography variant="h5" component="h2" gutterBottom>
+            <LocalShippingIcon sx={{ fontSize: 50, color: '#1976d2', mb: 2 }} />
+            <Typography variant="h6" component="h2" gutterBottom>
               Trucks Management
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body2" color="text.secondary">
               View, add, edit, and manage your fleet of trucks. Track maintenance, 
               assign drivers, and monitor vehicle status.
             </Typography>
           </Paper>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={6}>
+        <Grid item xs={3}>
           <Paper 
             elevation={3} 
             sx={{ 
-              p: 4, 
+              p: 3, 
               textAlign: 'center',
               cursor: 'pointer',
               transition: 'transform 0.2s',
@@ -57,22 +57,22 @@ const HomePage = () => {
               }
             }}
           >
-            <PersonIcon sx={{ fontSize: 60, color: '#1976d2', mb: 2 }} />
-            <Typography variant="h5" component="h2" gutterBottom>
+            <PersonIcon sx={{ fontSize: 50, color: '#1976d2', mb: 2 }} />
+            <Typography variant="h6" component="h2" gutterBottom>
               Drivers Management
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body2" color="text.secondary">
               Manage driver information, licenses, schedules, and assignments. 
               Keep track of driver performance and availability.
             </Typography>
           </Paper>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={6}>
+        <Grid item xs={3}>
           <Paper 
             elevation={3} 
             sx={{ 
-              p: 4, 
+              p: 3, 
               textAlign: 'center',
               cursor: 'pointer',
               transition: 'transform 0.2s',
@@ -82,22 +82,22 @@ const HomePage = () => {
               }
             }}
           >
-            <GroupIcon sx={{ fontSize: 60, color: '#1976d2', mb: 2 }} />
-            <Typography variant="h5" component="h2" gutterBottom>
+            <GroupIcon sx={{ fontSize: 50, color: '#1976d2', mb: 2 }} />
+            <Typography variant="h6" component="h2" gutterBottom>
               Personnels Management
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body2" color="text.secondary">
               Manage all personnel information, roles, schedules, and assignments. 
               Keep track of employee performance and availability.
             </Typography>
           </Paper>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={6}>
+        <Grid item xs={3}>
           <Paper 
             elevation={3} 
             sx={{ 
-              p: 4, 
+              p: 3, 
               textAlign: 'center',
               cursor: 'pointer',
               transition: 'transform 0.2s',
@@ -107,11 +107,11 @@ const HomePage = () => {
               }
             }}
           >
-            <DirectionsCarIcon sx={{ fontSize: 60, color: '#1976d2', mb: 2 }} />
-            <Typography variant="h5" component="h2" gutterBottom>
+            <DirectionsCarIcon sx={{ fontSize: 50, color: '#1976d2', mb: 2 }} />
+            <Typography variant="h6" component="h2" gutterBottom>
               Trailers Management
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body2" color="text.secondary">
               View, add, edit, and manage your fleet of trailers. Track maintenance, 
               assign to trucks, and monitor trailer status.
             </Typography>
