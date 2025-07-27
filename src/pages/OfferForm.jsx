@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Paper,
@@ -17,10 +17,14 @@ import {
   FormControlLabel,
   Switch,
   Alert,
-  Divider
+  Divider,
+  CircularProgress
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { ArrowForward, ArrowBack } from '@mui/icons-material';
+import { customerAPI } from '../api/customers';
+import { ordersAPI } from '../api/orders';
+import { useAuth } from '../contexts/AuthContext';
 
 const steps = ['Rota ve Yük Bilgileri', 'Bilgileri Onayla', 'Teklif Gönder'];
 
@@ -64,11 +68,18 @@ const countries = [
 
 const OfferForm = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [activeStep, setActiveStep] = useState(0);
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
+    // Customer selection
+    customerId: '',
+    
     // Step 1: Route and Cargo Info
     fromAddress: {
-      country: '',
+      country: 'Türkiye',
       city: '',
       district: '',
       address: '',
@@ -78,7 +89,7 @@ const OfferForm = () => {
       email: ''
     },
     toAddress: {
-      country: '',
+      country: 'Türkiye',
       city: '',
       district: '',
       address: '',
@@ -108,6 +119,53 @@ const OfferForm = () => {
   });
 
   const [errors, setErrors] = useState({});
+
+  // Load customers on component mount
+  useEffect(() => {
+    loadCustomers();
+  }, []);
+
+  const loadCustomers = async () => {
+    try {
+      setLoading(true);
+      const customersData = await customerAPI.getAll();
+      setCustomers(customersData);
+    } catch (error) {
+      console.error('Error loading customers:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCustomerChange = (e) => {
+    const customerId = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      customerId
+    }));
+
+    // Auto-fill customer information if customer is selected
+    if (customerId) {
+      const selectedCustomer = customers.find(c => c.id === customerId);
+      if (selectedCustomer) {
+        setFormData(prev => ({
+          ...prev,
+          customerId,
+          customerName: selectedCustomer.name,
+          customerPhone: selectedCustomer.phoneNumber || '',
+          customerEmail: selectedCustomer.email || ''
+        }));
+      }
+    }
+
+    // Clear error when user selects
+    if (errors.customerId) {
+      setErrors(prev => ({
+        ...prev,
+        customerId: ''
+      }));
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value, checked } = e.target;
@@ -139,6 +197,11 @@ const OfferForm = () => {
 
   const validateStep1 = () => {
     const newErrors = {};
+    
+    // Validate customer selection
+    if (!formData.customerId) {
+      newErrors.customerId = 'Müşteri seçimi zorunludur';
+    }
     
     // Validate from address
     if (!formData.fromAddress.country.trim()) {
@@ -202,16 +265,35 @@ const OfferForm = () => {
 
   const handleSubmit = async () => {
     try {
-      // Mock API call
-      console.log('Teklif gönderiliyor:', formData);
+      setSubmitting(true);
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Prepare order data
+      const orderData = {
+        customerId: parseInt(formData.customerId),
+        departureCountry: formData.fromAddress.country,
+        departureCity: formData.fromAddress.city,
+        departureAddress: formData.fromAddress.address,
+        arrivalCountry: formData.toAddress.country,
+        arrivalCity: formData.toAddress.city,
+        arrivalAddress: formData.toAddress.address,
+        cargoWeightKg: parseFloat(formData.weight),
+        cargoType: formData.cargoType,
+        canTransfer: formData.transferable
+      };
+      
+      console.log('Order data being sent:', orderData);
+      
+      // Create order
+      const response = await ordersAPI.create(orderData);
+      console.log('Order created successfully:', response);
       
       // Success - redirect to offers list
       navigate('/sales/tekliflerim');
     } catch (error) {
       console.error('Teklif gönderme hatası:', error);
+      // You can add error handling here (show error message to user)
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -220,6 +302,87 @@ const OfferForm = () => {
       <Typography variant="h6" gutterBottom sx={{ mb: 4 }}>
         Rota ve Yük Bilgileri
       </Typography>
+      
+      {/* Customer Selection */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h6" gutterBottom sx={{ mb: 2, color: '#1976d2' }}>
+          Müşteri Seçimi
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={6}>
+            <FormControl fullWidth error={!!errors.customerId} size="small">
+              <InputLabel>Müşteri Seçin *</InputLabel>
+              <Select
+                name="customerId"
+                value={formData.customerId}
+                onChange={handleCustomerChange}
+                label="Müşteri Seçin *"
+                disabled={loading}
+              >
+                <MenuItem value="">
+                  <em>Müşteri seçiniz</em>
+                </MenuItem>
+                {customers.map((customer) => (
+                  <MenuItem key={customer.id} value={customer.id}>
+                    <Box>
+                      <Typography variant="body1">
+                        {customer.name}
+                      </Typography>
+                      {customer.taxNo && (
+                        <Typography variant="caption" color="text.secondary">
+                          Vergi No: {customer.taxNo}
+                        </Typography>
+                      )}
+                    </Box>
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors.customerId && (
+                <Typography variant="caption" color="error">
+                  {errors.customerId}
+                </Typography>
+              )}
+            </FormControl>
+          </Grid>
+          
+          {formData.customerId && (
+            <Grid item xs={12} md={6}>
+              <Box sx={{ p: 2, border: '1px solid #e0e0e0', borderRadius: 1, bgcolor: '#fafafa' }}>
+                <Typography variant="subtitle2" gutterBottom>
+                  Seçilen Müşteri Bilgileri:
+                </Typography>
+                {(() => {
+                  const selectedCustomer = customers.find(c => c.id === formData.customerId);
+                  return selectedCustomer ? (
+                    <Box>
+                      <Typography variant="body2">
+                        <strong>Ad:</strong> {selectedCustomer.name}
+                      </Typography>
+                      {selectedCustomer.contactName && (
+                        <Typography variant="body2">
+                          <strong>İletişim:</strong> {selectedCustomer.contactName}
+                        </Typography>
+                      )}
+                      {selectedCustomer.phoneNumber && (
+                        <Typography variant="body2">
+                          <strong>Telefon:</strong> {selectedCustomer.phoneNumber}
+                        </Typography>
+                      )}
+                      {selectedCustomer.address && (
+                        <Typography variant="body2">
+                          <strong>Adres:</strong> {selectedCustomer.address}
+                        </Typography>
+                      )}
+                    </Box>
+                  ) : null;
+                })()}
+              </Box>
+            </Grid>
+          )}
+        </Grid>
+      </Box>
+      
+      <Divider sx={{ my: 4 }} />
       
       {/* From Address */}
       <Box sx={{ mb: 4 }}>
@@ -603,6 +766,53 @@ const OfferForm = () => {
       
       <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom color="primary">
+          Müşteri Bilgileri
+        </Typography>
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          {(() => {
+            const selectedCustomer = customers.find(c => c.id === formData.customerId);
+            return selectedCustomer ? (
+              <>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="text.secondary">Müşteri Adı:</Typography>
+                  <Typography variant="body1">{selectedCustomer.name}</Typography>
+                </Grid>
+                {selectedCustomer.taxNo && (
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="text.secondary">Vergi No:</Typography>
+                    <Typography variant="body1">{selectedCustomer.taxNo}</Typography>
+                  </Grid>
+                )}
+                {selectedCustomer.contactName && (
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="text.secondary">İletişim Kişisi:</Typography>
+                    <Typography variant="body1">{selectedCustomer.contactName}</Typography>
+                  </Grid>
+                )}
+                {selectedCustomer.phoneNumber && (
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="text.secondary">Telefon:</Typography>
+                    <Typography variant="body1">{selectedCustomer.phoneNumber}</Typography>
+                  </Grid>
+                )}
+                {selectedCustomer.address && (
+                  <Grid item xs={12}>
+                    <Typography variant="body2" color="text.secondary">Adres:</Typography>
+                    <Typography variant="body1">{selectedCustomer.address}</Typography>
+                  </Grid>
+                )}
+              </>
+            ) : (
+              <Grid item xs={12}>
+                <Typography variant="body1" color="text.secondary">Müşteri seçilmedi</Typography>
+              </Grid>
+            );
+          })()}
+        </Grid>
+        
+        <Divider sx={{ my: 3 }} />
+        
+        <Typography variant="h6" gutterBottom color="primary">
           Alış Adresi (Nereden)
         </Typography>
         <Grid container spacing={2} sx={{ mb: 2 }}>
@@ -781,9 +991,10 @@ const OfferForm = () => {
               <Button
                 variant="contained"
                 onClick={handleSubmit}
-                endIcon={<ArrowForward />}
+                disabled={submitting}
+                endIcon={submitting ? <CircularProgress size={20} /> : <ArrowForward />}
               >
-                Teklifi Gönder
+                {submitting ? 'Gönderiliyor...' : 'Teklifi Gönder'}
               </Button>
             ) : (
               <Button

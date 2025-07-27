@@ -7,6 +7,7 @@ import OperatorDashboard from '../pages/OperatorDashboard';
 import SalesDashboard from '../pages/SalesDashboard';
 import OfferForm from '../pages/OfferForm';
 import CustomerList from '../pages/CustomerList';
+import OfferList from '../pages/OfferList';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 const AppRoutes = () => {
@@ -102,6 +103,13 @@ const AppRoutes = () => {
           <ProtectedRoute allowedRoles={['sales']}>
             <MainLayout>
               <CustomerList />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/sales/teklifler" element={
+          <ProtectedRoute allowedRoles={['sales']}>
+            <MainLayout>
+              <OfferList />
             </MainLayout>
           </ProtectedRoute>
         } />
