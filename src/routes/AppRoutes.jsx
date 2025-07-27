@@ -8,6 +8,7 @@ import SalesDashboard from '../pages/SalesDashboard';
 import OfferForm from '../pages/OfferForm';
 import CustomerList from '../pages/CustomerList';
 import OfferList from '../pages/OfferList';
+import FleetDashboard from '../pages/FleetDashboard';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 const AppRoutes = () => {
@@ -117,6 +118,43 @@ const AppRoutes = () => {
           <ProtectedRoute allowedRoles={['sales']}>
             <MainLayout>
               <div>Tekliflerim Page - Coming Soon</div>
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+
+        {/* Protected routes - Fleet */}
+        <Route path="/fleet" element={
+          <ProtectedRoute allowedRoles={['fleet']}>
+            <MainLayout>
+              <FleetDashboard />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/fleet/tirlar" element={
+          <ProtectedRoute allowedRoles={['fleet']}>
+            <MainLayout>
+              <div>Tırlar Page - Coming Soon</div>
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/fleet/suruculer" element={
+          <ProtectedRoute allowedRoles={['fleet']}>
+            <MainLayout>
+              <div>Sürücüler Page - Coming Soon</div>
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/fleet/romorklar" element={
+          <ProtectedRoute allowedRoles={['fleet']}>
+            <MainLayout>
+              <div>Römorklar Page - Coming Soon</div>
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/fleet/teklifler" element={
+          <ProtectedRoute allowedRoles={['fleet']}>
+            <MainLayout>
+              <OfferList />
             </MainLayout>
           </ProtectedRoute>
         } />

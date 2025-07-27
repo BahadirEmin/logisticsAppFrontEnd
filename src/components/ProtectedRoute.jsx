@@ -7,6 +7,14 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   const { isAuthenticated, loading, user } = useAuth();
   const location = useLocation();
 
+  console.log('ProtectedRoute Debug:', {
+    isAuthenticated,
+    loading,
+    userRole: user?.role,
+    allowedRoles,
+    currentPath: location.pathname
+  });
+
   // Show loading spinner while checking authentication
   if (loading) {
     return (
@@ -36,6 +44,8 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
         return <Navigate to="/operator" replace />;
       case 'sales':
         return <Navigate to="/sales" replace />;
+      case 'fleet':
+        return <Navigate to="/fleet" replace />;
       default:
         return <Navigate to="/login" replace />;
     }

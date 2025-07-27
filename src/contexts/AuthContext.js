@@ -79,6 +79,10 @@ export const AuthProvider = ({ children }) => {
           }
         : { username, role: "sales" };
 
+      console.log("Login response:", response);
+      console.log("Original role:", response.user?.role);
+      console.log("Normalized role:", normalizedUser.role);
+
       // Store token and user data
       setToken(response.token);
       setUser(normalizedUser);

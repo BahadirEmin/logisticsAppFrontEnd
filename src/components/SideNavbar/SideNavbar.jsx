@@ -74,6 +74,14 @@ const SideNavbar = () => {
           { text: 'Teklifler', icon: <AssignmentIcon />, path: '/sales/teklifler' },
           { text: 'Tekliflerim', icon: <ListAltIcon />, path: '/sales/tekliflerim' },
         ];
+      case 'fleet':
+        return [
+          { text: 'Dashboard', icon: <HomeIcon />, path: '/fleet' },
+          { text: 'Tırlar', icon: <LocalShippingIcon />, path: '/fleet/tirlar' },
+          { text: 'Sürücüler', icon: <PersonIcon />, path: '/fleet/suruculer' },
+          { text: 'Römorklar', icon: <DirectionsCarIcon />, path: '/fleet/romorklar' },
+          { text: 'Teklifler', icon: <AssignmentIcon />, path: '/fleet/teklifler' },
+        ];
       default:
         return [];
     }
@@ -98,7 +106,7 @@ const SideNavbar = () => {
           {user?.name || user?.username}
         </Typography>
         <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
-          {userRole === 'admin' ? 'Admin' : userRole === 'operator' ? 'Operasyoncu' : 'Satışçı'}
+          {userRole === 'admin' ? 'Admin' : userRole === 'operator' ? 'Operasyoncu' : userRole === 'fleet' ? 'Filocu' : 'Satışçı'}
         </Typography>
       </Box>
       <Divider className="divider" />
