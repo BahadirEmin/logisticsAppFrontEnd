@@ -23,6 +23,7 @@ import TimelineIcon from '@mui/icons-material/Timeline';
 import AddIcon from '@mui/icons-material/Add';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useAuth } from '../../contexts/AuthContext';
 import './SideNavbar.css';
 
 const drawerWidth = '20%';
@@ -30,15 +31,19 @@ const drawerWidth = '20%';
 const SideNavbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   
-  // Get user data from localStorage
-  const userData = JSON.parse(localStorage.getItem('user') || '{}');
-  const userRole = userData.role;
+  const userRole = user?.role;
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('isAuthenticated');
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Force navigation even if logout fails
+      navigate('/login');
+    }
   };
 
   // Define menu items based on user role
@@ -86,7 +91,7 @@ const SideNavbar = () => {
           Logistics App
         </Typography>
         <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mt: 1 }}>
-          {userData.name}
+          {user?.name || user?.username}
         </Typography>
         <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
           {userRole === 'admin' ? 'Admin' : userRole === 'operator' ? 'Operasyoncu' : 'Satışçı'}

@@ -6,7 +6,7 @@ import HomePage from '../pages/HomePage';
 import OperatorDashboard from '../pages/OperatorDashboard';
 import SalesDashboard from '../pages/SalesDashboard';
 import OfferForm from '../pages/OfferForm';
-import ProtectedRoute from './ProtectedRoute';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 const AppRoutes = () => {
   return (

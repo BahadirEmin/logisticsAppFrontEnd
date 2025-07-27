@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Paper,
@@ -8,10 +8,12 @@ import {
   Box,
   Alert,
   InputAdornment,
-  IconButton
+  IconButton,
+  CircularProgress
 } from '@mui/material';
 import { Visibility, VisibilityOff, Login as LoginIcon } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -19,9 +21,18 @@ const LoginPage = () => {
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login, loading, error, isAuthenticated } = useAuth();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = location.state?.from?.pathname || '/sales';
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, location]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -29,77 +40,44 @@ const LoginPage = () => {
       ...prev,
       [name]: value
     }));
-    setError(''); // Clear error when user types
+    
+    // Clear error when user types
+    if (formErrors[name]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    
+    // Validate form
+    const errors = {};
+    if (!formData.username.trim()) {
+      errors.username = 'Kullanıcı adı zorunludur';
+    }
+    if (!formData.password.trim()) {
+      errors.password = 'Şifre zorunludur';
+    }
+    
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
 
     try {
-      // Mock API call - simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Mock login logic based on username
-      let userRole = '';
-      let userData = {};
-
-      if (formData.username === 'admin' && formData.password === 'admin123') {
-        userRole = 'admin';
-        userData = {
-          id: 1,
-          username: 'admin',
-          name: 'Admin User',
-          role: 'admin',
-          email: 'admin@logistics.com'
-        };
-      } else if (formData.username === 'operator' && formData.password === 'operator123') {
-        userRole = 'operator';
-        userData = {
-          id: 2,
-          username: 'operator',
-          name: 'Operasyoncu User',
-          role: 'operator',
-          email: 'operator@logistics.com'
-        };
-      } else if (formData.username === 'sales' && formData.password === 'sales123') {
-        userRole = 'sales';
-        userData = {
-          id: 3,
-          username: 'sales',
-          name: 'Satışçı User',
-          role: 'sales',
-          email: 'sales@logistics.com'
-        };
-      } else {
-        throw new Error('Geçersiz kullanıcı adı veya şifre');
-      }
-
-      // Save to localStorage
-      localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('isAuthenticated', 'true');
-
-      // Navigate based on role
-      switch (userRole) {
-        case 'admin':
-          navigate('/admin');
-          break;
-        case 'operator':
-          navigate('/operator');
-          break;
-        case 'sales':
-          navigate('/sales');
-          break;
-        default:
-          navigate('/');
-      }
-
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      await login(formData.username, formData.password);
+      // Login successful - AuthContext will handle redirect
+    } catch (error) {
+      // Error is handled by AuthContext
+      console.error('Login error:', error);
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -152,6 +130,9 @@ const LoginPage = () => {
               autoFocus
               value={formData.username}
               onChange={handleInputChange}
+              error={!!formErrors.username}
+              helperText={formErrors.username}
+              disabled={loading}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
@@ -173,6 +154,9 @@ const LoginPage = () => {
                 '& .MuiInputBase-input': {
                   color: 'white',
                 },
+                '& .MuiFormHelperText-root': {
+                  color: 'rgba(255, 255, 255, 0.8)',
+                },
               }}
             />
             <TextField
@@ -186,13 +170,17 @@ const LoginPage = () => {
               autoComplete="current-password"
               value={formData.password}
               onChange={handleInputChange}
+              error={!!formErrors.password}
+              helperText={formErrors.password}
+              disabled={loading}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
                       aria-label="toggle password visibility"
-                      onClick={() => setShowPassword(!showPassword)}
+                      onClick={togglePasswordVisibility}
                       edge="end"
+                      disabled={loading}
                       sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
@@ -221,6 +209,9 @@ const LoginPage = () => {
                 '& .MuiInputBase-input': {
                   color: 'white',
                 },
+                '& .MuiFormHelperText-root': {
+                  color: 'rgba(255, 255, 255, 0.8)',
+                },
               }}
             />
             <Button
@@ -240,6 +231,7 @@ const LoginPage = () => {
                 },
               }}
               disabled={loading}
+              startIcon={loading ? <CircularProgress size={20} /> : <LoginIcon />}
             >
               {loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
             </Button>
@@ -247,16 +239,10 @@ const LoginPage = () => {
 
           <Box sx={{ mt: 3, textAlign: 'center' }}>
             <Typography variant="body2" sx={{ opacity: 0.8 }}>
-              Test Kullanıcıları:
+              Test Kullanıcısı:
             </Typography>
             <Typography variant="body2" sx={{ opacity: 0.7, fontSize: '0.8rem' }}>
-              Admin: admin / admin123
-            </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.7, fontSize: '0.8rem' }}>
-              Operasyoncu: operator / operator123
-            </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.7, fontSize: '0.8rem' }}>
-              Satışçı: sales / sales123
+              sales / sales123
             </Typography>
           </Box>
         </Paper>
