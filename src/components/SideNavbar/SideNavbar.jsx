@@ -22,6 +22,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import AddIcon from '@mui/icons-material/Add';
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import PeopleIcon from '@mui/icons-material/People';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuth } from '../../contexts/AuthContext';
 import './SideNavbar.css';
@@ -67,6 +68,7 @@ const SideNavbar = () => {
       case 'sales':
         return [
           { text: 'Dashboard', icon: <HomeIcon />, path: '/sales' },
+          { text: 'Müşteriler', icon: <PeopleIcon />, path: '/sales/musteriler' },
           { text: 'Teklif Ver', icon: <AddIcon />, path: '/sales/teklif-ver' },
           { text: 'Tekliflerim', icon: <ListAltIcon />, path: '/sales/tekliflerim' },
         ];

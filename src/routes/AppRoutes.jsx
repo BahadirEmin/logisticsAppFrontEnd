@@ -6,6 +6,7 @@ import HomePage from '../pages/HomePage';
 import OperatorDashboard from '../pages/OperatorDashboard';
 import SalesDashboard from '../pages/SalesDashboard';
 import OfferForm from '../pages/OfferForm';
+import CustomerList from '../pages/CustomerList';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 const AppRoutes = () => {
@@ -94,6 +95,13 @@ const AppRoutes = () => {
           <ProtectedRoute allowedRoles={['sales']}>
             <MainLayout>
               <OfferForm />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/sales/musteriler" element={
+          <ProtectedRoute allowedRoles={['sales']}>
+            <MainLayout>
+              <CustomerList />
             </MainLayout>
           </ProtectedRoute>
         } />
