@@ -22,7 +22,10 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import AddIcon from '@mui/icons-material/Add';
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import PeopleIcon from '@mui/icons-material/People';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useAuth } from '../../contexts/AuthContext';
 import './SideNavbar.css';
 
 const drawerWidth = '20%';
@@ -30,15 +33,19 @@ const drawerWidth = '20%';
 const SideNavbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   
-  // Get user data from localStorage
-  const userData = JSON.parse(localStorage.getItem('user') || '{}');
-  const userRole = userData.role;
+  const userRole = user?.role;
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('isAuthenticated');
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Force navigation even if logout fails
+      navigate('/login');
+    }
   };
 
   // Define menu items based on user role
@@ -62,8 +69,18 @@ const SideNavbar = () => {
       case 'sales':
         return [
           { text: 'Dashboard', icon: <HomeIcon />, path: '/sales' },
+          { text: 'Müşteriler', icon: <PeopleIcon />, path: '/sales/musteriler' },
           { text: 'Teklif Ver', icon: <AddIcon />, path: '/sales/teklif-ver' },
+          { text: 'Teklifler', icon: <AssignmentIcon />, path: '/sales/teklifler' },
           { text: 'Tekliflerim', icon: <ListAltIcon />, path: '/sales/tekliflerim' },
+        ];
+      case 'fleet':
+        return [
+          { text: 'Dashboard', icon: <HomeIcon />, path: '/fleet' },
+          { text: 'Tırlar', icon: <LocalShippingIcon />, path: '/fleet/tirlar' },
+          { text: 'Sürücüler', icon: <PersonIcon />, path: '/fleet/suruculer' },
+          { text: 'Römorklar', icon: <DirectionsCarIcon />, path: '/fleet/romorklar' },
+          { text: 'Teklifler', icon: <AssignmentIcon />, path: '/fleet/teklifler' },
         ];
       default:
         return [];
@@ -86,10 +103,10 @@ const SideNavbar = () => {
           Logistics App
         </Typography>
         <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mt: 1 }}>
-          {userData.name}
+          {user?.name || user?.username}
         </Typography>
         <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
-          {userRole === 'admin' ? 'Admin' : userRole === 'operator' ? 'Operasyoncu' : 'Satışçı'}
+          {userRole === 'admin' ? 'Admin' : userRole === 'operator' ? 'Operasyoncu' : userRole === 'fleet' ? 'Filocu' : 'Satışçı'}
         </Typography>
       </Box>
       <Divider className="divider" />

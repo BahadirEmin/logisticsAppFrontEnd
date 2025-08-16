@@ -6,7 +6,10 @@ import HomePage from '../pages/HomePage';
 import OperatorDashboard from '../pages/OperatorDashboard';
 import SalesDashboard from '../pages/SalesDashboard';
 import OfferForm from '../pages/OfferForm';
-import ProtectedRoute from './ProtectedRoute';
+import CustomerList from '../pages/CustomerList';
+import OfferList from '../pages/OfferList';
+import FleetDashboard from '../pages/FleetDashboard';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 const AppRoutes = () => {
   return (
@@ -97,10 +100,61 @@ const AppRoutes = () => {
             </MainLayout>
           </ProtectedRoute>
         } />
+        <Route path="/sales/musteriler" element={
+          <ProtectedRoute allowedRoles={['sales']}>
+            <MainLayout>
+              <CustomerList />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/sales/teklifler" element={
+          <ProtectedRoute allowedRoles={['sales']}>
+            <MainLayout>
+              <OfferList />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
         <Route path="/sales/tekliflerim" element={
           <ProtectedRoute allowedRoles={['sales']}>
             <MainLayout>
               <div>Tekliflerim Page - Coming Soon</div>
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+
+        {/* Protected routes - Fleet */}
+        <Route path="/fleet" element={
+          <ProtectedRoute allowedRoles={['fleet']}>
+            <MainLayout>
+              <FleetDashboard />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/fleet/tirlar" element={
+          <ProtectedRoute allowedRoles={['fleet']}>
+            <MainLayout>
+              <div>Tırlar Page - Coming Soon</div>
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/fleet/suruculer" element={
+          <ProtectedRoute allowedRoles={['fleet']}>
+            <MainLayout>
+              <div>Sürücüler Page - Coming Soon</div>
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/fleet/romorklar" element={
+          <ProtectedRoute allowedRoles={['fleet']}>
+            <MainLayout>
+              <div>Römorklar Page - Coming Soon</div>
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/fleet/teklifler" element={
+          <ProtectedRoute allowedRoles={['fleet']}>
+            <MainLayout>
+              <OfferList />
             </MainLayout>
           </ProtectedRoute>
         } />
