@@ -51,4 +51,62 @@ export const ordersAPI = {
       throw error;
     }
   },
+
+  // Assign order to operation person
+  assignToOperation: async (orderId, operationPersonId) => {
+    try {
+      const response = await api.post(
+        `/v1/orders/${orderId}/assign-operation?operationPersonId=${operationPersonId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Assign order to fleet person
+  assignToFleet: async (orderId, fleetPersonId) => {
+    try {
+      const response = await api.post(
+        `/v1/orders/${orderId}/assign-fleet?fleetPersonId=${fleetPersonId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Get orders by sales person ID
+  getBySalesPersonId: async (salesPersonId) => {
+    try {
+      const response = await api.get(
+        `/v1/orders/sales-person/${salesPersonId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Get orders by fleet person ID
+  getByFleetPersonId: async (fleetPersonId) => {
+    try {
+      const response = await api.get(
+        `/v1/orders/fleet-person/${fleetPersonId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Get orders by trip status
+  getByTripStatus: async (tripStatus) => {
+    try {
+      const response = await api.get(`/v1/orders/status/${tripStatus}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };

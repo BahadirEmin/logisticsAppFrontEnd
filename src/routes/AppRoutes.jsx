@@ -4,6 +4,11 @@ import MainLayout from '../layouts/MainLayout';
 import LoginPage from '../pages/LoginPage';
 import HomePage from '../pages/HomePage';
 import OperatorDashboard from '../pages/OperatorDashboard';
+import OperatorProfile from '../pages/OperatorProfile';
+import ApprovedOffers from '../pages/ApprovedOffers';
+import TripTracking from '../pages/TripTracking';
+import OperatorMyOffers from '../pages/OperatorMyOffers';
+import FleetMyOffers from '../pages/FleetMyOffers';
 import SalesDashboard from '../pages/SalesDashboard';
 import OfferForm from '../pages/OfferForm';
 import CustomerList from '../pages/CustomerList';
@@ -57,30 +62,37 @@ const AppRoutes = () => {
 
         {/* Protected routes - Operator */}
         <Route path="/operator" element={
-          <ProtectedRoute allowedRoles={['operator']}>
+          <ProtectedRoute allowedRoles={['operator', 'operation']}>
             <MainLayout>
               <OperatorDashboard />
             </MainLayout>
           </ProtectedRoute>
         } />
         <Route path="/operator/hesabim" element={
-          <ProtectedRoute allowedRoles={['operator']}>
+          <ProtectedRoute allowedRoles={['operator', 'operation']}>
             <MainLayout>
-              <div>Hesabım Page - Coming Soon</div>
+              <OperatorProfile />
             </MainLayout>
           </ProtectedRoute>
         } />
         <Route path="/operator/onaylanan-teklifler" element={
-          <ProtectedRoute allowedRoles={['operator']}>
+          <ProtectedRoute allowedRoles={['operator', 'operation']}>
             <MainLayout>
-              <div>Onaylanan Teklifler Page - Coming Soon</div>
+              <ApprovedOffers />
             </MainLayout>
           </ProtectedRoute>
         } />
         <Route path="/operator/sefer-takip" element={
-          <ProtectedRoute allowedRoles={['operator']}>
+          <ProtectedRoute allowedRoles={['operator', 'operation']}>
             <MainLayout>
-              <div>Sefer Takip Ekranı - Coming Soon</div>
+              <TripTracking />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/operator/tekliflerim" element={
+          <ProtectedRoute allowedRoles={['operator', 'operation']}>
+            <MainLayout>
+              <OperatorMyOffers />
             </MainLayout>
           </ProtectedRoute>
         } />
@@ -155,6 +167,13 @@ const AppRoutes = () => {
           <ProtectedRoute allowedRoles={['fleet']}>
             <MainLayout>
               <OfferList />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/fleet/tekliflerim" element={
+          <ProtectedRoute allowedRoles={['fleet']}>
+            <MainLayout>
+              <FleetMyOffers />
             </MainLayout>
           </ProtectedRoute>
         } />

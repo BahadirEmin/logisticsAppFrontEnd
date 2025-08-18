@@ -60,9 +60,11 @@ const SideNavbar = () => {
           { text: 'Trailers', icon: <DirectionsCarIcon />, path: '/admin/trailers' },
         ];
       case 'operator':
+      case 'operation':
         return [
           { text: 'Dashboard', icon: <HomeIcon />, path: '/operator' },
           { text: 'Hesabım', icon: <AccountCircleIcon />, path: '/operator/hesabim' },
+          { text: 'Tekliflerim', icon: <ListAltIcon />, path: '/operator/tekliflerim' },
           { text: 'Onaylanan Teklifler', icon: <CheckCircleIcon />, path: '/operator/onaylanan-teklifler' },
           { text: 'Sefer Takip Ekranı', icon: <TimelineIcon />, path: '/operator/sefer-takip' },
         ];
@@ -77,6 +79,7 @@ const SideNavbar = () => {
       case 'fleet':
         return [
           { text: 'Dashboard', icon: <HomeIcon />, path: '/fleet' },
+          { text: 'Tekliflerim', icon: <ListAltIcon />, path: '/fleet/tekliflerim' },
           { text: 'Tırlar', icon: <LocalShippingIcon />, path: '/fleet/tirlar' },
           { text: 'Sürücüler', icon: <PersonIcon />, path: '/fleet/suruculer' },
           { text: 'Römorklar', icon: <DirectionsCarIcon />, path: '/fleet/romorklar' },
@@ -106,7 +109,7 @@ const SideNavbar = () => {
           {user?.name || user?.username}
         </Typography>
         <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
-          {userRole === 'admin' ? 'Admin' : userRole === 'operator' ? 'Operasyoncu' : userRole === 'fleet' ? 'Filocu' : 'Satışçı'}
+          {userRole === 'admin' ? 'Admin' : userRole === 'operator' || userRole === 'operation' ? 'Operasyoncu' : userRole === 'fleet' ? 'Filocu' : 'Satışçı'}
         </Typography>
       </Box>
       <Divider className="divider" />

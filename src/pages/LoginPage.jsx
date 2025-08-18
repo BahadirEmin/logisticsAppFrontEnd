@@ -24,15 +24,58 @@ const LoginPage = () => {
   const [formErrors, setFormErrors] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, loading, error, isAuthenticated } = useAuth();
+  const { login, loading, error, isAuthenticated, user } = useAuth();
 
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      const from = location.state?.from?.pathname || '/sales';
-      navigate(from, { replace: true });
+      const from = location.state?.from?.pathname;
+      
+      console.log('LoginPage - User object:', user);
+      console.log('LoginPage - User role:', user?.role);
+      console.log('LoginPage - User role type:', typeof user?.role);
+      
+      // If there's a specific redirect path, use it
+      if (from) {
+        console.log('LoginPage - Redirecting to specific path:', from);
+        navigate(from, { replace: true });
+      } else {
+        // Otherwise, redirect based on user role
+        let defaultPath = '/sales'; // fallback
+        
+        if (user?.role) {
+          console.log('LoginPage - Processing role:', user.role);
+          switch (user.role) {
+            case 'operator':
+            case 'operation':
+              defaultPath = '/operator';
+              console.log('LoginPage - Role is operator/operation, redirecting to:', defaultPath);
+              break;
+            case 'sales':
+              defaultPath = '/sales';
+              console.log('LoginPage - Role is sales, redirecting to:', defaultPath);
+              break;
+            case 'fleet':
+              defaultPath = '/fleet';
+              console.log('LoginPage - Role is fleet, redirecting to:', defaultPath);
+              break;
+            case 'admin':
+              defaultPath = '/admin';
+              console.log('LoginPage - Role is admin, redirecting to:', defaultPath);
+              break;
+            default:
+              defaultPath = '/sales';
+              console.log('LoginPage - Role not matched, using default path:', defaultPath);
+          }
+        } else {
+          console.log('LoginPage - No user role found, using default path:', defaultPath);
+        }
+        
+        console.log('LoginPage - Final redirect path:', defaultPath);
+        navigate(defaultPath, { replace: true });
+      }
     }
-  }, [isAuthenticated, navigate, location]);
+  }, [isAuthenticated, navigate, location, user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -68,7 +111,9 @@ const LoginPage = () => {
     }
 
     try {
-      await login(formData.username, formData.password);
+      console.log('LoginPage - Attempting login with:', formData.username);
+      const response = await login(formData.username, formData.password);
+      console.log('LoginPage - Login response:', response);
       // Login successful - AuthContext will handle redirect
     } catch (error) {
       // Error is handled by AuthContext
