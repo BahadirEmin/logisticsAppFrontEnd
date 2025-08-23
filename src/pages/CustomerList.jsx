@@ -36,7 +36,6 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Search as SearchIcon,
-  Visibility as ViewIcon,
   Warning as WarningIcon,
   Gavel as LawsuitIcon
 } from '@mui/icons-material';
@@ -71,6 +70,7 @@ const CustomerList = () => {
   });
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false); // kayıt/güncelleme durumu
+  const [deletingInline, setDeletingInline] = useState(false); // edit dialog içinden silme
 
   // Load customers and risk statuses
   useEffect(() => {
@@ -228,6 +228,24 @@ const CustomerList = () => {
     } catch (error) {
       setError('Müşteri silinirken hata oluştu');
       console.error('Delete customer error:', error);
+    }
+  };
+
+  // Inline delete confirmation
+  const confirmDeleteInline = async () => {
+    if (!editingCustomer) return;
+    try {
+      setDeletingInline(true);
+      await customerAPI.delete(editingCustomer.id);
+      setDialogOpen(false);
+      setEditingCustomer(null);
+      await loadData();
+    } catch (error) {
+      console.error('Inline delete error:', error);
+      const backendMessage = error?.response?.data?.message || error?.response?.data?.error || 'Müşteri silinirken hata oluştu';
+      setError(backendMessage);
+    } finally {
+      setDeletingInline(false);
     }
   };
 
@@ -579,8 +597,18 @@ const CustomerList = () => {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDialogOpen(false)} disabled={saving}>İptal</Button>
-            <Button onClick={handleSubmit} variant="contained" disabled={saving}>
+            {editingCustomer && (
+              <Button
+                onClick={confirmDeleteInline}
+                color="error"
+                disabled={saving || deletingInline}
+                sx={{ mr: 'auto' }}
+              >
+                {deletingInline ? 'Siliniyor...' : 'Sil'}
+              </Button>
+            )}
+            <Button onClick={() => setDialogOpen(false)} disabled={saving || deletingInline}>İptal</Button>
+            <Button onClick={handleSubmit} variant="contained" disabled={saving || deletingInline}>
               {saving ? (editingCustomer ? 'Güncelleniyor...' : 'Kaydediliyor...') : (editingCustomer ? 'Güncelle' : 'Kaydet')}
             </Button>
           </DialogActions>
