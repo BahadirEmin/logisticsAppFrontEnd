@@ -70,6 +70,7 @@ const CustomerList = () => {
     creditLimit: ''
   });
   const [formErrors, setFormErrors] = useState({});
+  const [saving, setSaving] = useState(false); // kayıt/güncelleme durumu
 
   // Load customers and risk statuses
   useEffect(() => {
@@ -184,22 +185,31 @@ const CustomerList = () => {
     }
 
     try {
+      setSaving(true);
       const customerData = {
         ...formData,
-        creditLimit: formData.creditLimit ? parseFloat(formData.creditLimit) : null
+        riskStatusId: formData.riskStatusId ? Number(formData.riskStatusId) : null,
+        creditLimit: formData.creditLimit !== '' ? Number(formData.creditLimit) : null,
       };
+
+      //console.log('[CustomerList] submitting', editingCustomer ? 'UPDATE' : 'CREATE', customerData);
 
       if (editingCustomer) {
         await customerAPI.update(editingCustomer.id, customerData);
+        //console.log('[CustomerList] Update request sent to /v1/customers/' + editingCustomer.id);
       } else {
         await customerAPI.create(customerData);
+        //console.log('[CustomerList] Create request sent to /v1/customers');
       }
 
       setDialogOpen(false);
-      loadData(); // Reload data
+      await loadData(); // Reload data
     } catch (error) {
-      setError('Müşteri kaydedilirken hata oluştu');
       console.error('Save customer error:', error);
+      const backendMessage = error?.response?.data?.message || error?.response?.data?.error || 'Müşteri kaydedilirken hata oluştu';
+      setError(backendMessage);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -569,9 +579,9 @@ const CustomerList = () => {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDialogOpen(false)}>İptal</Button>
-            <Button onClick={handleSubmit} variant="contained">
-              {editingCustomer ? 'Güncelle' : 'Kaydet'}
+            <Button onClick={() => setDialogOpen(false)} disabled={saving}>İptal</Button>
+            <Button onClick={handleSubmit} variant="contained" disabled={saving}>
+              {saving ? (editingCustomer ? 'Güncelleniyor...' : 'Kaydediliyor...') : (editingCustomer ? 'Güncelle' : 'Kaydet')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -597,4 +607,4 @@ const CustomerList = () => {
   );
 };
 
-export default CustomerList; 
+export default CustomerList;
