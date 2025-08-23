@@ -15,6 +15,7 @@ import CustomerList from '../pages/CustomerList';
 import OfferList from '../pages/OfferList';
 import FleetDashboard from '../pages/FleetDashboard';
 import ProtectedRoute from '../components/ProtectedRoute';
+import SalesMyOffers from '../pages/SalesMyOffers';
 
 const AppRoutes = () => {
   return (
@@ -129,7 +130,7 @@ const AppRoutes = () => {
         <Route path="/sales/tekliflerim" element={
           <ProtectedRoute allowedRoles={['sales']}>
             <MainLayout>
-              <div>Tekliflerim Page - Coming Soon</div>
+              <SalesMyOffers />
             </MainLayout>
           </ProtectedRoute>
         } />
@@ -186,4 +187,4 @@ const AppRoutes = () => {
   );
 };
 
-export default AppRoutes; 
+export default AppRoutes;

@@ -1012,4 +1012,4 @@ const OfferForm = () => {
   );
 };
 
-export default OfferForm; 
+export default OfferForm;
