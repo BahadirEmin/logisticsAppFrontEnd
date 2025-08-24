@@ -14,6 +14,8 @@ import OfferForm from '../pages/OfferForm';
 import CustomerList from '../pages/CustomerList';
 import OfferList from '../pages/OfferList';
 import FleetDashboard from '../pages/FleetDashboard';
+import VehicleList from '../pages/VehicleList';
+import TrailerList from '../pages/TrailerList';
 import ProtectedRoute from '../components/ProtectedRoute';
 import SalesMyOffers from '../pages/SalesMyOffers';
 
@@ -35,7 +37,7 @@ const AppRoutes = () => {
         <Route path="/admin/trucks" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <MainLayout>
-              <div>Trucks Page - Coming Soon</div>
+              <VehicleList />
             </MainLayout>
           </ProtectedRoute>
         } />
@@ -56,7 +58,7 @@ const AppRoutes = () => {
         <Route path="/admin/trailers" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <MainLayout>
-              <div>Trailers Page - Coming Soon</div>
+              <TrailerList />
             </MainLayout>
           </ProtectedRoute>
         } />
@@ -146,7 +148,7 @@ const AppRoutes = () => {
         <Route path="/fleet/tirlar" element={
           <ProtectedRoute allowedRoles={['fleet']}>
             <MainLayout>
-              <div>Tırlar Page - Coming Soon</div>
+              <VehicleList />
             </MainLayout>
           </ProtectedRoute>
         } />
@@ -160,7 +162,7 @@ const AppRoutes = () => {
         <Route path="/fleet/romorklar" element={
           <ProtectedRoute allowedRoles={['fleet']}>
             <MainLayout>
-              <div>Römorklar Page - Coming Soon</div>
+              <TrailerList />
             </MainLayout>
           </ProtectedRoute>
         } />
