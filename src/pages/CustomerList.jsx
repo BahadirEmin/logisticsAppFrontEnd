@@ -36,7 +36,6 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Search as SearchIcon,
-  Visibility as ViewIcon,
   Warning as WarningIcon,
   Gavel as LawsuitIcon
 } from '@mui/icons-material';
@@ -70,6 +69,8 @@ const CustomerList = () => {
     creditLimit: ''
   });
   const [formErrors, setFormErrors] = useState({});
+  const [saving, setSaving] = useState(false); // kayıt/güncelleme durumu
+  const [deletingInline, setDeletingInline] = useState(false); // edit dialog içinden silme
 
   // Load customers and risk statuses
   useEffect(() => {
@@ -184,22 +185,31 @@ const CustomerList = () => {
     }
 
     try {
+      setSaving(true);
       const customerData = {
         ...formData,
-        creditLimit: formData.creditLimit ? parseFloat(formData.creditLimit) : null
+        riskStatusId: formData.riskStatusId ? Number(formData.riskStatusId) : null,
+        creditLimit: formData.creditLimit !== '' ? Number(formData.creditLimit) : null,
       };
+
+      //console.log('[CustomerList] submitting', editingCustomer ? 'UPDATE' : 'CREATE', customerData);
 
       if (editingCustomer) {
         await customerAPI.update(editingCustomer.id, customerData);
+        //console.log('[CustomerList] Update request sent to /v1/customers/' + editingCustomer.id);
       } else {
         await customerAPI.create(customerData);
+        //console.log('[CustomerList] Create request sent to /v1/customers');
       }
 
       setDialogOpen(false);
-      loadData(); // Reload data
+      await loadData(); // Reload data
     } catch (error) {
-      setError('Müşteri kaydedilirken hata oluştu');
       console.error('Save customer error:', error);
+      const backendMessage = error?.response?.data?.message || error?.response?.data?.error || 'Müşteri kaydedilirken hata oluştu';
+      setError(backendMessage);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -218,6 +228,24 @@ const CustomerList = () => {
     } catch (error) {
       setError('Müşteri silinirken hata oluştu');
       console.error('Delete customer error:', error);
+    }
+  };
+
+  // Inline delete confirmation
+  const confirmDeleteInline = async () => {
+    if (!editingCustomer) return;
+    try {
+      setDeletingInline(true);
+      await customerAPI.delete(editingCustomer.id);
+      setDialogOpen(false);
+      setEditingCustomer(null);
+      await loadData();
+    } catch (error) {
+      console.error('Inline delete error:', error);
+      const backendMessage = error?.response?.data?.message || error?.response?.data?.error || 'Müşteri silinirken hata oluştu';
+      setError(backendMessage);
+    } finally {
+      setDeletingInline(false);
     }
   };
 
@@ -569,9 +597,19 @@ const CustomerList = () => {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDialogOpen(false)}>İptal</Button>
-            <Button onClick={handleSubmit} variant="contained">
-              {editingCustomer ? 'Güncelle' : 'Kaydet'}
+            {editingCustomer && (
+              <Button
+                onClick={confirmDeleteInline}
+                color="error"
+                disabled={saving || deletingInline}
+                sx={{ mr: 'auto' }}
+              >
+                {deletingInline ? 'Siliniyor...' : 'Sil'}
+              </Button>
+            )}
+            <Button onClick={() => setDialogOpen(false)} disabled={saving || deletingInline}>İptal</Button>
+            <Button onClick={handleSubmit} variant="contained" disabled={saving || deletingInline}>
+              {saving ? (editingCustomer ? 'Güncelleniyor...' : 'Kaydediliyor...') : (editingCustomer ? 'Güncelle' : 'Kaydet')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -597,4 +635,4 @@ const CustomerList = () => {
   );
 };
 
-export default CustomerList; 
+export default CustomerList;
