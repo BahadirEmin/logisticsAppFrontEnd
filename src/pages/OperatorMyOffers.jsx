@@ -78,7 +78,7 @@ const OperatorMyOffers = () => {
       // Get orders based on user role
       if (user?.role === 'operator' || user?.role === 'operation') {
         // For operators, get orders assigned to them
-        data = await ordersAPI.getBySalesPersonId(user.id);
+        data = await ordersAPI.getByOperationPersonId(user.id);
       } else if (user?.role === 'fleet') {
         // For fleet users, get orders assigned to them
         data = await ordersAPI.getByFleetPersonId(user.id);

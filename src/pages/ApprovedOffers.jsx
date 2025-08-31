@@ -32,6 +32,7 @@ import {
   Visibility
 } from '@mui/icons-material';
 import { ordersAPI } from '../api/orders';
+import { usersAPI } from '../api/users';
 import { useAuth } from '../contexts/AuthContext';
 
 const ApprovedOffers = () => {
@@ -40,6 +41,7 @@ const ApprovedOffers = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [error, setError] = useState(null);
+  const [assigningOrderId, setAssigningOrderId] = useState(null);
   const { user } = useAuth();
 
   // Status options for filtering
@@ -132,18 +134,69 @@ const ApprovedOffers = () => {
 
   const handleAssignToMe = async (offerId) => {
     try {
+      setAssigningOrderId(offerId);
+      
+      if (!user?.id) {
+        alert('Kullanıcı bilgisi bulunamadı. Lütfen tekrar giriş yapın.');
+        return;
+      }
+
+      // Debug logging
+      console.log('Assigning order:', {
+        orderId: offerId,
+        userId: user.id,
+        userRole: user.role,
+        userData: user
+      });
+
+      // Validate that user exists in users table before assignment
+      try {
+        await usersAPI.validateUser(user.id);
+        console.log('User validation successful for user ID:', user.id);
+      } catch (validationError) {
+        console.error('User validation failed:', validationError);
+        alert('Kullanıcı ID\'niz users tablosunda bulunamadı. Lütfen sistem yöneticisi ile iletişime geçin.');
+        return;
+      }
+
       if (user?.role === 'operator' || user?.role === 'operation') {
+        console.log('Calling assignToOperation with:', { orderId: offerId, operationPersonId: user.id });
         await ordersAPI.assignToOperation(offerId, user.id);
         alert('Teklif başarıyla size atandı!');
       } else if (user?.role === 'fleet') {
+        console.log('Calling assignToFleet with:', { orderId: offerId, fleetPersonId: user.id });
         await ordersAPI.assignToFleet(offerId, user.id);
         alert('Teklif başarıyla size atandı!');
+      } else {
+        alert('Bu işlem için yetkiniz bulunmamaktadır.');
+        return;
       }
+      
       // Reload the offers list
       await loadApprovedOffers();
     } catch (error) {
       console.error('Teklif atama hatası:', error);
-      alert('Teklif atanırken bir hata oluştu.');
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      let errorMessage = 'Teklif atanırken bir hata oluştu.';
+      
+      if (error.response?.data?.error) {
+        if (error.response.data.error.includes('foreign key constraint')) {
+          errorMessage = 'Kullanıcı ID\'niz personel tablosunda bulunamadı. Lütfen sistem yöneticisi ile iletişime geçin.';
+        } else {
+          errorMessage = error.response.data.error;
+        }
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      
+      alert(errorMessage);
+    } finally {
+      setAssigningOrderId(null);
     }
   };
 
@@ -152,6 +205,13 @@ const ApprovedOffers = () => {
       <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#1976d2', mb: 4 }}>
         Onaylanan Teklifler
       </Typography>
+      
+      {/* Debug info - remove in production */}
+      {user && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          <strong>Debug Info:</strong> User ID: {user.id}, Role: {user.role}, Name: {user.firstName} {user.lastName}
+        </Alert>
+      )}
 
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -314,12 +374,13 @@ const ApprovedOffers = () => {
                       {(user?.role === 'operator' || user?.role === 'operation' || user?.role === 'fleet') && (
                         <Button
                           size="small"
-                          startIcon={<Assignment />}
+                          startIcon={assigningOrderId === offer.id ? <CircularProgress size={16} /> : <Assignment />}
                           variant="contained"
                           color="primary"
                           onClick={() => handleAssignToMe(offer.id)}
+                          disabled={assigningOrderId === offer.id}
                         >
-                          Üzerine Al
+                          {assigningOrderId === offer.id ? 'Atanıyor...' : 'Üzerine Al'}
                         </Button>
                       )}
                     </Box>
