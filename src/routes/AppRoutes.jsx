@@ -16,6 +16,7 @@ import OfferList from '../pages/OfferList';
 import FleetDashboard from '../pages/FleetDashboard';
 import VehicleList from '../pages/VehicleList';
 import TrailerList from '../pages/TrailerList';
+import DriverList from '../pages/DriverList';
 import ProtectedRoute from '../components/ProtectedRoute';
 import SalesMyOffers from '../pages/SalesMyOffers';
 import OrderDetail from '../pages/OrderDetail';
@@ -46,7 +47,7 @@ const AppRoutes = () => {
         <Route path="/admin/drivers" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <MainLayout>
-              <div>Drivers Page - Coming Soon</div>
+              <DriverList />
             </MainLayout>
           </ProtectedRoute>
         } />
@@ -171,7 +172,7 @@ const AppRoutes = () => {
         <Route path="/fleet/suruculer" element={
           <ProtectedRoute allowedRoles={['fleet']}>
             <MainLayout>
-              <div>Sürücüler Page - Coming Soon</div>
+              <DriverList />
             </MainLayout>
           </ProtectedRoute>
         } />
