@@ -18,6 +18,8 @@ import VehicleList from '../pages/VehicleList';
 import TrailerList from '../pages/TrailerList';
 import ProtectedRoute from '../components/ProtectedRoute';
 import SalesMyOffers from '../pages/SalesMyOffers';
+import OrderDetail from '../pages/OrderDetail';
+import OrderEdit from '../pages/OrderEdit';
 
 const AppRoutes = () => {
   return (
@@ -133,6 +135,20 @@ const AppRoutes = () => {
           <ProtectedRoute allowedRoles={['sales']}>
             <MainLayout>
               <SalesMyOffers />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/sales/teklifler/:orderId" element={
+          <ProtectedRoute allowedRoles={['sales']}>
+            <MainLayout>
+              <OrderDetail />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/sales/teklifler/:orderId/duzenle" element={
+          <ProtectedRoute allowedRoles={['sales']}>
+            <MainLayout>
+              <OrderEdit />
             </MainLayout>
           </ProtectedRoute>
         } />
