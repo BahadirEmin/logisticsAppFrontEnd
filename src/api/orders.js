@@ -76,12 +76,25 @@ export const ordersAPI = {
         throw new Error("Order ID and Fleet Person ID are required");
       }
 
-      const response = await api.post(
-        `/v1/orders/${orderId}/assign-fleet?fleetPersonId=${fleetPersonId}`
+      console.log(
+        `Assigning order ${orderId} to fleet person ${fleetPersonId}`
       );
+
+      const response = await api.post(
+        `/v1/orders/${orderId}/assign-fleet?fleetPersonId=${fleetPersonId}`,
+        {}, // Empty body since backend expects query parameter
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Assign to fleet response:", response.data);
       return response.data;
     } catch (error) {
       console.error("Assign to fleet error:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
       throw error;
     }
   },
@@ -98,11 +111,11 @@ export const ordersAPI = {
     }
   },
 
-  // Get orders by fleet person ID
+  // Get orders by fleet person ID using search endpoint
   getByFleetPersonId: async (fleetPersonId) => {
     try {
       const response = await api.get(
-        `/v1/orders/fleet-person/${fleetPersonId}`
+        `/v1/orders/search?fleetPersonId=${fleetPersonId}`
       );
       return response.data;
     } catch (error) {
@@ -173,6 +186,35 @@ export const ordersAPI = {
       );
       return response.data;
     } catch (error) {
+      throw error;
+    }
+  },
+
+  // Assign fleet resources (vehicle, driver, trailer) to order
+  assignFleetResources: async (orderId, resources) => {
+    try {
+      if (!orderId) {
+        throw new Error("Order ID is required");
+      }
+
+      // Build query parameters
+      const params = new URLSearchParams();
+      if (resources.vehicleId) params.append("vehicleId", resources.vehicleId);
+      if (resources.driverId) params.append("driverId", resources.driverId);
+      if (resources.trailerId) params.append("trailerId", resources.trailerId);
+
+      const response = await api.post(
+        `/v1/orders/${orderId}/assign-fleet-resources?${params.toString()}`,
+        {}, // Empty body since backend expects query parameters
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Assign fleet resources error:", error);
       throw error;
     }
   },

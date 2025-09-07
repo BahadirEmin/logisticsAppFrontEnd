@@ -23,7 +23,7 @@ import {
   Schedule as ScheduleIcon
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ordersAPI } from '../api/orders';
+import { ordersAPI } from '../../api/orders';
 
 const OrderDetail = () => {
   const [order, setOrder] = useState(null);

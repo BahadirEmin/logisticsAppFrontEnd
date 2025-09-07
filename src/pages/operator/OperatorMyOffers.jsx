@@ -35,8 +35,8 @@ import {
   FilterList as FilterListIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { ordersAPI } from '../api/orders';
-import { useAuth } from '../contexts/AuthContext';
+import { ordersAPI } from '../../api/orders';
+import { useAuth } from '../../contexts/AuthContext';
 
 const OperatorMyOffers = () => {
   const [offers, setOffers] = useState([]);

@@ -22,9 +22,9 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { ArrowForward, ArrowBack } from '@mui/icons-material';
-import { customerAPI } from '../api/customers';
-import { ordersAPI } from '../api/orders';
-import { useAuth } from '../contexts/AuthContext';
+import { customerAPI } from '../../api/customers';
+import { ordersAPI } from '../../api/orders';
+import { useAuth } from '../../contexts/AuthContext';
 
 const steps = ['Rota ve Yük Bilgileri', 'Bilgileri Onayla', 'Teklif Gönder'];
 

@@ -39,7 +39,7 @@ import {
   Warning as WarningIcon,
   Gavel as LawsuitIcon
 } from '@mui/icons-material';
-import { customerAPI } from '../api/customers';
+import { customerAPI } from '../../api/customers';
 
 const CustomerList = () => {
   const [customers, setCustomers] = useState([]);

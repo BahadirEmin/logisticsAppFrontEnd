@@ -13,7 +13,7 @@ import {
   CircularProgress
 } from '@mui/material';
 import { Person, Save, Edit } from '@mui/icons-material';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 const OperatorProfile = () => {
   const { user, updateUser } = useAuth();
