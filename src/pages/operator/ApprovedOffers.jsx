@@ -31,9 +31,9 @@ import {
   Assignment,
   Visibility
 } from '@mui/icons-material';
-import { ordersAPI } from '../api/orders';
-import { usersAPI } from '../api/users';
-import { useAuth } from '../contexts/AuthContext';
+import { ordersAPI } from '../../api/orders';
+import { usersAPI } from '../../api/users';
+import { useAuth } from '../../contexts/AuthContext';
 
 const ApprovedOffers = () => {
   const [offers, setOffers] = useState([]);

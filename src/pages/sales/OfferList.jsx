@@ -20,25 +20,32 @@ import {
   Tooltip,
   Alert,
   CircularProgress,
-  Grid
+  Grid,
+  Card,
+  CardContent
 } from '@mui/material';
 import {
   Search as SearchIcon,
   Visibility as VisibilityIcon,
   Edit as EditIcon,
-  Delete as DeleteIcon
+  Delete as DeleteIcon,
+  Add as AddIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { ordersAPI } from '../api/orders';
+import { ordersAPI } from '../../api/orders';
+import { useAuth } from '../../contexts/AuthContext';
 
-const SalesMyOffers = () => {
+const OfferList = () => {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [customerFilter, setCustomerFilter] = useState('');
   const navigate = useNavigate();
+  const { user } = useAuth();
 
+  // Trip status options
   const tripStatusOptions = [
     { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması', color: 'default' },
     { value: 'ONAYLANDI', label: 'Onaylandı', color: 'success' },
@@ -59,8 +66,8 @@ const SalesMyOffers = () => {
       const data = await ordersAPI.getAll();
       setOffers(data);
     } catch (err) {
-      console.error('Tekliflerim yüklenirken hata:', err);
-      setError('Tekliflerim yüklenirken bir hata oluştu.');
+      console.error('Teklifler yüklenirken hata:', err);
+      setError('Teklifler yüklenirken bir hata oluştu.');
     } finally {
       setLoading(false);
     }
@@ -77,7 +84,7 @@ const SalesMyOffers = () => {
   };
 
   const filteredOffers = offers.filter(offer => {
-    const matchesSearch =
+    const matchesSearch = 
       offer.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       offer.departureCity?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       offer.arrivalCity?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -85,8 +92,9 @@ const SalesMyOffers = () => {
       offer.id?.toString().includes(searchTerm);
 
     const matchesStatus = !statusFilter || offer.tripStatus === statusFilter;
+    const matchesCustomer = !customerFilter || offer.customerName?.toLowerCase().includes(customerFilter.toLowerCase());
 
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && matchesCustomer;
   });
 
   const handleViewOffer = (offerId) => {
@@ -101,12 +109,16 @@ const SalesMyOffers = () => {
     if (window.confirm('Bu teklifi silmek istediğinizden emin misiniz?')) {
       try {
         await ordersAPI.delete(offerId);
-        await loadOffers();
+        await loadOffers(); // Reload the list
       } catch (err) {
         console.error('Teklif silinirken hata:', err);
         alert('Teklif silinirken bir hata oluştu.');
       }
     }
+  };
+
+  const handleCreateOffer = () => {
+    navigate('/sales/teklif-olustur');
   };
 
   if (loading) {
@@ -131,9 +143,10 @@ const SalesMyOffers = () => {
         </Alert>
       )}
 
+      {/* Filters and Actions */}
       <Paper sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <TextField
               fullWidth
               size="small"
@@ -145,7 +158,7 @@ const SalesMyOffers = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <FormControl fullWidth size="small">
               <InputLabel>Durum Filtresi</InputLabel>
               <Select
@@ -156,10 +169,10 @@ const SalesMyOffers = () => {
                 <MenuItem value="">Tümü</MenuItem>
                 {tripStatusOptions.map((status) => (
                   <MenuItem key={status.value} value={status.value}>
-                    <Chip
-                      label={status.label}
-                      color={status.color}
-                      size="small"
+                    <Chip 
+                      label={status.label} 
+                      color={status.color} 
+                      size="small" 
                       sx={{ mr: 1 }}
                     />
                     {status.label}
@@ -168,9 +181,88 @@ const SalesMyOffers = () => {
               </Select>
             </FormControl>
           </Grid>
+          <Grid item xs={12} md={3}>
+            <TextField
+              fullWidth
+              size="small"
+              label="Müşteri Ara"
+              value={customerFilter}
+              onChange={(e) => setCustomerFilter(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <Box display="flex" justifyContent="flex-end">
+              <Tooltip title="Yeni Teklif Oluştur">
+                <IconButton 
+                  color="primary" 
+                  onClick={handleCreateOffer}
+                  sx={{ 
+                    backgroundColor: 'primary.main', 
+                    color: 'white',
+                    '&:hover': { backgroundColor: 'primary.dark' }
+                  }}
+                >
+                  <AddIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Grid>
         </Grid>
       </Paper>
 
+      {/* Statistics Cards */}
+      <Grid container spacing={2} sx={{ mb: 2 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom>
+                Toplam Teklif
+              </Typography>
+              <Typography variant="h4">
+                {offers.length}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom>
+                Teklif Aşamasında
+              </Typography>
+              <Typography variant="h4" color="default">
+                {offers.filter(o => o.tripStatus === 'TEKLIF_ASAMASI').length}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom>
+                Onaylanan
+              </Typography>
+              <Typography variant="h4" color="success.main">
+                {offers.filter(o => o.tripStatus === 'ONAYLANDI').length}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom>
+                Tamamlanan
+              </Typography>
+              <Typography variant="h4" color="success.main">
+                {offers.filter(o => o.tripStatus === 'TAMAMLANDI').length}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Offers Table */}
       <Paper>
         <TableContainer>
           <Table>
@@ -191,8 +283,8 @@ const SalesMyOffers = () => {
                 <TableRow>
                   <TableCell colSpan={8} align="center">
                     <Typography variant="body2" color="textSecondary">
-                      {searchTerm || statusFilter
-                        ? 'Arama kriterlerinize uygun teklif bulunamadı.'
+                      {searchTerm || statusFilter || customerFilter 
+                        ? 'Arama kriterlerinize uygun teklif bulunamadı.' 
                         : 'Henüz teklif bulunmuyor.'}
                     </Typography>
                   </TableCell>
@@ -235,7 +327,7 @@ const SalesMyOffers = () => {
                       </Typography>
                       <Typography variant="caption" color="textSecondary">
                         {offer.cargoWeightKg} kg
-                        {offer.cargoWidth && offer.cargoLength && offer.cargoHeight &&
+                        {offer.cargoWidth && offer.cargoLength && offer.cargoHeight && 
                           ` • ${offer.cargoWidth}x${offer.cargoLength}x${offer.cargoHeight}m`}
                       </Typography>
                     </TableCell>
@@ -301,4 +393,4 @@ const SalesMyOffers = () => {
   );
 };
 
-export default SalesMyOffers;
+export default OfferList; 

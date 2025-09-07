@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Container,
   Paper,
@@ -8,9 +8,7 @@ import {
   Card,
   CardContent,
   Chip,
-  Button,
   TextField,
-  InputAdornment,
   Table,
   TableBody,
   TableCell,
@@ -32,10 +30,12 @@ import {
   FilterList as FilterListIcon,
   CheckCircle,
   Schedule,
-  LocalShipping
+  LocalShipping,
+  Assignment as AssignmentIcon
 } from '@mui/icons-material';
-import { ordersAPI } from '../api/orders';
-import { useAuth } from '../contexts/AuthContext';
+import { ordersAPI } from '../../api/orders';
+import { useAuth } from '../../contexts/AuthContext';
+import FleetResourceAssignment from '../../components/FleetResourceAssignment';
 
 const FleetMyOffers = () => {
   const [offers, setOffers] = useState([]);
@@ -43,6 +43,7 @@ const FleetMyOffers = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [assignmentDialog, setAssignmentDialog] = useState({ open: false, order: null });
   const { user } = useAuth();
 
   // Fleet-specific status options
@@ -53,16 +54,13 @@ const FleetMyOffers = () => {
     { value: 'delivered', label: 'Teslim Edildi', color: 'info', icon: <CheckCircle /> }
   ];
 
-  useEffect(() => {
-    loadFleetOffers();
-  }, []);
-
-  const loadFleetOffers = async () => {
+  const loadFleetOffers = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       
       // Get orders assigned to fleet user
+      console.log('Fetching orders for fleet person ID:', user.id);
       const data = await ordersAPI.getByFleetPersonId(user.id);
       console.log('Fleet My Offers API Response:', data);
       setOffers(data);
@@ -72,7 +70,11 @@ const FleetMyOffers = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user.id]);
+
+  useEffect(() => {
+    loadFleetOffers();
+  }, [loadFleetOffers]);
 
   const getStatusIcon = (status) => {
     const statusOption = fleetStatusOptions.find(option => option.value === status);
@@ -107,6 +109,19 @@ const FleetMyOffers = () => {
     console.log('Viewing offer:', offerId);
   };
 
+  const handleAssignResources = (order) => {
+    setAssignmentDialog({ open: true, order });
+  };
+
+  const handleCloseAssignment = () => {
+    setAssignmentDialog({ open: false, order: null });
+  };
+
+  const handleAssignmentSuccess = () => {
+    // Reload offers after successful assignment
+    loadFleetOffers();
+  };
+
   if (loading) {
     return (
       <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
@@ -125,6 +140,19 @@ const FleetMyOffers = () => {
       <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
         Fleet olarak size atanan teklifler
       </Typography>
+
+      {/* Debug Section - Remove this after testing */}
+      <Alert severity="info" sx={{ mb: 2 }}>
+        <Typography variant="body2">
+          Debug: Toplam {offers.length} atanmış teklif. 
+          User ID: {user?.id} | User Role: {user?.role}
+        </Typography>
+        {offers.length > 0 && (
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            İlk teklif: ID={offers[0]?.id}, Durum={offers[0]?.tripStatus || offers[0]?.status}
+          </Typography>
+        )}
+      </Alert>
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
@@ -304,6 +332,15 @@ const FleetMyOffers = () => {
                           <VisibilityIcon />
                         </IconButton>
                       </Tooltip>
+                      <Tooltip title="Kaynak Ata">
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          onClick={() => handleAssignResources(offer)}
+                        >
+                          <AssignmentIcon />
+                        </IconButton>
+                      </Tooltip>
                     </Box>
                   </TableCell>
                 </TableRow>
@@ -318,6 +355,15 @@ const FleetMyOffers = () => {
           Arama kriterlerinize uygun teklif bulunamadı.
         </Alert>
       )}
+
+      {/* Fleet Resource Assignment Dialog */}
+      <FleetResourceAssignment
+        open={assignmentDialog.open}
+        onClose={handleCloseAssignment}
+        orderId={assignmentDialog.order?.id}
+        orderInfo={assignmentDialog.order}
+        onSuccess={handleAssignmentSuccess}
+      />
     </Container>
   );
 };

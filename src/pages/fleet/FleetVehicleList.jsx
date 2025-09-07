@@ -36,12 +36,12 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Search as SearchIcon,
-  LocalShipping as TrailerIcon
+  LocalShipping as TruckIcon
 } from '@mui/icons-material';
-import { trailerAPI } from '../api/trailers';
+import { vehicleAPI } from '../../api/vehicles';
 
-const TrailerList = () => {
-  const [trailers, setTrailers] = useState([]);
+const FleetVehicleList = () => {
+  const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -49,31 +49,39 @@ const TrailerList = () => {
   
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTrailer, setEditingTrailer] = useState(null);
+  const [editingVehicle, setEditingVehicle] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [trailerToDelete, setTrailerToDelete] = useState(null);
+  const [vehicleToDelete, setVehicleToDelete] = useState(null);
   
   // Form state
   const [formData, setFormData] = useState({
-    trailerNo: '',
+    plateNo: '',
     vin: '',
     make: '',
     model: '',
     modelYear: '',
-    trailerType: '',
-    capacity: '',
-    length: '',
-    width: '',
-    height: '',
+    engineNo: '',
+    chassisNo: '',
+    color: '',
+    fuelType: '',
+    transmissionType: '',
+    engineCapacity: '',
+    horsepower: '',
+    mileage: '',
     purchaseDate: '',
+    purchasePrice: '',
+    currentValue: '',
+    insuranceExpiryDate: '',
+    inspectionExpiryDate: '',
     ownershipTypeId: 1,
-    isActive: true
+    isActive: true,
+    notes: ''
   });
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
   const [deletingInline, setDeletingInline] = useState(false);
 
-  // Load trailers
+  // Load vehicles
   useEffect(() => {
     loadData();
   }, []);
@@ -81,25 +89,25 @@ const TrailerList = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const trailersData = await trailerAPI.getAll();
-      setTrailers(trailersData);
+      const vehiclesData = await vehicleAPI.getAll();
+      setVehicles(vehiclesData);
     } catch (error) {
-      setError('Römork listesi yüklenirken hata oluştu');
+      setError('Araç listesi yüklenirken hata oluştu');
     } finally {
       setLoading(false);
     }
   };
 
-  // Filter trailers
-  const filteredTrailers = trailers.filter(trailer => {
-    const matchesSearch = trailer.trailerNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         trailer.make?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         trailer.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         trailer.vin?.toLowerCase().includes(searchTerm.toLowerCase());
+  // Filter vehicles
+  const filteredVehicles = vehicles.filter(vehicle => {
+    const matchesSearch = vehicle.plateNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         vehicle.make?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         vehicle.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         vehicle.vin?.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesActive = filterActive === '' || 
-                         (filterActive === 'true' && trailer.isActive) ||
-                         (filterActive === 'false' && !trailer.isActive);
+                         (filterActive === 'true' && vehicle.isActive) ||
+                         (filterActive === 'false' && !vehicle.isActive);
     
     return matchesSearch && matchesActive;
   });
@@ -124,8 +132,8 @@ const TrailerList = () => {
   // Validate form
   const validateForm = () => {
     const errors = {};
-    if (!formData.trailerNo.trim()) {
-      errors.trailerNo = 'Römork numarası zorunludur';
+    if (!formData.plateNo.trim()) {
+      errors.plateNo = 'Plaka numarası zorunludur';
     }
     if (!formData.make.trim()) {
       errors.make = 'Marka zorunludur';
@@ -139,51 +147,64 @@ const TrailerList = () => {
     if (!formData.vin.trim()) {
       errors.vin = 'VIN numarası zorunludur';
     }
-    if (!formData.trailerType.trim()) {
-      errors.trailerType = 'Römork tipi zorunludur';
-    }
     return errors;
   };
 
-  // Open add trailer dialog
-  const handleAddTrailer = () => {
-    setEditingTrailer(null);
+  // Open add vehicle dialog
+  const handleAddVehicle = () => {
+    setEditingVehicle(null);
     setFormData({
-      trailerNo: '',
+      plateNo: '',
       vin: '',
       make: '',
       model: '',
       modelYear: '',
-      trailerType: '',
-      capacity: '',
-      length: '',
-      width: '',
-      height: '',
+      engineNo: '',
+      chassisNo: '',
+      color: '',
+      fuelType: '',
+      transmissionType: '',
+      engineCapacity: '',
+      horsepower: '',
+      mileage: '',
       purchaseDate: '',
+      purchasePrice: '',
+      currentValue: '',
+      insuranceExpiryDate: '',
+      inspectionExpiryDate: '',
       ownershipTypeId: 1,
-      isActive: true
+      isActive: true,
+      notes: ''
     });
     setFormErrors({});
     setDialogOpen(true);
   };
 
-  // Open edit trailer dialog
-  const handleEditTrailer = (trailer) => {
-    setEditingTrailer(trailer);
+  // Open edit vehicle dialog
+  const handleEditVehicle = (vehicle) => {
+    setEditingVehicle(vehicle);
     setFormData({
-      trailerNo: trailer.trailerNo || '',
-      vin: trailer.vin || '',
-      make: trailer.make || '',
-      model: trailer.model || '',
-      modelYear: trailer.modelYear || '',
-      trailerType: trailer.trailerType || '',
-      capacity: trailer.capacity || '',
-      length: trailer.length || '',
-      width: trailer.width || '',
-      height: trailer.height || '',
-      purchaseDate: trailer.purchaseDate ? trailer.purchaseDate.split('T')[0] : '',
-      ownershipTypeId: trailer.ownershipTypeId || 1,
-      isActive: trailer.isActive !== undefined ? trailer.isActive : true
+      plateNo: vehicle.plateNo || '',
+      vin: vehicle.vin || '',
+      make: vehicle.make || '',
+      model: vehicle.model || '',
+      modelYear: vehicle.modelYear || '',
+      engineNo: vehicle.engineNo || '',
+      chassisNo: vehicle.chassisNo || '',
+      color: vehicle.color || '',
+      fuelType: vehicle.fuelType || '',
+      transmissionType: vehicle.transmissionType || '',
+      engineCapacity: vehicle.engineCapacity || '',
+      horsepower: vehicle.horsepower || '',
+      mileage: vehicle.mileage || '',
+      purchaseDate: vehicle.purchaseDate ? vehicle.purchaseDate.split('T')[0] : '',
+      purchasePrice: vehicle.purchasePrice || '',
+      currentValue: vehicle.currentValue || '',
+      insuranceExpiryDate: vehicle.insuranceExpiryDate ? vehicle.insuranceExpiryDate.split('T')[0] : '',
+      inspectionExpiryDate: vehicle.inspectionExpiryDate ? vehicle.inspectionExpiryDate.split('T')[0] : '',
+      ownershipTypeId: vehicle.ownershipTypeId || 1,
+      isActive: vehicle.isActive !== undefined ? vehicle.isActive : true,
+      notes: vehicle.notes || ''
     });
     setFormErrors({});
     setDialogOpen(true);
@@ -199,64 +220,65 @@ const TrailerList = () => {
 
     try {
       setSaving(true);
-      const trailerData = {
+      const vehicleData = {
         ...formData,
         modelYear: formData.modelYear ? Number(formData.modelYear) : null,
-        capacity: formData.capacity ? Number(formData.capacity) : null,
-        length: formData.length ? Number(formData.length) : null,
-        width: formData.width ? Number(formData.width) : null,
-        height: formData.height ? Number(formData.height) : null,
+        engineCapacity: formData.engineCapacity ? Number(formData.engineCapacity) : null,
+        horsepower: formData.horsepower ? Number(formData.horsepower) : null,
+        mileage: formData.mileage ? Number(formData.mileage) : null,
+        purchasePrice: formData.purchasePrice ? Number(formData.purchasePrice) : null,
+        currentValue: formData.currentValue ? Number(formData.currentValue) : null,
         ownershipTypeId: Number(formData.ownershipTypeId),
         isActive: Boolean(formData.isActive)
       };
 
-      if (editingTrailer) {
-        await trailerAPI.update(editingTrailer.id, trailerData);
+      if (editingVehicle) {
+        await vehicleAPI.update(editingVehicle.id, vehicleData);
       } else {
-        await trailerAPI.create(trailerData);
+        await vehicleAPI.create(vehicleData);
       }
 
       setDialogOpen(false);
       await loadData();
     } catch (error) {
-      console.error('Save trailer error:', error);
-      const backendMessage = error?.response?.data?.message || error?.response?.data?.error || 'Römork kaydedilirken hata oluştu';
+      console.error('Save vehicle error:', error);
+      const backendMessage = error?.response?.data?.message || error?.response?.data?.error || 'Araç kaydedilirken hata oluştu';
       setError(backendMessage);
     } finally {
       setSaving(false);
     }
   };
 
-  // Handle delete trailer
-  const handleDeleteTrailer = (trailer) => {
-    setTrailerToDelete(trailer);
+  // Handle delete vehicle
+  const handleDeleteVehicle = (vehicle) => {
+    setVehicleToDelete(vehicle);
     setDeleteDialogOpen(true);
   };
 
   const confirmDelete = async () => {
     try {
-      await trailerAPI.delete(trailerToDelete.id);
+      await vehicleAPI.delete(vehicleToDelete.id);
       setDeleteDialogOpen(false);
-      setTrailerToDelete(null);
+      setVehicleToDelete(null);
       loadData();
     } catch (error) {
-      setError('Römork silinirken hata oluştu');
-      console.error('Delete trailer error:', error);
+      setError('Araç silinirken hata oluştu');
+      console.error('Delete vehicle error:', error);
     }
   };
 
   // Inline delete confirmation
   const confirmDeleteInline = async () => {
-    if (!editingTrailer) return;
+    if (!editingVehicle) return;
     try {
       setDeletingInline(true);
-      await trailerAPI.delete(editingTrailer.id);
+      await vehicleAPI.delete(editingVehicle.id);
       setDialogOpen(false);
-      setEditingTrailer(null);
+      setEditingVehicle(null);
       await loadData();
     } catch (error) {
       console.error('Inline delete error:', error);
-      const backendMessage = error?.response?.data?.message || error?.response?.data?.error || 'Römork silinirken hata oluştu';
+      const backendMessage = error?.response?.data?.message || error?.response?.data?.error || 'Araç silinirken hata oluştu';
       setError(backendMessage);
     } finally {
       setDeletingInline(false);
@@ -269,10 +291,13 @@ const TrailerList = () => {
     return new Date(dateString).toLocaleDateString('tr-TR');
   };
 
-  // Format dimensions
-  const formatDimension = (value, unit) => {
-    if (!value) return '-';
-    return `${value} ${unit}`;
+  // Format currency
+  const formatCurrency = (amount) => {
+    if (!amount) return '-';
+    return new Intl.NumberFormat('tr-TR', {
+      style: 'currency',
+      currency: 'TRY'
+    }).format(amount);
   };
 
   if (loading) {
@@ -289,15 +314,15 @@ const TrailerList = () => {
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
           <Typography variant="h4" component="h1" sx={{ color: '#1976d2' }}>
-            Römork Listesi
+            Tır Listesi (Fleet)
           </Typography>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={handleAddTrailer}
+            onClick={handleAddVehicle}
             sx={{ px: 3 }}
           >
-            Yeni Römork Ekle
+            Yeni Tır Ekle
           </Button>
         </Box>
 
@@ -314,7 +339,7 @@ const TrailerList = () => {
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Römork Ara"
+                label="Tır Ara"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 InputProps={{
@@ -324,7 +349,7 @@ const TrailerList = () => {
                     </InputAdornment>
                   ),
                 }}
-                placeholder="Römork no, marka, model veya VIN..."
+                placeholder="Plaka, marka, model veya VIN..."
               />
             </Grid>
             <Grid item xs={12} md={3}>
@@ -344,75 +369,75 @@ const TrailerList = () => {
           </Grid>
         </Box>
 
-        {/* Trailers Table */}
+        {/* Vehicles Table */}
         <TableContainer component={Paper} elevation={1}>
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                <TableCell><strong>Römork No</strong></TableCell>
+                <TableCell><strong>Plaka</strong></TableCell>
                 <TableCell><strong>Marka/Model</strong></TableCell>
                 <TableCell><strong>VIN</strong></TableCell>
-                <TableCell><strong>Tip</strong></TableCell>
-                <TableCell><strong>Kapasite</strong></TableCell>
-                <TableCell><strong>Boyutlar</strong></TableCell>
                 <TableCell><strong>Model Yılı</strong></TableCell>
+                <TableCell><strong>Kilometre</strong></TableCell>
                 <TableCell><strong>Durum</strong></TableCell>
+                <TableCell><strong>Sigorta</strong></TableCell>
+                <TableCell><strong>Muayene</strong></TableCell>
                 <TableCell><strong>İşlemler</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredTrailers.map((trailer) => (
-                <TableRow key={trailer.id} hover>
+              {filteredVehicles.map((vehicle) => (
+                <TableRow key={vehicle.id} hover>
                   <TableCell>
                     <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
-                      {trailer.trailerNo}
+                      {vehicle.plateNo}
                     </Typography>
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2">
-                      {trailer.make} {trailer.model}
+                      {vehicle.make} {vehicle.model}
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary">
+                      {vehicle.color}
                     </Typography>
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                      {trailer.vin}
+                      {vehicle.vin}
                     </Typography>
+                  </TableCell>
+                  <TableCell>{vehicle.modelYear}</TableCell>
+                  <TableCell>
+                    {vehicle.mileage ? `${vehicle.mileage.toLocaleString('tr-TR')} km` : '-'}
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={trailer.trailerType}
-                      color="primary"
+                      label={vehicle.isActive ? 'Aktif' : 'Pasif'}
+                      color={vehicle.isActive ? 'success' : 'default'}
                       size="small"
-                      variant="outlined"
                     />
                   </TableCell>
                   <TableCell>
-                    {trailer.capacity ? `${trailer.capacity} ton` : '-'}
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">
-                      {formatDimension(trailer.length, 'm')} × {formatDimension(trailer.width, 'm')} × {formatDimension(trailer.height, 'm')}
+                    <Typography variant="body2" color={new Date(vehicle.insuranceExpiryDate) < new Date() ? 'error' : 'textPrimary'}>
+                      {formatDate(vehicle.insuranceExpiryDate)}
                     </Typography>
                   </TableCell>
-                  <TableCell>{trailer.modelYear}</TableCell>
                   <TableCell>
-                    <Chip
-                      label={trailer.isActive ? 'Aktif' : 'Pasif'}
-                      color={trailer.isActive ? 'success' : 'default'}
-                      size="small"
-                    />
+                    <Typography variant="body2" color={new Date(vehicle.inspectionExpiryDate) < new Date() ? 'error' : 'textPrimary'}>
+                      {formatDate(vehicle.inspectionExpiryDate)}
+                    </Typography>
                   </TableCell>
                   <TableCell>
                     <IconButton
                       size="small"
-                      onClick={() => handleEditTrailer(trailer)}
+                      onClick={() => handleEditVehicle(vehicle)}
                       color="primary"
                     >
                       <EditIcon />
                     </IconButton>
                     <IconButton
                       size="small"
-                      onClick={() => handleDeleteTrailer(trailer)}
+                      onClick={() => handleDeleteVehicle(vehicle)}
                       color="error"
                     >
                       <DeleteIcon />
@@ -424,22 +449,22 @@ const TrailerList = () => {
           </Table>
         </TableContainer>
 
-        {filteredTrailers.length === 0 && !loading && (
+        {filteredVehicles.length === 0 && !loading && (
           <Box sx={{ textAlign: 'center', py: 4 }}>
-            <TrailerIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+            <TruckIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
             <Typography variant="h6" color="text.secondary">
-              Römork bulunamadı
+              Tır bulunamadı
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {searchTerm || filterActive !== '' ? 'Arama kriterlerinizi değiştirmeyi deneyin.' : 'Henüz römork eklenmemiş.'}
+              {searchTerm || filterActive !== '' ? 'Arama kriterlerinizi değiştirmeyi deneyin.' : 'Henüz tır eklenmemiş.'}
             </Typography>
           </Box>
         )}
 
-        {/* Add/Edit Trailer Dialog */}
+        {/* Add/Edit Vehicle Dialog */}
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
           <DialogTitle>
-            {editingTrailer ? 'Römork Düzenle' : 'Yeni Römork Ekle'}
+            {editingVehicle ? 'Tır Düzenle' : 'Yeni Tır Ekle'}
           </DialogTitle>
           <DialogContent>
             <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -453,12 +478,12 @@ const TrailerList = () => {
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Römork No *"
-                  name="trailerNo"
-                  value={formData.trailerNo}
+                  label="Plaka No *"
+                  name="plateNo"
+                  value={formData.plateNo}
                   onChange={handleInputChange}
-                  error={!!formErrors.trailerNo}
-                  helperText={formErrors.trailerNo}
+                  error={!!formErrors.plateNo}
+                  helperText={formErrors.plateNo}
                 />
               </Grid>
               
@@ -514,41 +539,19 @@ const TrailerList = () => {
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Römork Tipi *"
-                  name="trailerType"
-                  value={formData.trailerType}
+                  label="Motor No"
+                  name="engineNo"
+                  value={formData.engineNo}
                   onChange={handleInputChange}
-                  error={!!formErrors.trailerType}
-                  helperText={formErrors.trailerType}
-                  placeholder="Flatbed, Container, etc."
                 />
               </Grid>
               
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Kapasite (ton)"
-                  name="capacity"
-                  type="number"
-                  value={formData.capacity}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-
-              {/* Dimensions */}
-              <Grid item xs={12}>
-                <Typography variant="h6" sx={{ mb: 2, mt: 2, color: '#1976d2' }}>
-                  Boyutlar
-                </Typography>
-              </Grid>
-              
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  label="Uzunluk (m)"
-                  name="length"
-                  type="number"
-                  value={formData.length}
+                  label="Şasi No"
+                  name="chassisNo"
+                  value={formData.chassisNo}
                   onChange={handleInputChange}
                 />
               </Grid>
@@ -556,10 +559,9 @@ const TrailerList = () => {
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
-                  label="Genişlik (m)"
-                  name="width"
-                  type="number"
-                  value={formData.width}
+                  label="Renk"
+                  name="color"
+                  value={formData.color}
                   onChange={handleInputChange}
                 />
               </Grid>
@@ -567,11 +569,66 @@ const TrailerList = () => {
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
-                  label="Yükseklik (m)"
-                  name="height"
-                  type="number"
-                  value={formData.height}
+                  label="Yakıt Tipi"
+                  name="fuelType"
+                  value={formData.fuelType}
                   onChange={handleInputChange}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Vites Tipi"
+                  name="transmissionType"
+                  value={formData.transmissionType}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Motor Hacmi (L)"
+                  name="engineCapacity"
+                  type="number"
+                  value={formData.engineCapacity}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Beygir Gücü"
+                  name="horsepower"
+                  type="number"
+                  value={formData.horsepower}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Kilometre"
+                  name="mileage"
+                  type="number"
+                  value={formData.mileage}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={formData.isActive}
+                      onChange={handleInputChange}
+                      name="isActive"
+                    />
+                  }
+                  label="Aktif"
                 />
               </Grid>
 
@@ -597,6 +654,28 @@ const TrailerList = () => {
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
+                  label="Satın Alma Fiyatı (TL)"
+                  name="purchasePrice"
+                  type="number"
+                  value={formData.purchasePrice}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Güncel Değer (TL)"
+                  name="currentValue"
+                  type="number"
+                  value={formData.currentValue}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
                   label="Mülkiyet Tipi ID"
                   name="ownershipTypeId"
                   type="number"
@@ -604,23 +683,53 @@ const TrailerList = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
+
+              {/* Legal Information */}
+              <Grid item xs={12}>
+                <Typography variant="h6" sx={{ mb: 2, mt: 2, color: '#1976d2' }}>
+                  Yasal Bilgiler
+                </Typography>
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Sigorta Bitiş Tarihi"
+                  name="insuranceExpiryDate"
+                  type="date"
+                  value={formData.insuranceExpiryDate}
+                  onChange={handleInputChange}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Muayene Bitiş Tarihi"
+                  name="inspectionExpiryDate"
+                  type="date"
+                  value={formData.inspectionExpiryDate}
+                  onChange={handleInputChange}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
               
               <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.isActive}
-                      onChange={handleInputChange}
-                      name="isActive"
-                    />
-                  }
-                  label="Aktif"
+                <TextField
+                  fullWidth
+                  label="Notlar"
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleInputChange}
+                  multiline
+                  rows={3}
                 />
               </Grid>
             </Grid>
           </DialogContent>
           <DialogActions>
-            {editingTrailer && (
+            {editingVehicle && (
               <Button
                 onClick={confirmDeleteInline}
                 color="error"
@@ -639,7 +748,7 @@ const TrailerList = () => {
               variant="contained"
               disabled={saving}
             >
-              {saving ? 'Kaydediliyor...' : (editingTrailer ? 'Güncelle' : 'Kaydet')}
+              {saving ? 'Kaydediliyor...' : (editingVehicle ? 'Güncelle' : 'Kaydet')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -649,7 +758,7 @@ const TrailerList = () => {
           <DialogTitle>Silme Onayı</DialogTitle>
           <DialogContent>
             <Typography>
-              "{trailerToDelete?.trailerNo}" numaralı römorku silmek istediğinizden emin misiniz?
+              "{vehicleToDelete?.plateNo}" plakalı tırı silmek istediğinizden emin misiniz?
             </Typography>
           </DialogContent>
           <DialogActions>
@@ -666,4 +775,4 @@ const TrailerList = () => {
   );
 };
 
-export default TrailerList; 
+export default FleetVehicleList;

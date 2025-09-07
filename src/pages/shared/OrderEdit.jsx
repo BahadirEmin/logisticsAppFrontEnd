@@ -26,7 +26,7 @@ import {
   Cancel as CancelIcon
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ordersAPI } from '../api/orders';
+import { ordersAPI } from '../../api/orders';
 
 const OrderEdit = () => {
   const [order, setOrder] = useState(null);

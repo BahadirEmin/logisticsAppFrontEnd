@@ -1,26 +1,30 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
-import LoginPage from '../pages/LoginPage';
-import HomePage from '../pages/HomePage';
-import OperatorDashboard from '../pages/OperatorDashboard';
-import OperatorProfile from '../pages/OperatorProfile';
-import ApprovedOffers from '../pages/ApprovedOffers';
-import TripTracking from '../pages/TripTracking';
-import OperatorMyOffers from '../pages/OperatorMyOffers';
-import FleetMyOffers from '../pages/FleetMyOffers';
-import SalesDashboard from '../pages/SalesDashboard';
-import OfferForm from '../pages/OfferForm';
-import CustomerList from '../pages/CustomerList';
-import OfferList from '../pages/OfferList';
-import FleetDashboard from '../pages/FleetDashboard';
-import VehicleList from '../pages/VehicleList';
-import TrailerList from '../pages/TrailerList';
-import DriverList from '../pages/DriverList';
+import LoginPage from '../pages/shared/LoginPage';
+import AdminDashboard from '../pages/admin/AdminDashboard';
+import OperatorDashboard from '../pages/operator/OperatorDashboard';
+import OperatorProfile from '../pages/operator/OperatorProfile';
+import ApprovedOffers from '../pages/operator/ApprovedOffers';
+import TripTracking from '../pages/shared/TripTracking';
+import OperatorMyOffers from '../pages/operator/OperatorMyOffers';
+import FleetMyOffers from '../pages/fleet/FleetMyOffers';
+import SalesDashboard from '../pages/sales/SalesDashboard';
+import OfferForm from '../pages/sales/OfferForm';
+import CustomerList from '../pages/sales/CustomerList';
+import SalesOfferList from '../pages/sales/OfferList';
+import FleetDashboard from '../pages/fleet/FleetDashboard';
+import AdminVehicleList from '../pages/admin/VehicleList';
+import FleetVehicleList from '../pages/fleet/FleetVehicleList';
+import AdminTrailerList from '../pages/admin/TrailerList';
+import FleetTrailerList from '../pages/fleet/FleetTrailerList';
+import AdminDriverList from '../pages/admin/DriverList';
+import FleetDriverList from '../pages/fleet/FleetDriverList';
 import ProtectedRoute from '../components/ProtectedRoute';
-import SalesMyOffers from '../pages/SalesMyOffers';
-import OrderDetail from '../pages/OrderDetail';
-import OrderEdit from '../pages/OrderEdit';
+import SalesMyOffers from '../pages/sales/SalesMyOffers';
+import OrderDetail from '../pages/shared/OrderDetail';
+import OrderEdit from '../pages/shared/OrderEdit';
+import FleetOfferList from '../pages/fleet/FleetOfferList';
 
 const AppRoutes = () => {
   return (
@@ -33,21 +37,21 @@ const AppRoutes = () => {
         <Route path="/admin" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <MainLayout>
-              <HomePage />
+              <AdminDashboard />
             </MainLayout>
           </ProtectedRoute>
         } />
         <Route path="/admin/trucks" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <MainLayout>
-              <VehicleList />
+              <AdminVehicleList />
             </MainLayout>
           </ProtectedRoute>
         } />
         <Route path="/admin/drivers" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <MainLayout>
-              <DriverList />
+              <AdminDriverList />
             </MainLayout>
           </ProtectedRoute>
         } />
@@ -61,7 +65,7 @@ const AppRoutes = () => {
         <Route path="/admin/trailers" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <MainLayout>
-              <TrailerList />
+              <AdminTrailerList />
             </MainLayout>
           </ProtectedRoute>
         } />
@@ -128,7 +132,7 @@ const AppRoutes = () => {
         <Route path="/sales/teklifler" element={
           <ProtectedRoute allowedRoles={['sales']}>
             <MainLayout>
-              <OfferList />
+              <SalesOfferList />
             </MainLayout>
           </ProtectedRoute>
         } />
@@ -165,28 +169,28 @@ const AppRoutes = () => {
         <Route path="/fleet/tirlar" element={
           <ProtectedRoute allowedRoles={['fleet']}>
             <MainLayout>
-              <VehicleList />
+              <FleetVehicleList />
             </MainLayout>
           </ProtectedRoute>
         } />
         <Route path="/fleet/suruculer" element={
           <ProtectedRoute allowedRoles={['fleet']}>
             <MainLayout>
-              <DriverList />
+              <FleetDriverList />
             </MainLayout>
           </ProtectedRoute>
         } />
         <Route path="/fleet/romorklar" element={
           <ProtectedRoute allowedRoles={['fleet']}>
             <MainLayout>
-              <TrailerList />
+              <FleetTrailerList />
             </MainLayout>
           </ProtectedRoute>
         } />
         <Route path="/fleet/teklifler" element={
           <ProtectedRoute allowedRoles={['fleet']}>
             <MainLayout>
-              <OfferList />
+              <FleetOfferList />
             </MainLayout>
           </ProtectedRoute>
         } />

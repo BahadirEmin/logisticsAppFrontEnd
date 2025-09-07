@@ -44,8 +44,8 @@ import {
   Phone as PhoneIcon,
   Email as EmailIcon
 } from '@mui/icons-material';
-import { driversAPI } from '../api/drivers';
-import { useAuth } from '../contexts/AuthContext';
+import { driversAPI } from '../../api/drivers';
+import { useAuth } from '../../contexts/AuthContext';
 
 const DriverList = () => {
   const [drivers, setDrivers] = useState([]);
