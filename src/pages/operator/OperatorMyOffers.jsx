@@ -32,7 +32,8 @@ import {
   Schedule as ScheduleIcon,
   LocalShipping as LocalShippingIcon,
   Assignment as AssignmentIcon,
-  FilterList as FilterListIcon
+  FilterList as FilterListIcon,
+  Download as DownloadIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
@@ -148,6 +149,16 @@ const OperatorMyOffers = () => {
   const handleApproveOffer = (offerId) => {
     // Approve the offer (change status to ONAYLANDI)
     console.log('Approving offer:', offerId);
+  };
+
+  const handleDownloadDriverDocument = async (orderId) => {
+    try {
+      await ordersAPI.downloadDriverInformationDocument(orderId);
+      console.log('Driver information document downloaded successfully');
+    } catch (error) {
+      console.error('Error downloading driver information document:', error);
+      setError('Şoför bilgilendirme dokümanı indirilirken bir hata oluştu.');
+    }
   };
 
   if (loading) {
@@ -345,6 +356,15 @@ const OperatorMyOffers = () => {
                           onClick={() => handleViewOffer(offer.id)}
                         >
                           <VisibilityIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Şoför Bilgilendirme Dokümanı İndir">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDownloadDriverDocument(offer.id)}
+                          color="primary"
+                        >
+                          <DownloadIcon />
                         </IconButton>
                       </Tooltip>
                     </Box>
