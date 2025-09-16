@@ -218,4 +218,38 @@ export const ordersAPI = {
       throw error;
     }
   },
+
+  // Download driver information document
+  downloadDriverInformationDocument: async (orderId) => {
+    try {
+      if (!orderId) {
+        throw new Error("Order ID is required");
+      }
+
+      const response = await api.get(
+        `/v1/orders/${orderId}/driver-information-document`,
+        {
+          responseType: "blob", // Important for downloading binary files
+          headers: {
+            accept: "application/octet-stream",
+          },
+        }
+      );
+
+      // Create blob link to download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `driver_info_${orderId}.docx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      return response.data;
+    } catch (error) {
+      console.error("Download driver information document error:", error);
+      throw error;
+    }
+  },
 };
