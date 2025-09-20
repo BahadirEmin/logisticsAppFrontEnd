@@ -26,7 +26,7 @@ import { customerAPI } from '../../api/customers';
 import { ordersAPI } from '../../api/orders';
 import { useAuth } from '../../contexts/AuthContext';
 
-const steps = ['Rota ve Yük Bilgileri', 'Bilgileri Onayla', 'Teklif Gönder'];
+const steps = ['Rota ve Yük Bilgileri', 'Bilgileri Onayla', 'Teklif Fiyatı ve Gönder'];
 
 const cargoTypes = [
   'Genel Kargo',
@@ -113,9 +113,8 @@ const OfferForm = () => {
     customerEmail: '',
     specialRequirements: '',
     
-    // Step 3: Pricing (will be added)
-    estimatedPrice: '',
-    currency: 'TRY'
+    // Step 3: Pricing
+    quotePrice: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -267,18 +266,43 @@ const OfferForm = () => {
     try {
       setSubmitting(true);
       
-      // Prepare order data
+      // Prepare order data with all form fields
       const orderData = {
         customerId: parseInt(formData.customerId),
+        
+        // Departure address details
         departureCountry: formData.fromAddress.country,
         departureCity: formData.fromAddress.city,
+        departureDistrict: formData.fromAddress.district || null,
+        departurePostalCode: formData.fromAddress.zipCode || null,
         departureAddress: formData.fromAddress.address,
+        departureContactName: formData.fromAddress.contactPerson || null,
+        departureContactPhone: formData.fromAddress.phone || null,
+        departureContactEmail: formData.fromAddress.email || null,
+        
+        // Arrival address details
         arrivalCountry: formData.toAddress.country,
         arrivalCity: formData.toAddress.city,
+        arrivalDistrict: formData.toAddress.district || null,
+        arrivalPostalCode: formData.toAddress.zipCode || null,
         arrivalAddress: formData.toAddress.address,
+        arrivalContactName: formData.toAddress.contactPerson || null,
+        arrivalContactPhone: formData.toAddress.phone || null,
+        arrivalContactEmail: formData.toAddress.email || null,
+        
+        // Cargo details
+        cargoWidth: formData.dimensions.width ? parseFloat(formData.dimensions.width) : null,
+        cargoLength: formData.dimensions.length ? parseFloat(formData.dimensions.length) : null,
+        cargoHeight: formData.dimensions.height ? parseFloat(formData.dimensions.height) : null,
         cargoWeightKg: parseFloat(formData.weight),
         cargoType: formData.cargoType,
-        canTransfer: formData.transferable
+        canTransfer: formData.transferable,
+        
+        // Sales person info
+        salesPersonId: user?.id || null,
+        
+        // Quote price
+        quotePrice: formData.quotePrice ? parseFloat(formData.quotePrice) : null
       };
       
       console.log('Order data being sent:', orderData);
@@ -930,18 +954,40 @@ const OfferForm = () => {
   const renderStep3 = () => (
     <Box>
       <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
-        Teklif Gönder
+        Teklif Fiyatı ve Gönder
       </Typography>
       
-      <Alert severity="success" sx={{ mb: 3 }}>
-        Teklifiniz başarıyla oluşturuldu! Şimdi operasyon ekibine gönderiliyor.
-      </Alert>
-      
       <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-        <Typography variant="body1" gutterBottom>
-          Teklif detayları operasyon ekibine iletildi. En kısa sürede size dönüş yapılacaktır.
+        <Typography variant="h6" gutterBottom color="primary" sx={{ mb: 2 }}>
+          Teklif Fiyatı
         </Typography>
+        
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6} md={4}>
+            <TextField
+              fullWidth
+              size="small"
+              label="Teklif Edilen Fiyat (TL)"
+              name="quotePrice"
+              type="number"
+              value={formData.quotePrice}
+              onChange={handleInputChange}
+              placeholder="0.00"
+              inputProps={{
+                step: "0.01",
+                min: "0"
+              }}
+            />
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+              Müşteriye teklif edilecek fiyatı giriniz (TL cinsinden)
+            </Typography>
+          </Grid>
+        </Grid>
       </Paper>
+      
+      <Alert severity="info" sx={{ mb: 3 }}>
+        Teklif fiyatını girdikten sonra "Teklifi Gönder" butonuna tıklayarak teklifinizi operasyon ekibine gönderebilirsiniz.
+      </Alert>
     </Box>
   );
 
