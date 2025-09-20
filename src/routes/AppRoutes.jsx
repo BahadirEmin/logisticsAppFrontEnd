@@ -22,6 +22,7 @@ import AdminDriverList from '../pages/admin/DriverList';
 import FleetDriverList from '../pages/fleet/FleetDriverList';
 import ProtectedRoute from '../components/ProtectedRoute';
 import SalesMyOffers from '../pages/sales/SalesMyOffers';
+import SuppliersList from '../pages/sales/SuppliersList';
 import OrderDetail from '../pages/shared/OrderDetail';
 import OrderEdit from '../pages/shared/OrderEdit';
 import FleetOfferList from '../pages/fleet/FleetOfferList';
@@ -126,6 +127,13 @@ const AppRoutes = () => {
           <ProtectedRoute allowedRoles={['sales']}>
             <MainLayout>
               <CustomerList />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/sales/tedarikciler" element={
+          <ProtectedRoute allowedRoles={['sales']}>
+            <MainLayout>
+              <SuppliersList />
             </MainLayout>
           </ProtectedRoute>
         } />
