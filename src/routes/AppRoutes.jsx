@@ -26,6 +26,8 @@ import SuppliersList from '../pages/sales/SuppliersList';
 import OrderDetail from '../pages/shared/OrderDetail';
 import OrderEdit from '../pages/shared/OrderEdit';
 import FleetOfferList from '../pages/fleet/FleetOfferList';
+import OperatorOrderDetail from '../pages/operator/OperatorOrderDetail';
+import OperatorOrderEdit from '../pages/operator/OperatorOrderEdit';
 
 const AppRoutes = () => {
   return (
@@ -104,6 +106,20 @@ const AppRoutes = () => {
           <ProtectedRoute allowedRoles={['operator', 'operation']}>
             <MainLayout>
               <OperatorMyOffers />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/operator/teklifler/:orderId" element={
+          <ProtectedRoute allowedRoles={['operator', 'operation']}>
+            <MainLayout>
+              <OperatorOrderDetail />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/operator/teklifler/:orderId/duzenle" element={
+          <ProtectedRoute allowedRoles={['operator', 'operation']}>
+            <MainLayout>
+              <OperatorOrderEdit />
             </MainLayout>
           </ProtectedRoute>
         } />
