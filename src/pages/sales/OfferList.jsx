@@ -22,14 +22,21 @@ import {
   CircularProgress,
   Grid,
   Card,
-  CardContent
+  CardContent,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Divider
 } from '@mui/material';
 import {
   Search as SearchIcon,
   Visibility as VisibilityIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Add as AddIcon
+  Add as AddIcon,
+  CheckCircle as CheckCircleIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
@@ -42,16 +49,18 @@ const OfferList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [customerFilter, setCustomerFilter] = useState('');
+  const [approvalDialog, setApprovalDialog] = useState({ open: false, offer: null });
+  const [approving, setApproving] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
   // Trip status options
   const tripStatusOptions = [
     { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması', color: 'default' },
-    { value: 'ONAYLANDI', label: 'Onaylandı', color: 'success' },
+    { value: 'ONAYLANAN_TEKLIF', label: 'Onaylanan Teklif', color: 'success' },
     { value: 'YOLA_CIKTI', label: 'Yola Çıktı', color: 'info' },
-    { value: 'GUMRUKTE', label: 'Gümrükte', color: 'warning' },
-    { value: 'TAMAMLANDI', label: 'Tamamlandı', color: 'success' },
+    { value: 'TESLIM_EDILDI', label: 'Teslim Edildi', color: 'success' },
+    { value: 'REDDEDILDI', label: 'Reddedildi', color: 'error' },
     { value: 'IPTAL_EDILDI', label: 'İptal Edildi', color: 'error' }
   ];
 
@@ -115,6 +124,59 @@ const OfferList = () => {
         alert('Teklif silinirken bir hata oluştu.');
       }
     }
+  };
+
+  const handleApproveOffer = (offer) => {
+    setApprovalDialog({ open: true, offer });
+  };
+
+  const handleConfirmApproval = async () => {
+    if (!approvalDialog.offer) return;
+    
+    try {
+      setApproving(true);
+      
+      // Update order with all required fields, changing tripStatus to 'ONAYLANAN_TEKLIF'
+      const updateData = {
+        tripStatus: 'ONAYLANAN_TEKLIF',
+        orderNumber: approvalDialog.offer.orderNumber || `ORD-${approvalDialog.offer.id}`,
+        customerId: approvalDialog.offer.customerId,
+        salesPersonId: approvalDialog.offer.salesPersonId,
+        fleetPersonId: approvalDialog.offer.fleetPersonId,
+        operationPersonId: approvalDialog.offer.operationPersonId,
+        vehicleId: approvalDialog.offer.vehicleId,
+        trailerId: approvalDialog.offer.trailerId,
+        driverId: approvalDialog.offer.driverId,
+        pickupDate: approvalDialog.offer.pickupDate,
+        deliveryDate: approvalDialog.offer.deliveryDate,
+        pickupAddress: approvalDialog.offer.departureAddress || approvalDialog.offer.pickupAddress,
+        deliveryAddress: approvalDialog.offer.arrivalAddress || approvalDialog.offer.deliveryAddress,
+        cargoDescription: approvalDialog.offer.cargoType || approvalDialog.offer.cargoDescription,
+        weight: approvalDialog.offer.cargoWeightKg || approvalDialog.offer.weight,
+        volume: approvalDialog.offer.volume,
+        price: approvalDialog.offer.quotePrice || approvalDialog.offer.price,
+        currency: approvalDialog.offer.currency || 'TRY',
+        notes: approvalDialog.offer.notes
+      };
+      
+      await ordersAPI.update(approvalDialog.offer.id, updateData);
+      
+      // Close dialog and refresh offers
+      setApprovalDialog({ open: false, offer: null });
+      await loadOffers();
+      
+      // Show success message
+      setError(null);
+    } catch (err) {
+      console.error('Teklif onaylanırken hata:', err);
+      setError('Teklif onaylanırken bir hata oluştu.');
+    } finally {
+      setApproving(false);
+    }
+  };
+
+  const handleCancelApproval = () => {
+    setApprovalDialog({ open: false, offer: null });
   };
 
   const handleCreateOffer = () => {
@@ -360,6 +422,15 @@ const OfferList = () => {
                         </Tooltip>
                         {offer.tripStatus === 'TEKLIF_ASAMASI' && (
                           <>
+                            <Tooltip title="Onayla">
+                              <IconButton
+                                size="small"
+                                color="success"
+                                onClick={() => handleApproveOffer(offer)}
+                              >
+                                <CheckCircleIcon />
+                              </IconButton>
+                            </Tooltip>
                             <Tooltip title="Düzenle">
                               <IconButton
                                 size="small"
@@ -380,6 +451,19 @@ const OfferList = () => {
                             </Tooltip>
                           </>
                         )}
+                        {offer.tripStatus === 'ONAYLANAN_TEKLIF' && (
+                          <>
+                            <Tooltip title="Düzenle">
+                              <IconButton
+                                size="small"
+                                color="warning"
+                                onClick={() => handleEditOffer(offer.id)}
+                              >
+                                <EditIcon />
+                              </IconButton>
+                            </Tooltip>
+                          </>
+                        )}
                       </Box>
                     </TableCell>
                   </TableRow>
@@ -389,6 +473,136 @@ const OfferList = () => {
           </Table>
         </TableContainer>
       </Paper>
+
+      {/* Approval Confirmation Dialog */}
+      <Dialog
+        open={approvalDialog.open}
+        onClose={handleCancelApproval}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" gap={1}>
+            <CheckCircleIcon color="success" />
+            <Typography variant="h6">Teklifi Onayla</Typography>
+          </Box>
+        </DialogTitle>
+        
+        <DialogContent>
+          {approvalDialog.offer && (
+            <Box>
+              <Alert severity="warning" sx={{ mb: 3 }}>
+                Bu teklifi onaylamak istediğinizden emin misiniz? Onaylandıktan sonra teklif durumu "Onaylanan Teklif" olarak değişecektir.
+              </Alert>
+
+              <Paper elevation={2} sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom color="primary">
+                  Teklif Detayları
+                </Typography>
+                
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">Teklif No:</Typography>
+                    <Typography variant="body1" fontWeight="bold">#{approvalDialog.offer.id}</Typography>
+                  </Grid>
+                  
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">Müşteri:</Typography>
+                    <Typography variant="body1" fontWeight="medium">{approvalDialog.offer.customerName}</Typography>
+                  </Grid>
+                  
+                  <Grid item xs={12}>
+                    <Divider sx={{ my: 1 }} />
+                  </Grid>
+                  
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">Nereden:</Typography>
+                    <Typography variant="body1">
+                      {approvalDialog.offer.departureCity}, {approvalDialog.offer.departureCountry}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {approvalDialog.offer.departureAddress}
+                    </Typography>
+                  </Grid>
+                  
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">Nereye:</Typography>
+                    <Typography variant="body1">
+                      {approvalDialog.offer.arrivalCity}, {approvalDialog.offer.arrivalCountry}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {approvalDialog.offer.arrivalAddress}
+                    </Typography>
+                  </Grid>
+                  
+                  <Grid item xs={12}>
+                    <Divider sx={{ my: 1 }} />
+                  </Grid>
+                  
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">Yük Tipi:</Typography>
+                    <Typography variant="body1">{approvalDialog.offer.cargoType}</Typography>
+                  </Grid>
+                  
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">Ağırlık:</Typography>
+                    <Typography variant="body1">{approvalDialog.offer.cargoWeightKg} kg</Typography>
+                  </Grid>
+                  
+                  {approvalDialog.offer.cargoWidth && approvalDialog.offer.cargoLength && approvalDialog.offer.cargoHeight && (
+                    <Grid item xs={12}>
+                      <Typography variant="body2" color="text.secondary">Ölçüler:</Typography>
+                      <Typography variant="body1">
+                        {approvalDialog.offer.cargoWidth} x {approvalDialog.offer.cargoLength} x {approvalDialog.offer.cargoHeight} m
+                      </Typography>
+                    </Grid>
+                  )}
+                  
+                  {approvalDialog.offer.quotePrice && (
+                    <Grid item xs={12}>
+                      <Typography variant="body2" color="text.secondary">Teklif Fiyatı:</Typography>
+                      <Typography variant="body1" fontWeight="bold" color="success.main">
+                        {approvalDialog.offer.quotePrice.toLocaleString('tr-TR')} TL
+                      </Typography>
+                    </Grid>
+                  )}
+                  
+                  <Grid item xs={12}>
+                    <Divider sx={{ my: 1 }} />
+                  </Grid>
+                  
+                  <Grid item xs={12}>
+                    <Typography variant="body2" color="text.secondary">Oluşturulma Tarihi:</Typography>
+                    <Typography variant="body1">
+                      {new Date(approvalDialog.offer.createdAt).toLocaleDateString('tr-TR')} - 
+                      {new Date(approvalDialog.offer.createdAt).toLocaleTimeString('tr-TR')}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Paper>
+            </Box>
+          )}
+        </DialogContent>
+        
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button
+            onClick={handleCancelApproval}
+            disabled={approving}
+            color="inherit"
+          >
+            İptal
+          </Button>
+          <Button
+            onClick={handleConfirmApproval}
+            variant="contained"
+            color="success"
+            disabled={approving}
+            startIcon={approving ? <CircularProgress size={20} /> : <CheckCircleIcon />}
+          >
+            {approving ? 'Onaylanıyor...' : 'Evet, Onayla'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
