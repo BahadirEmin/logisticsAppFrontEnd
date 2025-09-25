@@ -25,6 +25,8 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowForward, ArrowBack, Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { customerAPI } from '../../api/customers';
 import { ordersAPI } from '../../api/orders';
+import { parseNumber } from '../../utils/numberFormatter';
+import { useFormattedInput, useCargoFormattedInput } from '../../hooks/useFormattedInput';
 
 const steps = ['Rota ve Yük Bilgileri', 'Bilgileri Onayla', 'Teklif Gönder'];
 
@@ -133,6 +135,10 @@ const OfferForm = () => {
 
   const [errors, setErrors] = useState({});
 
+  // Use custom hooks for formatted input handling
+  const { handleInputChange } = useFormattedInput(setFormData, setErrors);
+  const { handleCargoItemChange } = useCargoFormattedInput(setFormData);
+
   // Load customers on component mount
   useEffect(() => {
     loadCustomers();
@@ -180,92 +186,7 @@ const OfferForm = () => {
     }
   };
 
-  // Format number with thousands separator
-  const formatNumber = (num) => {
-    if (!num) return '';
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  };
 
-  // Parse formatted number back to plain number
-  const parseNumber = (str) => {
-    if (!str) return '';
-    return str.replace(/\./g, '');
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value, checked } = e.target;
-    let processedValue = value;
-
-    // Format price fields with thousands separator
-    if (name === 'estimatedPrice' || name.includes('weight')) {
-      const numericValue = value.replace(/[^0-9]/g, '');
-      if (numericValue) {
-        processedValue = formatNumber(numericValue);
-      } else {
-        processedValue = '';
-      }
-    }
-    
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setFormData(prev => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: processedValue
-        }
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: name === 'transferable' ? checked : processedValue
-      }));
-    }
-    
-    // Clear error when user types
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  // Handle cargo item changes
-  const handleCargoItemChange = (index, field, value) => {
-    let processedValue = value;
-    
-    // Format weight fields with thousands separator
-    if (field === 'weight') {
-      const numericValue = value.replace(/[^0-9]/g, '');
-      if (numericValue) {
-        processedValue = formatNumber(numericValue);
-      } else {
-        processedValue = '';
-      }
-    }
-
-    if (field.includes('.')) {
-      const [parent, child] = field.split('.');
-      setFormData(prev => ({
-        ...prev,
-        cargoItems: prev.cargoItems.map((item, i) => 
-          i === index 
-            ? { ...item, [parent]: { ...item[parent], [child]: processedValue } }
-            : item
-        )
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        cargoItems: prev.cargoItems.map((item, i) => 
-          i === index 
-            ? { ...item, [field]: processedValue }
-            : item
-        )
-      }));
-    }
-  };
 
   // Add new cargo item
   const addCargoItem = () => {
@@ -303,39 +224,38 @@ const OfferForm = () => {
     }
     
     // Validate from address - Zorunlu alanlar: Ülke, Şehir, Posta kodu
-    if (!formData.fromAddress.country.trim()) {
-      newErrors['fromAddress.country'] = 'Ülke seçimi zorunludur';
-    }
-    if (!formData.fromAddress.city.trim()) {
-      newErrors['fromAddress.city'] = 'Şehir alanı zorunludur';
-    }
-    if (!formData.fromAddress.zipCode.trim()) {
-      newErrors['fromAddress.zipCode'] = 'Posta kodu zorunludur';
-    }
+    // if (!formData.fromAddress.country.trim()) {
+    //   newErrors['fromAddress.country'] = 'Ülke seçimi zorunludur';
+    // }
+    // if (!formData.fromAddress.city.trim()) {
+    //   newErrors['fromAddress.city'] = 'Şehir alanı zorunludur';
+    // }
+    // if (!formData.fromAddress.zipCode.trim()) {
+    //   newErrors['fromAddress.zipCode'] = 'Posta kodu zorunludur';
+    // }
     
-    // Validate to address - Zorunlu alanlar: Ülke, Şehir, Posta kodu
-    if (!formData.toAddress.country.trim()) {
-      newErrors['toAddress.country'] = 'Ülke seçimi zorunludur';
-    }
-    if (!formData.toAddress.city.trim()) {
-      newErrors['toAddress.city'] = 'Şehir alanı zorunludur';
-    }
-    if (!formData.toAddress.zipCode.trim()) {
-      newErrors['toAddress.zipCode'] = 'Posta kodu zorunludur';
-    }
+    // // Validate to address - Zorunlu alanlar: Ülke, Şehir, Posta kodu
+    // if (!formData.toAddress.country.trim()) {
+    //   newErrors['toAddress.country'] = 'Ülke seçimi zorunludur';
+    // }
+    // if (!formData.toAddress.city.trim()) {
+    //   newErrors['toAddress.city'] = 'Şehir alanı zorunludur';
+    // }
+    // if (!formData.toAddress.zipCode.trim()) {
+    //   newErrors['toAddress.zipCode'] = 'Posta kodu zorunludur';
+    // }
     
-    // Validate cargo items - Yük ölçüleri zorunlu
-    formData.cargoItems.forEach((item, index) => {
-      if (!item.dimensions.length || !item.dimensions.width || !item.dimensions.height) {
-        newErrors[`cargoItems.${index}.dimensions`] = 'Tüm ölçü alanları zorunludur';
-      }
-      if (!item.cargoType) {
-        newErrors[`cargoItems.${index}.cargoType`] = 'Yük tipi seçimi zorunludur';
-      }
-      if (!item.weight || parseFloat(parseNumber(item.weight)) <= 0) {
-        newErrors[`cargoItems.${index}.weight`] = 'Geçerli bir ağırlık giriniz';
-      }
-    });
+    // formData.cargoItems.forEach((item, index) => {
+    //   if (!item.dimensions.length || !item.dimensions.width || !item.dimensions.height) {
+    //     newErrors[`cargoItems.${index}.dimensions`] = 'Tüm ölçü alanları zorunludur';
+    //   }
+    //   if (!item.cargoType) {
+    //     newErrors[`cargoItems.${index}.cargoType`] = 'Yük tipi seçimi zorunludur';
+    //   }
+    //   if (!item.weight || parseFloat(parseNumber(item.weight)) <= 0) {
+    //     newErrors[`cargoItems.${index}.weight`] = 'Geçerli bir ağırlık giriniz';
+    //   }
+    // });
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -420,17 +340,14 @@ const OfferForm = () => {
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
             <FormControl fullWidth error={!!errors.customerId} size="small">
-              <InputLabel>Müşteri Seçin *</InputLabel>
+              <InputLabel>Müşteri Seçin</InputLabel>
               <Select
                 name="customerId"
                 value={formData.customerId}
                 onChange={handleCustomerChange}
-                label="Müşteri Seçin *"
+                label="Müşteri Seçin"
                 disabled={loading}
               >
-                <MenuItem value="">
-                  <em>Müşteri seçiniz</em>
-                </MenuItem>
                 {customers.map((customer) => (
                   <MenuItem key={customer.id} value={customer.id}>
                     <Box>
@@ -526,12 +443,10 @@ const OfferForm = () => {
             <TextField
               fullWidth
               size="small"
-              label="Şehir *"
+              label="Şehir"
               name="fromAddress.city"
               value={formData.fromAddress.city}
               onChange={handleInputChange}
-              error={!!errors['fromAddress.city']}
-              helperText={errors['fromAddress.city']}
             />
           </Grid>
           
@@ -550,12 +465,10 @@ const OfferForm = () => {
             <TextField
               fullWidth
               size="small"
-              label="Posta Kodu *"
+              label="Posta Kodu"
               name="fromAddress.zipCode"
               value={formData.fromAddress.zipCode}
               onChange={handleInputChange}
-              error={!!errors['fromAddress.zipCode']}
-              helperText={errors['fromAddress.zipCode']}
             />
           </Grid>
           
@@ -643,12 +556,10 @@ const OfferForm = () => {
             <TextField
               fullWidth
               size="small"
-              label="Şehir *"
+              label="Şehir"
               name="toAddress.city"
               value={formData.toAddress.city}
               onChange={handleInputChange}
-              error={!!errors['toAddress.city']}
-              helperText={errors['toAddress.city']}
             />
           </Grid>
           
@@ -667,12 +578,10 @@ const OfferForm = () => {
             <TextField
               fullWidth
               size="small"
-              label="Posta Kodu *"
+              label="Posta Kodu"
               name="toAddress.zipCode"
               value={formData.toAddress.zipCode}
               onChange={handleInputChange}
-              error={!!errors['toAddress.zipCode']}
-              helperText={errors['toAddress.zipCode']}
             />
           </Grid>
           
@@ -758,59 +667,55 @@ const OfferForm = () => {
               )}
             </Box>
 
-            {/* Cargo Dimensions - Zorunlu */}
+            {/* Cargo Dimensions - Artık Opsiyonel */}
             <Typography variant="body2" gutterBottom sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-              Yük Ölçüleri *
+              Yük Ölçüleri
             </Typography>
             <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid item xs={12} sm={4}>
                 <TextField
                   fullWidth
                   size="small"
-                  label="Uzunluk (cm) *"
+                  label="Uzunluk (cm)"
                   type="number"
                   value={item.dimensions.length}
                   onChange={(e) => handleCargoItemChange(index, 'dimensions.length', e.target.value)}
-                  error={!!errors[`cargoItems.${index}.dimensions`]}
-                  helperText={errors[`cargoItems.${index}.dimensions`]}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
                 <TextField
                   fullWidth
                   size="small"
-                  label="Genişlik (cm) *"
+                  label="Genişlik (cm)"
                   type="number"
                   value={item.dimensions.width}
                   onChange={(e) => handleCargoItemChange(index, 'dimensions.width', e.target.value)}
-                  error={!!errors[`cargoItems.${index}.dimensions`]}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
                 <TextField
                   fullWidth
                   size="small"
-                  label="Yükseklik (cm) *"
+                  label="Yükseklik (cm)"
                   type="number"
                   value={item.dimensions.height}
                   onChange={(e) => handleCargoItemChange(index, 'dimensions.height', e.target.value)}
-                  error={!!errors[`cargoItems.${index}.dimensions`]}
                 />
               </Grid>
             </Grid>
 
-            {/* Cargo Type and Weight - Zorunlu */}
+            {/* Cargo Type and Weight - Artık Opsiyonel */}
             <Typography variant="body2" gutterBottom sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-              Yük Detayları *
+              Yük Detayları
             </Typography>
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid item xs={12} sm={6}>
-                <FormControl fullWidth error={!!errors[`cargoItems.${index}.cargoType`]} size="small">
-                  <InputLabel>Yük Tipi *</InputLabel>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Yük Tipi</InputLabel>
                   <Select
                     value={item.cargoType}
                     onChange={(e) => handleCargoItemChange(index, 'cargoType', e.target.value)}
-                    label="Yük Tipi *"
+                    label="Yük Tipi"
                   >
                     {cargoTypes.map((type) => (
                       <MenuItem key={type} value={type}>
@@ -818,22 +723,15 @@ const OfferForm = () => {
                       </MenuItem>
                     ))}
                   </Select>
-                  {errors[`cargoItems.${index}.cargoType`] && (
-                    <Typography variant="caption" color="error">
-                      {errors[`cargoItems.${index}.cargoType`]}
-                    </Typography>
-                  )}
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   size="small"
-                  label="Ağırlık (kg) *"
+                  label="Ağırlık (kg)"
                   value={item.weight}
                   onChange={(e) => handleCargoItemChange(index, 'weight', e.target.value)}
-                  error={!!errors[`cargoItems.${index}.weight`]}
-                  helperText={errors[`cargoItems.${index}.weight`]}
                 />
               </Grid>
             </Grid>
@@ -1125,7 +1023,10 @@ const OfferForm = () => {
       </Paper>
       
       <Alert severity="info" sx={{ mb: 3 }}>
-        Fiyat bilgisini girmezseniz, teklif operasyon ekibine fiyatsız olarak gönderilecek ve daha sonra fiyat belirlenebilir.
+        <Typography variant="body2">
+          <strong>Bilgi:</strong> Boş bıraktığınız alanları teklif gönderildikten sonra da doldurabilirsiniz. 
+          Fiyat bilgisini girmezseniz, operasyon ekibi daha sonra fiyat belirleyebilir.
+        </Typography>
       </Alert>
       
       <Alert severity="warning" sx={{ mb: 3 }}>

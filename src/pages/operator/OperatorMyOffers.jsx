@@ -38,6 +38,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
 import { useAuth } from '../../contexts/AuthContext';
+import { shouldFormatField, handleNumberInput } from '../../utils/numberFormatter';
 
 const OperatorMyOffers = () => {
   const [offers, setOffers] = useState([]);
