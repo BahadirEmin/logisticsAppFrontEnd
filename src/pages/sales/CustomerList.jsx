@@ -40,6 +40,7 @@ import {
   Gavel as LawsuitIcon
 } from '@mui/icons-material';
 import { customerAPI } from '../../api/customers';
+import { useFormattedInput } from '../../hooks/useFormattedInput';
 
 const CustomerList = () => {
   const [customers, setCustomers] = useState([]);
@@ -111,22 +112,8 @@ const CustomerList = () => {
     return matchesSearch && matchesRiskStatus && matchesBlacklisted;
   });
 
-  // Handle form input changes
-  const handleInputChange = (e) => {
-    const { name, value, checked, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-    
-    // Clear error when user types
-    if (formErrors[name]) {
-      setFormErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
+  // Use custom hook for formatted input handling
+  const { handleInputChange } = useFormattedInput(setFormData, setFormErrors);
 
   // Validate form
   const validateForm = () => {

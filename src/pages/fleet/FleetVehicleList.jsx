@@ -39,6 +39,7 @@ import {
   LocalShipping as TruckIcon
 } from '@mui/icons-material';
 import { vehicleAPI } from '../../api/vehicles';
+import { useFormattedInput } from '../../hooks/useFormattedInput';
 
 const FleetVehicleList = () => {
   const [vehicles, setVehicles] = useState([]);
@@ -112,22 +113,8 @@ const FleetVehicleList = () => {
     return matchesSearch && matchesActive;
   });
 
-  // Handle form input changes
-  const handleInputChange = (e) => {
-    const { name, value, checked, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-    
-    // Clear error when user types
-    if (formErrors[name]) {
-      setFormErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
+  // Use custom hook for formatted input handling
+  const { handleInputChange } = useFormattedInput(setFormData, setFormErrors);
 
   // Validate form
   const validateForm = () => {
