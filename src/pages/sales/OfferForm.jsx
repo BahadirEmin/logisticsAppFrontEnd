@@ -28,7 +28,7 @@ import { ordersAPI } from '../../api/orders';
 import { parseNumber } from '../../utils/numberFormatter';
 import { useFormattedInput, useCargoFormattedInput } from '../../hooks/useFormattedInput';
 
-const steps = ['Rota ve Yük Bilgileri', 'Bilgileri Onayla', 'Teklif Gönder'];
+const steps = ['Rota ve Yük Bilgileri', 'Bilgileri Onayla', 'Teklif Fiyatı ve Gönder'];
 
 const cargoTypes = [
   'Genel Kargo',
@@ -128,9 +128,8 @@ const OfferForm = () => {
     customerEmail: '',
     specialRequirements: '',
     
-    // Step 3: Pricing (will be added)
-    estimatedPrice: '',
-    currency: 'TRY'
+    // Step 3: Pricing
+    quotePrice: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -285,12 +284,18 @@ const OfferForm = () => {
       // Prepare order data with cargo items
       const orderData = {
         customerId: parseInt(formData.customerId),
+        
+        // Departure address details
         departureCountry: formData.fromAddress.country,
         departureCity: formData.fromAddress.city,
+        departureDistrict: formData.fromAddress.district || null,
+        departurePostalCode: formData.fromAddress.zipCode || null,
         departureAddress: formData.fromAddress.address,
         departureZipCode: formData.fromAddress.zipCode,
         arrivalCountry: formData.toAddress.country,
         arrivalCity: formData.toAddress.city,
+        arrivalDistrict: formData.toAddress.district || null,
+        arrivalPostalCode: formData.toAddress.zipCode || null,
         arrivalAddress: formData.toAddress.address,
         arrivalZipCode: formData.toAddress.zipCode,
         cargoWeightKg: totalWeight,
@@ -970,6 +975,7 @@ const OfferForm = () => {
   const renderStep3 = () => (
     <Box>
       <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
+        Teklif Fiyatı ve Gönder
         Teklif Fiyatı ve Gönder
       </Typography>
       

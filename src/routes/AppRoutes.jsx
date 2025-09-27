@@ -22,9 +22,12 @@ import AdminDriverList from '../pages/admin/DriverList';
 import FleetDriverList from '../pages/fleet/FleetDriverList';
 import ProtectedRoute from '../components/ProtectedRoute';
 import SalesMyOffers from '../pages/sales/SalesMyOffers';
+import SuppliersList from '../pages/sales/SuppliersList';
 import OrderDetail from '../pages/shared/OrderDetail';
 import OrderEdit from '../pages/shared/OrderEdit';
 import FleetOfferList from '../pages/fleet/FleetOfferList';
+import OperatorOrderDetail from '../pages/operator/OperatorOrderDetail';
+import OperatorOrderEdit from '../pages/operator/OperatorOrderEdit';
 
 const AppRoutes = () => {
   return (
@@ -106,6 +109,20 @@ const AppRoutes = () => {
             </MainLayout>
           </ProtectedRoute>
         } />
+        <Route path="/operator/teklifler/:orderId" element={
+          <ProtectedRoute allowedRoles={['operator', 'operation']}>
+            <MainLayout>
+              <OperatorOrderDetail />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/operator/teklifler/:orderId/duzenle" element={
+          <ProtectedRoute allowedRoles={['operator', 'operation']}>
+            <MainLayout>
+              <OperatorOrderEdit />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
 
         {/* Protected routes - Sales */}
         <Route path="/sales" element={
@@ -126,6 +143,13 @@ const AppRoutes = () => {
           <ProtectedRoute allowedRoles={['sales']}>
             <MainLayout>
               <CustomerList />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/sales/tedarikciler" element={
+          <ProtectedRoute allowedRoles={['sales']}>
+            <MainLayout>
+              <SuppliersList />
             </MainLayout>
           </ProtectedRoute>
         } />
