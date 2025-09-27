@@ -23,7 +23,13 @@ import {
   Grid,
   Card,
   CardContent,
-  Button
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormControlLabel,
+  Switch
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -33,7 +39,9 @@ import {
   LocalShipping as LocalShippingIcon,
   Assignment as AssignmentIcon,
   FilterList as FilterListIcon,
-  Download as DownloadIcon
+  Download as DownloadIcon,
+  Person as PersonIcon,
+  Edit as EditIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
@@ -45,7 +53,10 @@ const OperatorMyOffers = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [editDialog, setEditDialog] = useState({ open: false, offer: null });
+  const [saving, setSaving] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Operator-specific status options
   const operatorStatusOptions = [
@@ -88,7 +99,6 @@ const OperatorMyOffers = () => {
         data = await ordersAPI.getAll();
       }
       
-      console.log('My Offers API Response:', data);
       setOffers(data);
     } catch (err) {
       console.error('Operatör teklifleri yüklenirken hata:', err);
@@ -137,19 +147,43 @@ const OperatorMyOffers = () => {
   });
 
   const handleViewOffer = (offerId) => {
-    // Navigate to offer detail view
-    console.log('Viewing offer:', offerId);
+    navigate(`/operator/teklifler/${offerId}`);
   };
 
-  const handleProcessOffer = (offerId) => {
-    // Process the offer (change status to ISLEME_ALINDI)
-    console.log('Processing offer:', offerId);
+  const handleEditOffer = (offer) => {
+    setEditDialog({ open: true, offer: { ...offer } });
   };
 
-  const handleApproveOffer = (offerId) => {
-    // Approve the offer (change status to ONAYLANDI)
-    console.log('Approving offer:', offerId);
+  const handleCloseEditDialog = () => {
+    setEditDialog({ open: false, offer: null });
   };
+
+  const handleSaveOffer = async () => {
+    if (!editDialog.offer) return;
+    
+    try {
+      setSaving(true);
+      await ordersAPI.update(editDialog.offer.id, editDialog.offer);
+      await loadOperatorOffers(); // Reload the list
+      setEditDialog({ open: false, offer: null });
+    } catch (err) {
+      console.error('Teklif güncellenirken hata:', err);
+      setError('Teklif güncellenirken bir hata oluştu.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleEditInputChange = (field, value) => {
+    setEditDialog(prev => ({
+      ...prev,
+      offer: {
+        ...prev.offer,
+        [field]: value
+      }
+    }));
+  };
+
 
   const handleDownloadDriverDocument = async (orderId) => {
     try {
@@ -349,7 +383,7 @@ const OperatorMyOffers = () => {
                     <strong>{offer.price ? `₺${offer.price}` : 'N/A'}</strong>
                   </TableCell>
                   <TableCell>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                       <Tooltip title="Detay Görüntüle">
                         <IconButton
                           size="small"
@@ -367,6 +401,24 @@ const OperatorMyOffers = () => {
                           <DownloadIcon />
                         </IconButton>
                       </Tooltip>
+                      {/* Show edit button for assigned offers */}
+                      {(offer.operationPersonId === user?.id || offer.fleetPersonId === user?.id) && (
+                        <Tooltip title="Düzenle">
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEditOffer(offer)}
+                            color="warning"
+                          >
+                            <EditIcon />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      {/* Show "Sizin Üzerinizde" icon for assigned offers */}
+                      {(offer.operationPersonId === user?.id || offer.fleetPersonId === user?.id) && (
+                        <Tooltip title="Sizin Üzerinizde">
+                          <PersonIcon color="success" fontSize="small" />
+                        </Tooltip>
+                      )}
                     </Box>
                   </TableCell>
                 </TableRow>
@@ -381,6 +433,154 @@ const OperatorMyOffers = () => {
           Arama kriterlerinize uygun teklif bulunamadı.
         </Alert>
       )}
+
+      {/* Edit Dialog */}
+      <Dialog
+        open={editDialog.open}
+        onClose={handleCloseEditDialog}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" gap={1}>
+            <EditIcon color="primary" />
+            <Typography variant="h6">Teklifi Düzenle</Typography>
+          </Box>
+        </DialogTitle>
+        
+        <DialogContent>
+          {editDialog.offer && (
+            <Box sx={{ mt: 2 }}>
+              <Grid container spacing={2}>
+                {/* Status */}
+                <Grid item xs={12}>
+                  <FormControl fullWidth>
+                    <InputLabel>Durum</InputLabel>
+                    <Select
+                      value={editDialog.offer.tripStatus || editDialog.offer.status || ''}
+                      onChange={(e) => handleEditInputChange('tripStatus', e.target.value)}
+                      label="Durum"
+                    >
+                      {operatorStatusOptions.map((status) => (
+                        <MenuItem key={status.value} value={status.value}>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            {status.icon}
+                            <Chip 
+                              label={status.label} 
+                              color={status.color} 
+                              size="small" 
+                              sx={{ ml: 1 }}
+                            />
+                          </Box>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                {/* Departure Address */}
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Kalkış Adresi"
+                    value={editDialog.offer.departureAddress || ''}
+                    onChange={(e) => handleEditInputChange('departureAddress', e.target.value)}
+                    multiline
+                    rows={2}
+                  />
+                </Grid>
+
+                {/* Arrival Address */}
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Varış Adresi"
+                    value={editDialog.offer.arrivalAddress || ''}
+                    onChange={(e) => handleEditInputChange('arrivalAddress', e.target.value)}
+                    multiline
+                    rows={2}
+                  />
+                </Grid>
+
+                {/* Cargo Type */}
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Yük Tipi"
+                    value={editDialog.offer.cargoType || ''}
+                    onChange={(e) => handleEditInputChange('cargoType', e.target.value)}
+                  />
+                </Grid>
+
+                {/* Cargo Weight */}
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Ağırlık (kg)"
+                    type="number"
+                    value={editDialog.offer.cargoWeightKg || ''}
+                    onChange={(e) => handleEditInputChange('cargoWeightKg', Number(e.target.value))}
+                  />
+                </Grid>
+
+                {/* Price */}
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Fiyat (₺)"
+                    type="number"
+                    value={editDialog.offer.price || editDialog.offer.quotePrice || ''}
+                    onChange={(e) => handleEditInputChange('price', Number(e.target.value))}
+                  />
+                </Grid>
+
+                {/* Estimated Delivery Date */}
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Tahmini Teslimat Tarihi"
+                    type="date"
+                    value={editDialog.offer.estimatedDeliveryDate ? editDialog.offer.estimatedDeliveryDate.split('T')[0] : ''}
+                    onChange={(e) => handleEditInputChange('estimatedDeliveryDate', e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+
+                {/* Notes */}
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Notlar"
+                    value={editDialog.offer.notes || ''}
+                    onChange={(e) => handleEditInputChange('notes', e.target.value)}
+                    multiline
+                    rows={3}
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          )}
+        </DialogContent>
+        
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button
+            onClick={handleCloseEditDialog}
+            disabled={saving}
+            color="inherit"
+          >
+            İptal
+          </Button>
+          <Button
+            onClick={handleSaveOffer}
+            variant="contained"
+            color="primary"
+            disabled={saving}
+            startIcon={saving ? <CircularProgress size={20} /> : <EditIcon />}
+          >
+            {saving ? 'Kaydediliyor...' : 'Kaydet'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

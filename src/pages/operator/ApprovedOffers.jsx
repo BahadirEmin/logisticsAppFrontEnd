@@ -18,7 +18,8 @@ import {
   Card,
   CardContent,
   Alert,
-  CircularProgress
+  CircularProgress,
+  Tooltip
 } from '@mui/material';
 import {
   Search, 
@@ -29,8 +30,10 @@ import {
   Warning,
   DirectionsCar,
   Assignment,
-  Visibility
+  Visibility,
+  Person as PersonIcon
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
 import { usersAPI } from '../../api/users';
 import { useAuth } from '../../contexts/AuthContext';
@@ -43,6 +46,7 @@ const ApprovedOffers = () => {
   const [error, setError] = useState(null);
   const [assigningOrderId, setAssigningOrderId] = useState(null);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Status options for filtering
   const statusOptions = [
@@ -64,7 +68,6 @@ const ApprovedOffers = () => {
       
       // Make real API call to get all orders
       const data = await ordersAPI.getAll();
-      console.log('API Response:', data);
       setOffers(data);
     } catch (err) {
       console.error('Operatör teklifleri yüklenirken hata:', err);
@@ -128,8 +131,7 @@ const ApprovedOffers = () => {
   }
 
   const handleViewOffer = (offerId) => {
-    // Navigate to offer detail view
-    console.log('Viewing offer:', offerId);
+    navigate(`/operator/teklifler/${offerId}`);
   };
 
   const handleAssignToMe = async (offerId) => {
@@ -141,18 +143,9 @@ const ApprovedOffers = () => {
         return;
       }
 
-      // Debug logging
-      console.log('Assigning order:', {
-        orderId: offerId,
-        userId: user.id,
-        userRole: user.role,
-        userData: user
-      });
-
       // Validate that user exists in users table before assignment
       try {
         await usersAPI.validateUser(user.id);
-        console.log('User validation successful for user ID:', user.id);
       } catch (validationError) {
         console.error('User validation failed:', validationError);
         alert('Kullanıcı ID\'niz users tablosunda bulunamadı. Lütfen sistem yöneticisi ile iletişime geçin.');
@@ -160,11 +153,9 @@ const ApprovedOffers = () => {
       }
 
       if (user?.role === 'operator' || user?.role === 'operation') {
-        console.log('Calling assignToOperation with:', { orderId: offerId, operationPersonId: user.id });
         await ordersAPI.assignToOperation(offerId, user.id);
         alert('Teklif başarıyla size atandı!');
       } else if (user?.role === 'fleet') {
-        console.log('Calling assignToFleet with:', { orderId: offerId, fleetPersonId: user.id });
         await ordersAPI.assignToFleet(offerId, user.id);
         alert('Teklif başarıyla size atandı!');
       } else {
@@ -176,11 +167,6 @@ const ApprovedOffers = () => {
       await loadApprovedOffers();
     } catch (error) {
       console.error('Teklif atama hatası:', error);
-      console.error('Error details:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status
-      });
       
       let errorMessage = 'Teklif atanırken bir hata oluştu.';
       
@@ -206,12 +192,6 @@ const ApprovedOffers = () => {
         Onaylanan Teklifler
       </Typography>
       
-      {/* Debug info - remove in production */}
-      {user && (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          <strong>Debug Info:</strong> User ID: {user.id}, Role: {user.role}, Name: {user.firstName} {user.lastName}
-        </Alert>
-      )}
 
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -360,7 +340,7 @@ const ApprovedOffers = () => {
                     <strong>{offer.price ? `₺${offer.price}` : 'N/A'}</strong>
                   </TableCell>
                   <TableCell>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                       <Button
                         size="small"
                         startIcon={<Visibility />}
@@ -370,8 +350,9 @@ const ApprovedOffers = () => {
                         Detay
                       </Button>
                       
-                      {/* Show assign button only for operators and fleet users */}
-                      {(user?.role === 'operator' || user?.role === 'operation' || user?.role === 'fleet') && (
+                      {/* Show assign button only for unassigned offers */}
+                      {(user?.role === 'operator' || user?.role === 'operation' || user?.role === 'fleet') && 
+                       !(offer.operationPersonId === user?.id || offer.fleetPersonId === user?.id) && (
                         <Button
                           size="small"
                           startIcon={assigningOrderId === offer.id ? <CircularProgress size={16} /> : <Assignment />}
@@ -382,6 +363,13 @@ const ApprovedOffers = () => {
                         >
                           {assigningOrderId === offer.id ? 'Atanıyor...' : 'Üzerine Al'}
                         </Button>
+                      )}
+                      
+                      {/* Show "Sizin Üzerinizde" icon for assigned offers */}
+                      {(offer.operationPersonId === user?.id || offer.fleetPersonId === user?.id) && (
+                        <Tooltip title="Sizin Üzerinizde">
+                          <PersonIcon color="success" fontSize="small" />
+                        </Tooltip>
                       )}
                     </Box>
                   </TableCell>
