@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Container,
-  Paper,
   Typography,
   Box,
   Grid,
@@ -45,7 +44,7 @@ const OperatorOrderDetail = () => {
 
   useEffect(() => {
     loadOrder();
-  }, [orderId]);
+  }, [orderId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadOrder = async () => {
     try {
@@ -166,48 +165,110 @@ const OperatorOrderDetail = () => {
       <Grid container spacing={3}>
         {/* Status Card */}
         <Grid item xs={12}>
-          <Card>
+          <Card sx={{ 
+            height: '100%',
+            background: `linear-gradient(135deg, ${
+              order.tripStatus === 'TEKLIF_ASAMASI' ? '#f5f5f5, #e0e0e0' :
+              order.tripStatus === 'ONAYLANDI' ? '#e8f5e8, #c8e6c9' :
+              order.tripStatus === 'YOLA_CIKTI' ? '#e3f2fd, #bbdefb' :
+              order.tripStatus === 'GUMRUKTE' ? '#fff3e0, #ffcc02' :
+              order.tripStatus === 'TAMAMLANDI' ? '#e8f5e8, #4caf50' :
+              '#ffebee, #f44336'
+            })`
+          }}>
             <CardHeader
-              title="Sipariş Durumu"
+              title="Sipariş Durumu ve Özet"
+              avatar={<PersonIcon color="primary" />}
               action={
                 <Chip
                   label={getStatusLabel(order.tripStatus)}
                   color={getStatusColor(order.tripStatus)}
-                  variant="outlined"
+                  variant="filled"
+                  size="large"
+                  sx={{ fontWeight: 'bold' }}
                 />
               }
             />
+            <CardContent>
+              <Box sx={{ textAlign: 'center', py: 2 }}>
+                {/* Sipariş Numarası ve Durum */}
+                <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+                  Sipariş #{order.id}
+                </Typography>
+                <Typography variant="h5" color="primary" sx={{ fontWeight: 'bold', mb: 3 }}>
+                  {getStatusLabel(order.tripStatus)}
+                </Typography>
+                
+                {/* Güzergah */}
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  <strong>{order.departureCity}, {order.departureCountry}</strong> → <strong>{order.arrivalCity}, {order.arrivalCountry}</strong>
+                </Typography>
+                
+                {/* Özet Bilgiler */}
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, flexWrap: 'wrap', mb: 2 }}>
+                  <Typography variant="body1">
+                    <strong>Yük:</strong> {order.cargoType}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Ağırlık:</strong> {order.cargoWeightKg} kg
+                  </Typography>
+                  <Typography variant="body1" color="textSecondary">
+                    <strong>Oluşturulma:</strong> {formatDate(order.createdAt)}
+                  </Typography>
+                </Box>
+                
+                {/* Tarih Bilgileri */}
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, flexWrap: 'wrap' }}>
+                  {order.loadingDate && (
+                    <Typography variant="body2" color="warning.main" sx={{ fontWeight: 'medium' }}>
+                      <strong>Yükleme:</strong> {formatDate(order.loadingDate)}
+                    </Typography>
+                  )}
+                  {order.deadlineDate && (
+                    <Typography variant="body2" color="error.main" sx={{ fontWeight: 'bold' }}>
+                      <strong>Son Teslim:</strong> {formatDate(order.deadlineDate)}
+                    </Typography>
+                  )}
+                  {order.estimatedArrivalDate && (
+                    <Typography variant="body2" color="info.main" sx={{ fontWeight: 'medium' }}>
+                      <strong>Tahmini Varış:</strong> {formatDate(order.estimatedArrivalDate)}
+                    </Typography>
+                  )}
+                </Box>
+              </Box>
+            </CardContent>
           </Card>
         </Grid>
 
-        {/* Departure Information */}
+        {/* Location Information Row */}
         <Grid item xs={12} md={6}>
-          <Card>
+          <Card sx={{ height: '100%', minHeight: 380 }}>
             <CardHeader
               title="Kalkış Bilgileri"
               avatar={<LocationIcon color="primary" />}
+              sx={{ pb: 1 }}
             />
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
+            <CardContent sx={{ pt: 0 }}>
+              <Typography variant="h6" gutterBottom color="primary">
                 {order.departureCity}, {order.departureCountry}
               </Typography>
-              <Typography variant="body2" color="textSecondary" paragraph>
+              <Typography variant="body2" color="textSecondary" paragraph sx={{ minHeight: 40 }}>
                 {order.departureAddress}
               </Typography>
-              <Typography variant="body2">
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
                 <strong>İlçe:</strong> {order.departureDistrict || 'Belirtilmemiş'}
               </Typography>
-              <Typography variant="body2">
+              <Typography variant="body2" sx={{ mb: 2 }}>
                 <strong>Posta Kodu:</strong> {order.departurePostalCode || 'Belirtilmemiş'}
               </Typography>
               <Divider sx={{ my: 2 }} />
-              <Typography variant="subtitle2" gutterBottom>
+              <Typography variant="subtitle2" gutterBottom color="primary">
                 İletişim Bilgileri
               </Typography>
-              <Typography variant="body2">
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
                 <strong>Ad Soyad:</strong> {order.departureContactName || 'Belirtilmemiş'}
               </Typography>
-              <Typography variant="body2">
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
                 <strong>Telefon:</strong> {order.departureContactPhone || 'Belirtilmemiş'}
               </Typography>
               <Typography variant="body2">
@@ -217,34 +278,34 @@ const OperatorOrderDetail = () => {
           </Card>
         </Grid>
 
-        {/* Arrival Information */}
         <Grid item xs={12} md={6}>
-          <Card>
+          <Card sx={{ height: '100%', minHeight: 380 }}>
             <CardHeader
               title="Varış Bilgileri"
               avatar={<LocationIcon color="secondary" />}
+              sx={{ pb: 1 }}
             />
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
+            <CardContent sx={{ pt: 0 }}>
+              <Typography variant="h6" gutterBottom color="secondary">
                 {order.arrivalCity}, {order.arrivalCountry}
               </Typography>
-              <Typography variant="body2" color="textSecondary" paragraph>
+              <Typography variant="body2" color="textSecondary" paragraph sx={{ minHeight: 40 }}>
                 {order.arrivalAddress}
               </Typography>
-              <Typography variant="body2">
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
                 <strong>İlçe:</strong> {order.arrivalDistrict || 'Belirtilmemiş'}
               </Typography>
-              <Typography variant="body2">
+              <Typography variant="body2" sx={{ mb: 2 }}>
                 <strong>Posta Kodu:</strong> {order.arrivalPostalCode || 'Belirtilmemiş'}
               </Typography>
               <Divider sx={{ my: 2 }} />
-              <Typography variant="subtitle2" gutterBottom>
+              <Typography variant="subtitle2" gutterBottom color="secondary">
                 İletişim Bilgileri
               </Typography>
-              <Typography variant="body2">
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
                 <strong>Ad Soyad:</strong> {order.arrivalContactName || 'Belirtilmemiş'}
               </Typography>
-              <Typography variant="body2">
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
                 <strong>Telefon:</strong> {order.arrivalContactPhone || 'Belirtilmemiş'}
               </Typography>
               <Typography variant="body2">
@@ -254,89 +315,159 @@ const OperatorOrderDetail = () => {
           </Card>
         </Grid>
 
-        {/* Cargo Information */}
+        {/* Cargo and Date Information Row */}
         <Grid item xs={12} md={6}>
-          <Card>
+          <Card sx={{ height: '100%', minHeight: 280 }}>
             <CardHeader
               title="Yük Bilgileri"
               avatar={<CargoIcon color="info" />}
+              sx={{ pb: 1 }}
             />
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
+            <CardContent sx={{ pt: 0 }}>
+              <Typography variant="h6" gutterBottom color="info.main">
                 {order.cargoType}
               </Typography>
-              <Typography variant="body2" paragraph>
+              <Typography variant="body2" sx={{ mb: 1, mt: 2 }}>
                 <strong>Ağırlık:</strong> {order.cargoWeightKg} kg
               </Typography>
-              <Typography variant="body2">
-                <strong>Boyutlar:</strong> {order.cargoWidth} x {order.cargoLength} x {order.cargoHeight} m
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Genişlik:</strong> {order.cargoWidth} m
               </Typography>
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                <strong>Transfer Edilebilir:</strong> {order.canTransfer ? 'Evet' : 'Hayır'}
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Uzunluk:</strong> {order.cargoLength} m
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Yükseklik:</strong> {order.cargoHeight} m
+              </Typography>
+              <Typography variant="body2" sx={{ mt: 2 }}>
+                <strong>Transfer Edilebilir:</strong> 
+                <Chip 
+                  label={order.canTransfer ? 'Evet' : 'Hayır'} 
+                  color={order.canTransfer ? 'success' : 'error'} 
+                  size="small"
+                  sx={{ ml: 1 }}
+                />
               </Typography>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Dates Information */}
         <Grid item xs={12} md={6}>
-          <Card>
+          <Card sx={{ height: '100%', minHeight: 280 }}>
             <CardHeader
               title="Tarih Bilgileri"
               avatar={<ScheduleIcon color="warning" />}
+              sx={{ pb: 1 }}
             />
-            <CardContent>
-              <Typography variant="body2" paragraph>
-                <strong>Yükleme Tarihi:</strong> {formatDate(order.loadingDate)}
+            <CardContent sx={{ pt: 0 }}>
+              <Typography variant="body2" sx={{ mb: 1, mt: 2 }}>
+                <strong>Yükleme Tarihi:</strong> 
+                <Box component="span" sx={{ ml: 1, color: 'warning.main' }}>
+                  {formatDate(order.loadingDate)}
+                </Box>
               </Typography>
-              <Typography variant="body2" paragraph>
-                <strong>Son Teslim Tarihi:</strong> {formatDate(order.deadlineDate)}
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Son Teslim Tarihi:</strong> 
+                <Box component="span" sx={{ ml: 1, color: 'error.main' }}>
+                  {formatDate(order.deadlineDate)}
+                </Box>
               </Typography>
-              <Typography variant="body2" paragraph>
-                <strong>Tahmini Varış Tarihi:</strong> {formatDate(order.estimatedArrivalDate)}
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Tahmini Varış Tarihi:</strong> 
+                <Box component="span" sx={{ ml: 1, color: 'info.main' }}>
+                  {formatDate(order.estimatedArrivalDate)}
+                </Box>
               </Typography>
-              <Typography variant="body2">
-                <strong>Oluşturulma Tarihi:</strong> {formatDate(order.createdAt)}
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Oluşturulma Tarihi:</strong> 
+                <Box component="span" sx={{ ml: 1, color: 'text.secondary' }}>
+                  {formatDate(order.createdAt)}
+                </Box>
               </Typography>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Additional Information */}
-        <Grid item xs={12}>
-          <Card>
-            <CardHeader title="Ek Bilgiler" />
-            <CardContent>
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
-                  <Typography variant="body2">
-                    <strong>Müşteri ID:</strong> {order.customerId}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Satış Personeli ID:</strong> {order.salesPersonId}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Operasyon Personeli ID:</strong> {order.operationPersonId || 'Atanmamış'}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Filo Personeli ID:</strong> {order.fleetPersonId || 'Atanmamış'}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Typography variant="body2">
-                    <strong>Atanan Tır ID:</strong> {order.assignedTruckId || 'Atanmamış'}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Atanan Romork ID:</strong> {order.assignedTrailerId || 'Atanmamış'}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Gümrük Adresi:</strong> {order.customsAddress || 'Belirtilmemiş'}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Gümrük Personeli ID:</strong> {order.customsPersonId || 'Atanmamış'}
-                  </Typography>
-                </Grid>
-              </Grid>
+        {/* Personnel Assignment Information */}
+        <Grid item xs={12} md={6}>
+          <Card sx={{ height: '100%', minHeight: 240 }}>
+            <CardHeader 
+              title="Personel Atamaları" 
+              avatar={<PersonIcon color="primary" />}
+              sx={{ pb: 1 }}
+            />
+            <CardContent sx={{ pt: 0 }}>
+              <Typography variant="body2" sx={{ mb: 1, mt: 1 }}>
+                <strong>Müşteri ID:</strong> {order.customerId}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Satış Personeli ID:</strong> {order.salesPersonId}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Operasyon Personeli:</strong> 
+                <Chip 
+                  label={order.operationPersonId || 'Atanmamış'} 
+                  color={order.operationPersonId ? 'success' : 'default'} 
+                  size="small"
+                  sx={{ ml: 1 }}
+                />
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Filo Personeli:</strong> 
+                <Chip 
+                  label={order.fleetPersonId || 'Atanmamış'} 
+                  color={order.fleetPersonId ? 'success' : 'default'} 
+                  size="small"
+                  sx={{ ml: 1 }}
+                />
+              </Typography>
+              <Typography variant="body2">
+                <strong>Gümrük Personeli:</strong> 
+                <Chip 
+                  label={order.customsPersonId || 'Atanmamış'} 
+                  color={order.customsPersonId ? 'success' : 'default'} 
+                  size="small"
+                  sx={{ ml: 1 }}
+                />
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Vehicle Assignment Information */}
+        <Grid item xs={12} md={6}>
+          <Card sx={{ height: '100%', minHeight: 240 }}>
+            <CardHeader 
+              title="Araç Atamaları" 
+              avatar={<CargoIcon color="secondary" />}
+              sx={{ pb: 1 }}
+            />
+            <CardContent sx={{ pt: 0 }}>
+              <Typography variant="body2" sx={{ mb: 1, mt: 1 }}>
+                <strong>Atanan Tır:</strong> 
+                <Chip 
+                  label={order.assignedTruckId || 'Atanmamış'} 
+                  color={order.assignedTruckId ? 'success' : 'default'} 
+                  size="small"
+                  sx={{ ml: 1 }}
+                />
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                <strong>Atanan Romork:</strong> 
+                <Chip 
+                  label={order.assignedTrailerId || 'Atanmamış'} 
+                  color={order.assignedTrailerId ? 'success' : 'default'} 
+                  size="small"
+                  sx={{ ml: 1 }}
+                />
+              </Typography>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="subtitle2" gutterBottom color="secondary">
+                Gümrük Bilgileri
+              </Typography>
+              <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
+                <strong>Gümrük Adresi:</strong> {order.customsAddress || 'Belirtilmemiş'}
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
