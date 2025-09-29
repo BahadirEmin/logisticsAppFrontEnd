@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Grid,
@@ -6,12 +6,12 @@ import {
   CardContent,
   Typography,
   Box,
-  Paper,
   List,
   ListItem,
   ListItemText,
   ListItemIcon,
-  Divider
+  Divider,
+  CircularProgress
 } from '@mui/material';
 import {
   LocalShipping as TruckIcon,
@@ -24,26 +24,90 @@ import {
   Warning as WarningIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { vehicleAPI } from '../../api/vehicles';
+import { driversAPI } from '../../api/drivers';
+import { trailerAPI } from '../../api/trailers';
+import { ordersAPI } from '../../api/orders';
 
 const FleetDashboard = () => {
   const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState({
+    totalTrucks: 0,
+    activeTrucks: 0,
+    maintenanceTrucks: 0,
+    availableTrucks: 0,
+    totalDrivers: 0,
+    activeDrivers: 0,
+    onLeaveDrivers: 0,
+    totalTrailers: 0,
+    activeTrailers: 0,
+    maintenanceTrailers: 0,
+    totalOffers: 0,
+    pendingOffers: 0,
+    approvedOffers: 0,
+    completedOffers: 0
+  });
 
-  // Mock data - gerçek uygulamada API'den gelecek
-  const dashboardData = {
-    totalTrucks: 25,
-    activeTrucks: 18,
-    maintenanceTrucks: 3,
-    availableTrucks: 4,
-    totalDrivers: 30,
-    activeDrivers: 28,
-    onLeaveDrivers: 2,
-    totalTrailers: 35,
-    activeTrailers: 32,
-    maintenanceTrailers: 3,
-    totalOffers: 45,
-    pendingOffers: 12,
-    approvedOffers: 28,
-    completedOffers: 5
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      // Paralel olarak tüm verileri çek
+      const [vehicles, drivers, trailers, orders] = await Promise.all([
+        vehicleAPI.getAll(),
+        driversAPI.getAll(),
+        trailerAPI.getAll(),
+        ordersAPI.getAll()
+      ]);
+
+      // Araç istatistikleri
+      const totalTrucks = vehicles.length;
+      const activeTrucks = vehicles.filter(v => v.isActive && v.status !== 'maintenance').length;
+      const maintenanceTrucks = vehicles.filter(v => v.status === 'maintenance').length;
+      const availableTrucks = vehicles.filter(v => v.isActive && v.status === 'available').length;
+
+      // Şoför istatistikleri
+      const totalDrivers = drivers.length;
+      const activeDrivers = drivers.filter(d => d.isActive).length;
+      const onLeaveDrivers = drivers.filter(d => d.status === 'on_leave').length;
+
+      // Römork istatistikleri
+      const totalTrailers = trailers.length;
+      const activeTrailers = trailers.filter(t => t.isActive).length;
+      const maintenanceTrailers = trailers.filter(t => t.status === 'maintenance').length;
+
+      // Teklif istatistikleri
+      const totalOffers = orders.length;
+      const pendingOffers = orders.filter(o => o.tripStatus === 'TEKLIF_ASAMASI').length;
+      const approvedOffers = orders.filter(o => o.tripStatus === 'ONAYLANDI').length;
+      const completedOffers = orders.filter(o => o.tripStatus === 'TAMAMLANDI').length;
+
+      setDashboardData({
+        totalTrucks,
+        activeTrucks,
+        maintenanceTrucks,
+        availableTrucks,
+        totalDrivers,
+        activeDrivers,
+        onLeaveDrivers,
+        totalTrailers,
+        activeTrailers,
+        maintenanceTrailers,
+        totalOffers,
+        pendingOffers,
+        approvedOffers,
+        completedOffers
+      });
+    } catch (error) {
+      console.error('Dashboard verileri yüklenirken hata:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const recentActivities = [
@@ -66,6 +130,14 @@ const FleetDashboard = () => {
         return <ScheduleIcon color="action" />;
     }
   };
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Container, Typography, Box, Paper, Grid, Card, CardContent, CardActions, Button } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Container, Typography, Box, Paper, Grid, Card, CardContent, CardActions, Button, CircularProgress } from '@mui/material';
 import { 
   Add, 
   ListAlt, 
@@ -10,9 +10,57 @@ import {
   Cancel
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { ordersAPI } from '../../api/orders';
 
 const SalesDashboard = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState({
+    thisMonthOffers: 0,
+    approvedOffers: 0,
+    pendingOffers: 0,
+    totalValue: 0
+  });
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      const orders = await ordersAPI.getAll();
+      
+      // Bu ayın teklifleri (örnek: Son 30 gün)
+      const currentDate = new Date();
+      const thirtyDaysAgo = new Date(currentDate.getTime() - (30 * 24 * 60 * 60 * 1000));
+      
+      const thisMonthOffers = orders.filter(order => {
+        const orderDate = new Date(order.createdAt);
+        return orderDate >= thirtyDaysAgo;
+      }).length;
+      
+      const approvedOffers = orders.filter(o => o.tripStatus === 'ONAYLANDI').length;
+      const pendingOffers = orders.filter(o => o.tripStatus === 'TEKLIF_ASAMASI').length;
+      
+      // Toplam değer hesaplama (quotePrice alanından)
+      const totalValue = orders.reduce((sum, order) => {
+        return sum + (parseFloat(order.quotePrice) || 0);
+      }, 0);
+
+      setDashboardData({
+        thisMonthOffers,
+        approvedOffers,
+        pendingOffers,
+        totalValue
+      });
+    } catch (error) {
+      console.error('Dashboard verileri yüklenirken hata:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreateOffer = () => {
     navigate('/sales/teklif-ver');
@@ -34,52 +82,61 @@ const SalesDashboard = () => {
       </Box>
 
       {/* Quick Stats */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
-            <Add sx={{ fontSize: 40, color: '#1976d2', mb: 1 }} />
-            <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-              15
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Bu Ay Teklif
-            </Typography>
-          </Paper>
+      {loading ? (
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+          <CircularProgress size={60} />
+        </Box>
+      ) : (
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid item xs={12} sm={6} md={3}>
+            <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
+              <Add sx={{ fontSize: 40, color: '#1976d2', mb: 1 }} />
+              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                {dashboardData.thisMonthOffers}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Bu Ay Teklif
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
+              <CheckCircle sx={{ fontSize: 40, color: '#4caf50', mb: 1 }} />
+              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#4caf50' }}>
+                {dashboardData.approvedOffers}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Onaylanan
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
+              <Pending sx={{ fontSize: 40, color: '#ff9800', mb: 1 }} />
+              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#ff9800' }}>
+                {dashboardData.pendingOffers}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Bekleyen
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
+              <AttachMoney sx={{ fontSize: 40, color: '#9c27b0', mb: 1 }} />
+              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#9c27b0' }}>
+                {dashboardData.totalValue > 1000 
+                  ? `${Math.round(dashboardData.totalValue / 1000)}K` 
+                  : dashboardData.totalValue
+                }
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Toplam Değer (₺)
+              </Typography>
+            </Paper>
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
-            <CheckCircle sx={{ fontSize: 40, color: '#4caf50', mb: 1 }} />
-            <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#4caf50' }}>
-              8
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Onaylanan
-            </Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
-            <Pending sx={{ fontSize: 40, color: '#ff9800', mb: 1 }} />
-            <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#ff9800' }}>
-              4
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Bekleyen
-            </Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
-            <AttachMoney sx={{ fontSize: 40, color: '#9c27b0', mb: 1 }} />
-            <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#9c27b0' }}>
-              125K
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Toplam Değer
-            </Typography>
-          </Paper>
-        </Grid>
-      </Grid>
+      )}
 
       {/* Quick Actions */}
       <Grid container spacing={4}>

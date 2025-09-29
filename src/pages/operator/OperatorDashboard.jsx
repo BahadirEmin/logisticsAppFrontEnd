@@ -1,5 +1,5 @@
-import React from 'react';
-import { Container, Typography, Box, Paper, Grid, Card, CardContent, CardActions, Button } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Container, Typography, Box, Paper, Grid, Card, CardContent, CardActions, Button, CircularProgress } from '@mui/material';
 import { 
   Timeline, 
   CheckCircle, 
@@ -9,8 +9,58 @@ import {
   Person,
   Assignment
 } from '@mui/icons-material';
+import { vehicleAPI } from '../../api/vehicles';
+import { driversAPI } from '../../api/drivers';
+import { ordersAPI } from '../../api/orders';
 
 const OperatorDashboard = () => {
+  const [loading, setLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState({
+    activeTrips: 0,
+    approvedOffers: 0,
+    activeVehicles: 0,
+    activeDrivers: 0
+  });
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      // Paralel olarak tüm verileri çek
+      const [vehicles, drivers, orders] = await Promise.all([
+        vehicleAPI.getAll(),
+        driversAPI.getAll(),
+        ordersAPI.getAll()
+      ]);
+
+      // İstatistikleri hesapla
+      const activeTrips = orders.filter(o => 
+        o.tripStatus === 'YOLA_CIKTI' || o.tripStatus === 'GUMRUKTE'
+      ).length;
+      
+      const approvedOffers = orders.filter(o => 
+        o.tripStatus === 'ONAYLANDI'
+      ).length;
+      
+      const activeVehicles = vehicles.filter(v => v.isActive).length;
+      const activeDrivers = drivers.filter(d => d.isActive).length;
+
+      setDashboardData({
+        activeTrips,
+        approvedOffers,
+        activeVehicles,
+        activeDrivers
+      });
+    } catch (error) {
+      console.error('Dashboard verileri yüklenirken hata:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <Container maxWidth="lg" sx={{ mt: 4, ml: 0 }}>
       <Box sx={{ mb: 4 }}>
@@ -23,52 +73,58 @@ const OperatorDashboard = () => {
       </Box>
 
       {/* Quick Stats */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
-            <Timeline sx={{ fontSize: 40, color: '#1976d2', mb: 1 }} />
-            <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-              12
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Aktif Seferler
-            </Typography>
-          </Paper>
+      {loading ? (
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+          <CircularProgress size={60} />
+        </Box>
+      ) : (
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid item xs={12} sm={6} md={3}>
+            <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
+              <Timeline sx={{ fontSize: 40, color: '#1976d2', mb: 1 }} />
+              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                {dashboardData.activeTrips}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Aktif Seferler
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
+              <CheckCircle sx={{ fontSize: 40, color: '#4caf50', mb: 1 }} />
+              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#4caf50' }}>
+                {dashboardData.approvedOffers}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Onaylanan Teklifler
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
+              <LocalShipping sx={{ fontSize: 40, color: '#ff9800', mb: 1 }} />
+              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#ff9800' }}>
+                {dashboardData.activeVehicles}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Aktif Araçlar
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
+              <Person sx={{ fontSize: 40, color: '#9c27b0', mb: 1 }} />
+              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#9c27b0' }}>
+                {dashboardData.activeDrivers}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Aktif Sürücüler
+              </Typography>
+            </Paper>
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
-            <CheckCircle sx={{ fontSize: 40, color: '#4caf50', mb: 1 }} />
-            <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#4caf50' }}>
-              8
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Onaylanan Teklifler
-            </Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
-            <LocalShipping sx={{ fontSize: 40, color: '#ff9800', mb: 1 }} />
-            <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#ff9800' }}>
-              25
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Aktif Araçlar
-            </Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
-            <Person sx={{ fontSize: 40, color: '#9c27b0', mb: 1 }} />
-            <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#9c27b0' }}>
-              18
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Aktif Sürücüler
-            </Typography>
-          </Paper>
-        </Grid>
-      </Grid>
+      )}
 
       {/* Quick Actions */}
       <Grid container spacing={4}>
