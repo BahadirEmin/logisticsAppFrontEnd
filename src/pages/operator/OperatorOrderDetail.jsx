@@ -21,7 +21,7 @@ import {
   LocalShipping as CargoIcon,
   Schedule as ScheduleIcon
 } from '@mui/icons-material';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -31,7 +31,31 @@ const OperatorOrderDetail = () => {
   const [error, setError] = useState(null);
   const { orderId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
+
+  // Kullanıcının nereden geldiğini belirle
+  const getBackPath = () => {
+    // Eğer state ile önceki sayfa bilgisi geldiyse onu kullan
+    if (location.state?.from) {
+      return location.state.from;
+    }
+    
+    // URL path'e göre varsayılan geri dönüş yolu belirle
+    const currentPath = location.pathname;
+    
+    // Eğer onaylanan tekliflerden geldiyse
+    if (currentPath.includes('onaylanan-teklifler')) {
+      return '/operator/onaylanan-teklifler';
+    }
+    
+    // Varsayılan olarak tekliflerim sayfasına dön
+    return '/operator/tekliflerim';
+  };
+
+  const handleBack = () => {
+    navigate(getBackPath());
+  };
 
   const tripStatusOptions = [
     { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması', color: 'default' },
@@ -102,7 +126,7 @@ const OperatorOrderDetail = () => {
         <Button
           variant="outlined"
           startIcon={<ArrowBackIcon />}
-          onClick={() => navigate('/operator/tekliflerim')}
+          onClick={handleBack}
         >
           Geri Dön
         </Button>
@@ -119,7 +143,7 @@ const OperatorOrderDetail = () => {
         <Button
           variant="outlined"
           startIcon={<ArrowBackIcon />}
-          onClick={() => navigate('/operator/tekliflerim')}
+          onClick={handleBack}
         >
           Geri Dön
         </Button>
@@ -134,7 +158,7 @@ const OperatorOrderDetail = () => {
           <Button
             variant="outlined"
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate('/operator/tekliflerim')}
+            onClick={handleBack}
           >
             Geri Dön
           </Button>
@@ -218,7 +242,7 @@ const OperatorOrderDetail = () => {
                 </Box>
                 
                 {/* Tarih Bilgileri */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, flexWrap: 'wrap' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, flexWrap: 'wrap', mb: 2 }}>
                   {order.loadingDate && (
                     <Typography variant="body2" color="warning.main" sx={{ fontWeight: 'medium' }}>
                       <strong>Yükleme:</strong> {formatDate(order.loadingDate)}
@@ -235,6 +259,14 @@ const OperatorOrderDetail = () => {
                     </Typography>
                   )}
                 </Box>
+
+                {/* Teklif Ücreti - En altta */}
+                <Typography variant="body1" sx={{ textAlign: 'center', mt: 2, fontWeight: 'bold' }}>
+                  Teklif Ücreti: {(order.estimatedPrice || order.price || order.quotePrice) 
+                    ? `${order.estimatedPrice || order.price || order.quotePrice} ${order.currency || 'TRY'}`
+                    : 'Belirtilmemiş'
+                  }
+                </Typography>
               </Box>
             </CardContent>
           </Card>

@@ -148,7 +148,13 @@ const OperatorMyOffers = () => {
   });
 
   const handleViewOffer = (offerId) => {
-    navigate(`/operator/teklifler/${offerId}`);
+    navigate(`/operator/teklifler/${offerId}`, { 
+      state: { from: '/operator/tekliflerim' } 
+    });
+  };
+
+  const handleTrackTrip = (offerId) => {
+    navigate(`/operator/sefer-takip?orderId=${offerId}`);
   };
 
   const handleEditOffer = (offer) => {
@@ -349,7 +355,17 @@ const OperatorMyOffers = () => {
             </TableHead>
             <TableBody>
               {filteredOffers.map((offer) => (
-                <TableRow key={offer.id} hover>
+                <TableRow 
+                  key={offer.id} 
+                  hover 
+                  onDoubleClick={() => handleTrackTrip(offer.id)}
+                  sx={{ 
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: '#f5f5f5'
+                    }
+                  }}
+                >
                   <TableCell>#{offer.id}</TableCell>
                   <TableCell>{offer.customerName || offer.customer?.name || 'N/A'}</TableCell>
                   <TableCell>

@@ -1,5 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Paper, Grid, Card, CardContent, CardActions, Button, CircularProgress } from '@mui/material';
+import { 
+  Container, 
+  Typography, 
+  Box, 
+  Paper, 
+  Grid, 
+  Card, 
+  CardContent, 
+  CardActions, 
+  Button, 
+  CircularProgress,
+  Alert,
+  AlertTitle,
+  Chip,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon
+} from '@mui/material';
 import { 
   Add, 
   ListAlt, 
@@ -7,7 +25,10 @@ import {
   AttachMoney,
   CheckCircle,
   Pending,
-  Cancel
+  Cancel,
+  Assignment as AssignmentIcon,
+  Warning as WarningIcon,
+  Person as PersonIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
@@ -21,6 +42,7 @@ const SalesDashboard = () => {
     pendingOffers: 0,
     totalValue: 0
   });
+  const [approvedOffersNeedingOperator, setApprovedOffersNeedingOperator] = useState([]);
 
   useEffect(() => {
     loadDashboardData();
@@ -43,6 +65,14 @@ const SalesDashboard = () => {
       
       const approvedOffers = orders.filter(o => o.tripStatus === 'ONAYLANDI').length;
       const pendingOffers = orders.filter(o => o.tripStatus === 'TEKLIF_ASAMASI').length;
+      
+      // Operatör atanmamış onaylanan teklifler
+      const needsOperator = orders.filter(o => 
+        o.tripStatus === 'ONAYLANDI' && 
+        (!o.operationPersonId && !o.fleetPersonId)
+      );
+
+      setApprovedOffersNeedingOperator(needsOperator);
       
       // Toplam değer hesaplama (quotePrice alanından)
       const totalValue = orders.reduce((sum, order) => {
@@ -136,6 +166,74 @@ const SalesDashboard = () => {
             </Paper>
           </Grid>
         </Grid>
+      )}
+
+      {/* Operasyon Atama Uyarısı */}
+      {!loading && approvedOffersNeedingOperator.length > 0 && (
+        <Alert severity="warning" sx={{ mb: 4 }} icon={<WarningIcon />}>
+          <AlertTitle>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <AssignmentIcon />
+              Operatör Atama Gerekiyor
+            </Box>
+          </AlertTitle>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            {approvedOffersNeedingOperator.length} adet onaylanan teklif için operatör atanması gerekiyor.
+          </Typography>
+          
+          <List dense sx={{ mt: 1 }}>
+            {approvedOffersNeedingOperator.slice(0, 3).map((offer) => (
+              <ListItem key={offer.id} sx={{ py: 0.5 }}>
+                <ListItemIcon sx={{ minWidth: 24 }}>
+                  <PersonIcon color="warning" fontSize="small" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="body2" fontWeight="bold">
+                        Teklif #{offer.id}
+                      </Typography>
+                      <Chip 
+                        label={`${offer.estimatedPrice || 0} ${offer.currency || 'TRY'}`}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                      />
+                    </Box>
+                  }
+                  secondary={
+                    <Typography variant="caption" color="text.secondary">
+                      {offer.departureCity} → {offer.arrivalCity} | {offer.customerName}
+                    </Typography>
+                  }
+                />
+              </ListItem>
+            ))}
+            {approvedOffersNeedingOperator.length > 3 && (
+              <ListItem sx={{ py: 0.5 }}>
+                <ListItemText
+                  primary={
+                    <Typography variant="body2" color="warning.main" fontWeight="bold">
+                      ... ve {approvedOffersNeedingOperator.length - 3} teklif daha
+                    </Typography>
+                  }
+                />
+              </ListItem>
+            )}
+          </List>
+          
+          <Box sx={{ mt: 2 }}>
+            <Button
+              variant="contained"
+              color="warning"
+              size="small"
+              startIcon={<AssignmentIcon />}
+              onClick={() => navigate('/sales/tekliflerim?filter=approved')}
+            >
+              Operatör Ataması Yap
+            </Button>
+          </Box>
+        </Alert>
       )}
 
       {/* Quick Actions */}
