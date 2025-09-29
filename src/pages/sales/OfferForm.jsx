@@ -24,6 +24,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { ArrowForward, ArrowBack, Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { customerAPI } from '../../api/customers';
+import { countriesAPI } from '../../api/countries';
 import { ordersAPI } from '../../api/orders';
 import { parseNumber } from '../../utils/numberFormatter';
 import { useFormattedInput, useCargoFormattedInput } from '../../hooks/useFormattedInput';
@@ -48,37 +49,11 @@ const currencies = [
   { value: 'GBP', label: 'STERLİN', symbol: '£' }
 ];
 
-const countries = [
-  'Türkiye',
-  'Almanya',
-  'Fransa',
-  'İtalya',
-  'Hollanda',
-  'Belçika',
-  'Avusturya',
-  'İsviçre',
-  'Polonya',
-  'Çek Cumhuriyeti',
-  'Macaristan',
-  'Slovakya',
-  'Slovenya',
-  'Hırvatistan',
-  'Sırbistan',
-  'Bulgaristan',
-  'Romanya',
-  'Yunanistan',
-  'Makedonya',
-  'Arnavutluk',
-  'Kosova',
-  'Bosna Hersek',
-  'Karadağ',
-  'Diğer'
-];
-
 const OfferForm = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [customers, setCustomers] = useState([]);
+  const [countries, setCountries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -141,6 +116,26 @@ const OfferForm = () => {
   // Load customers on component mount
   useEffect(() => {
     loadCustomers();
+    loadCountries();
+  }, []);
+
+  // Reload customers when page becomes visible (user returns from customer list page)
+  useEffect(() => {
+    const handleFocus = () => {
+      loadCustomers();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        loadCustomers();
+      }
+    });
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
+    };
   }, []);
 
   const loadCustomers = async () => {
@@ -152,6 +147,27 @@ const OfferForm = () => {
       console.error('Error loading customers:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadCountries = async () => {
+    try {
+      const countriesData = await countriesAPI.getActive();
+      
+      // Ülkeleri Türkçe isme göre alfabetik sıraya koy
+      const sortedCountries = countriesData
+        .filter(country => country.isActive && country.countryNameTr && country.countryNameTr !== 'DİĞER')
+        .sort((a, b) => a.countryNameTr.localeCompare(b.countryNameTr, 'tr', { sensitivity: 'base' }));
+      
+      // "DİĞER" seçeneğini en sona ekle (varsa)
+      const otherCountry = countriesData.find(country => country.countryNameTr === 'DİĞER');
+      if (otherCountry) {
+        sortedCountries.push(otherCountry);
+      }
+      
+      setCountries(sortedCountries);
+    } catch (error) {
+      console.error('Error loading countries:', error);
     }
   };
 
@@ -339,9 +355,20 @@ const OfferForm = () => {
       
       {/* Customer Selection */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h6" gutterBottom sx={{ mb: 2, color: '#1976d2' }}>
-          Müşteri Seçimi
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+          <Typography variant="h6" sx={{ color: '#1976d2' }}>
+            Müşteri Seçimi
+          </Typography>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={() => navigate('/sales/musteriler')}
+            sx={{ minWidth: 'auto' }}
+          >
+            Müşteri Ekle
+          </Button>
+        </Box>
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
             <FormControl fullWidth error={!!errors.customerId} size="small">
@@ -431,8 +458,8 @@ const OfferForm = () => {
                 label="Ülke"
               >
                 {countries.map((country) => (
-                  <MenuItem key={country} value={country}>
-                    {country}
+                  <MenuItem key={country.id} value={country.countryNameTr}>
+                    {country.countryNameTr}
                   </MenuItem>
                 ))}
               </Select>
@@ -544,8 +571,8 @@ const OfferForm = () => {
                 label="Ülke"
               >
                 {countries.map((country) => (
-                  <MenuItem key={country} value={country}>
-                    {country}
+                  <MenuItem key={country.id} value={country.countryNameTr}>
+                    {country.countryNameTr}
                   </MenuItem>
                 ))}
               </Select>
@@ -677,7 +704,7 @@ const OfferForm = () => {
               Yük Ölçüleri
             </Typography>
             <Grid container spacing={2} sx={{ mb: 3 }}>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={4} md={4}>
                 <TextField
                   fullWidth
                   size="small"
@@ -687,7 +714,7 @@ const OfferForm = () => {
                   onChange={(e) => handleCargoItemChange(index, 'dimensions.length', e.target.value)}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={4} md={4}>
                 <TextField
                   fullWidth
                   size="small"
@@ -697,7 +724,7 @@ const OfferForm = () => {
                   onChange={(e) => handleCargoItemChange(index, 'dimensions.width', e.target.value)}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={4} md={4}>
                 <TextField
                   fullWidth
                   size="small"
@@ -714,7 +741,7 @@ const OfferForm = () => {
               Yük Detayları
             </Typography>
             <Grid container spacing={2} sx={{ mb: 2 }}>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={6} md={6}>
                 <FormControl fullWidth size="small">
                   <InputLabel>Yük Tipi</InputLabel>
                   <Select
@@ -730,7 +757,7 @@ const OfferForm = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={6} md={6}>
                 <TextField
                   fullWidth
                   size="small"
