@@ -143,6 +143,25 @@ const OfferForm = () => {
     loadCustomers();
   }, []);
 
+  // Reload customers when page becomes visible (user returns from customer list page)
+  useEffect(() => {
+    const handleFocus = () => {
+      loadCustomers();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        loadCustomers();
+      }
+    });
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
+    };
+  }, []);
+
   const loadCustomers = async () => {
     try {
       setLoading(true);
@@ -339,9 +358,20 @@ const OfferForm = () => {
       
       {/* Customer Selection */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h6" gutterBottom sx={{ mb: 2, color: '#1976d2' }}>
-          Müşteri Seçimi
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+          <Typography variant="h6" sx={{ color: '#1976d2' }}>
+            Müşteri Seçimi
+          </Typography>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={() => navigate('/sales/musteriler')}
+            sx={{ minWidth: 'auto' }}
+          >
+            Müşteri Ekle
+          </Button>
+        </Box>
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
             <FormControl fullWidth error={!!errors.customerId} size="small">
