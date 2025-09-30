@@ -304,6 +304,7 @@ const SuppliersList = () => {
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
+                  size="small"
                   label="Ara"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -314,7 +315,6 @@ const SuppliersList = () => {
                       </InputAdornment>
                     ),
                   }}
-                  placeholder="Şirket adı, vergi no, e-posta, şehir..."
                 />
               </Grid>
               <Grid item xs={12} md={3}>

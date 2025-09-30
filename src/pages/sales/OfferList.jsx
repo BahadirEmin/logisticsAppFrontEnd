@@ -21,8 +21,6 @@ import {
   Alert,
   CircularProgress,
   Grid,
-  Card,
-  CardContent,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -47,7 +45,6 @@ const OfferList = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [customerFilter, setCustomerFilter] = useState('');
   const [approvalDialog, setApprovalDialog] = useState({ open: false, offer: null });
   const [approving, setApproving] = useState(false);
   const navigate = useNavigate();
@@ -91,7 +88,7 @@ const OfferList = () => {
   };
 
   const filteredOffers = offers.filter(offer => {
-    const matchesSearch = 
+    const matchesSearch =
       offer.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       offer.departureCity?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       offer.arrivalCity?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -99,12 +96,9 @@ const OfferList = () => {
       offer.id?.toString().includes(searchTerm);
 
     const matchesStatus = !statusFilter || offer.tripStatus === statusFilter;
-    const matchesCustomer = !customerFilter || offer.customerName?.toLowerCase().includes(customerFilter.toLowerCase());
 
-    return matchesSearch && matchesStatus && matchesCustomer;
-  });
-
-  const handleViewOffer = (offerId) => {
+    return matchesSearch && matchesStatus;
+  });  const handleViewOffer = (offerId) => {
     navigate(`/sales/teklifler/${offerId}`);
   };
 
@@ -193,9 +187,53 @@ const OfferList = () => {
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Tekliflerim
+      <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#1976d2', mb: 3 }}>
+        Teklifler
       </Typography>
+
+      {/* Statistics Cards */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 2, textAlign: 'center' }}>
+            <Typography color="textSecondary" gutterBottom>
+              Toplam Teklif
+            </Typography>
+            <Typography variant="h4" component="div" color="primary.main">
+              {offers.length}
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 2, textAlign: 'center' }}>
+            <Typography color="textSecondary" gutterBottom>
+              Teklif Aşamasında
+            </Typography>
+            <Typography variant="h4" component="div" color="warning.main">
+              {offers.filter(o => o.tripStatus === 'TEKLIF_ASAMASI').length}
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 2, textAlign: 'center' }}>
+            <Typography color="textSecondary" gutterBottom>
+              Onaylanan
+            </Typography>
+            <Typography variant="h4" component="div" color="success.main">
+              {offers.filter(o => o.tripStatus === 'ONAYLANAN_TEKLIF').length}
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 2, textAlign: 'center' }}>
+            <Typography color="textSecondary" gutterBottom>
+              Reddedilen
+            </Typography>
+            <Typography variant="h4" component="div" color="error.main">
+              {offers.filter(o => o.tripStatus === 'REDDEDILDI').length}
+            </Typography>
+          </Paper>
+        </Grid>
+      </Grid>
 
       {/* Info Alert about order status management */}
       <Alert severity="info" sx={{ mb: 2 }}>
@@ -249,15 +287,6 @@ const OfferList = () => {
             </FormControl>
           </Grid>
           <Grid item xs={12} md={3}>
-            <TextField
-              fullWidth
-              size="small"
-              label="Müşteri Ara"
-              value={customerFilter}
-              onChange={(e) => setCustomerFilter(e.target.value)}
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
             <Box display="flex" justifyContent="flex-end">
               <Tooltip title="Yeni Teklif Oluştur">
                 <IconButton 
@@ -276,58 +305,6 @@ const OfferList = () => {
           </Grid>
         </Grid>
       </Paper>
-
-      {/* Statistics Cards */}
-      <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Toplam Teklif
-              </Typography>
-              <Typography variant="h4">
-                {offers.length}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Teklif Aşamasında
-              </Typography>
-              <Typography variant="h4" color="default">
-                {offers.filter(o => o.tripStatus === 'TEKLIF_ASAMASI').length}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Onaylanan
-              </Typography>
-              <Typography variant="h4" color="success.main">
-                {offers.filter(o => o.tripStatus === 'ONAYLANDI').length}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Tamamlanan
-              </Typography>
-              <Typography variant="h4" color="success.main">
-                {offers.filter(o => o.tripStatus === 'TAMAMLANDI').length}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
 
       {/* Offers Table */}
       <Paper>
@@ -350,8 +327,8 @@ const OfferList = () => {
                 <TableRow>
                   <TableCell colSpan={8} align="center">
                     <Typography variant="body2" color="textSecondary">
-                      {searchTerm || statusFilter || customerFilter 
-                        ? 'Arama kriterlerinize uygun teklif bulunamadı.' 
+                      {searchTerm || statusFilter
+                        ? 'Arama kriterlerinize uygun teklif bulunamadı.'
                         : 'Henüz teklif bulunmuyor.'}
                     </Typography>
                   </TableCell>

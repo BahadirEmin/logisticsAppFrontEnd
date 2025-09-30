@@ -314,6 +314,7 @@ const TrailerList = () => {
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
+                size="small"
                 label="Römork Ara"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -324,7 +325,6 @@ const TrailerList = () => {
                     </InputAdornment>
                   ),
                 }}
-                placeholder="Römork no, marka, model veya VIN..."
               />
             </Grid>
             <Grid item xs={12} md={3}>

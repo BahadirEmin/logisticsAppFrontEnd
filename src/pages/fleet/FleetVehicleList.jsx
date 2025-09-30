@@ -326,6 +326,7 @@ const FleetVehicleList = () => {
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
+                size="small"
                 label="Tır Ara"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -336,7 +337,6 @@ const FleetVehicleList = () => {
                     </InputAdornment>
                   ),
                 }}
-                placeholder="Plaka, marka, model veya VIN..."
               />
             </Grid>
             <Grid item xs={12} md={3}>

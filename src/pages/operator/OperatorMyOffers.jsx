@@ -21,8 +21,6 @@ import {
   Alert,
   CircularProgress,
   Grid,
-  Card,
-  CardContent,
   Button,
   Dialog,
   DialogTitle,
@@ -214,70 +212,59 @@ const OperatorMyOffers = () => {
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#1976d2' }}>
-        Tekliflerim
+      <Typography variant="h4" component="h1" gutterBottom sx={{ color: 'primary.main' }}>
+        Operatör Tekliflerim
       </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-        Operatör olarak işlediğiniz ve takip ettiğiniz teklifler
-      </Typography>
+
+      {/* Statistics Cards */}
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="primary" fontWeight="bold">
+              {offers.length}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Toplam Teklif
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="warning.main" fontWeight="bold">
+              {offers.filter(o => (o.tripStatus || o.status) === 'pending').length}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Beklemede
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="success.main" fontWeight="bold">
+              {offers.filter(o => (o.tripStatus || o.status) === 'approved').length}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Onaylanan
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="primary.main" fontWeight="bold">
+              ₺{offers.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0).toLocaleString()}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Toplam Değer
+            </Typography>
+          </Paper>
+        </Grid>
+      </Grid>
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
         </Alert>
       )}
-
-      {/* Stats Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Toplam Teklif
-              </Typography>
-              <Typography variant="h4" component="div">
-                {offers.length}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Bekleyen
-              </Typography>
-              <Typography variant="h4" component="div" color="warning.main">
-                {offers.filter(o => (o.tripStatus || o.status) === 'pending').length}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Onaylanan
-              </Typography>
-              <Typography variant="h4" component="div" color="success.main">
-                {offers.filter(o => (o.tripStatus || o.status) === 'approved').length}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Toplam Değer
-              </Typography>
-              <Typography variant="h4" component="div" color="primary.main">
-                ₺{offers.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0).toLocaleString()}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
 
       {/* Filters */}
       <Paper sx={{ p: 2, mb: 2 }}>
@@ -286,7 +273,7 @@ const OperatorMyOffers = () => {
             <TextField
               fullWidth
               size="small"
-              label="Ara..."
+              label="Arama"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{

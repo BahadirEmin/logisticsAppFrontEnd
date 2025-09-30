@@ -185,8 +185,8 @@ const SalesMyOffers = () => {
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h4" component="h1" sx={{ color: '#1976d2' }}>
-          Tekliflerim
+        <Typography variant="h4" component="h1" sx={{ color: 'primary.main' }}>
+          Satış Tekliflerim
         </Typography>
         <Button
           variant="contained"
@@ -198,45 +198,45 @@ const SalesMyOffers = () => {
         </Button>
       </Box>
 
-      {/* Stats Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      {/* Statistics Cards */}
+      <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography color="textSecondary" gutterBottom>
-              Toplam Teklif
-            </Typography>
-            <Typography variant="h4" component="div" color="primary.main">
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="primary" fontWeight="bold">
               {offers.length}
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Toplam Teklif
+            </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography color="textSecondary" gutterBottom>
-              Onaylanan
-            </Typography>
-            <Typography variant="h4" component="div" color="success.main">
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="success.main" fontWeight="bold">
               {offers.filter(o => o.tripStatus === 'ONAYLANAN_TEKLIF').length}
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Onaylanan
+            </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography color="textSecondary" gutterBottom>
-              Bekleyen
-            </Typography>
-            <Typography variant="h4" component="div" color="warning.main">
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="warning.main" fontWeight="bold">
               {offers.filter(o => o.tripStatus === 'TEKLIF_ASAMASI').length}
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Bekleyen
+            </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography color="textSecondary" gutterBottom>
-              Reddedilen
-            </Typography>
-            <Typography variant="h4" component="div" color="error.main">
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="error.main" fontWeight="bold">
               {offers.filter(o => o.tripStatus === 'REDDEDILDI').length}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Reddedilen
             </Typography>
           </Paper>
         </Grid>
@@ -263,7 +263,7 @@ const SalesMyOffers = () => {
             <TextField
               fullWidth
               size="small"
-              label="Ara..."
+              label="Arama"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{

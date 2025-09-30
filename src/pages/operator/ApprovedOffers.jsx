@@ -251,7 +251,8 @@ const ApprovedOffers = () => {
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
-              placeholder="Müşteri adı, adres ara..."
+              size="small"
+              label="Ara..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
@@ -261,7 +262,6 @@ const ApprovedOffers = () => {
                   </InputAdornment>
                 ),
               }}
-              size="small"
             />
           </Grid>
           <Grid item xs={12} md={6}>

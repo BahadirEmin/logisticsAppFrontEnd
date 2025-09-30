@@ -302,6 +302,7 @@ const CustomerList = () => {
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
+                  size="small"
                   label="Ara"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -312,7 +313,6 @@ const CustomerList = () => {
                       </InputAdornment>
                     ),
                   }}
-                  placeholder="Müşteri adı, vergi no, iletişim kişisi..."
                 />
               </Grid>
               <Grid item xs={12} md={3}>
