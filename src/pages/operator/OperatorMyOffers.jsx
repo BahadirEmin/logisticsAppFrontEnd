@@ -25,9 +25,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
-  FormControlLabel,
-  Switch
+  DialogActions
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -36,7 +34,6 @@ import {
   Schedule as ScheduleIcon,
   LocalShipping as LocalShippingIcon,
   Assignment as AssignmentIcon,
-  FilterList as FilterListIcon,
   Download as DownloadIcon,
   Person as PersonIcon,
   Edit as EditIcon
@@ -269,7 +266,7 @@ const OperatorMyOffers = () => {
       {/* Filters */}
       <Paper sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={6}>
             <TextField
               fullWidth
               size="small"
@@ -293,33 +290,15 @@ const OperatorMyOffers = () => {
                 <MenuItem value="all">Tümü</MenuItem>
                 {operatorStatusOptions.map((status) => (
                   <MenuItem key={status.value} value={status.value}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      {status.icon}
-                      <Chip 
-                        label={status.label} 
-                        color={status.color} 
-                        size="small" 
-                        sx={{ ml: 1 }}
-                      />
-                    </Box>
+                    <Chip 
+                      label={status.label} 
+                      color={status.color} 
+                      size="small"
+                    />
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Box display="flex" justifyContent="flex-end">
-              <Tooltip title="Filtreleri Temizle">
-                <IconButton 
-                  onClick={() => {
-                    setSearchTerm('');
-                    setStatusFilter('all');
-                  }}
-                >
-                  <FilterListIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
           </Grid>
         </Grid>
       </Paper>
