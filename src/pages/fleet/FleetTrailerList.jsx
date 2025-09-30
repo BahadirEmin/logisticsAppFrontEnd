@@ -81,10 +81,13 @@ const TrailerList = () => {
   const loadData = async () => {
     try {
       setLoading(true);
+      setError(null);
       const trailersData = await trailerAPI.getAll();
-      setTrailers(trailersData);
+      setTrailers(Array.isArray(trailersData) ? trailersData : []);
     } catch (error) {
+      console.error('Error loading trailers:', error);
       setError('Römork listesi yüklenirken hata oluştu');
+      setTrailers([]); // Set empty array on error
     } finally {
       setLoading(false);
     }

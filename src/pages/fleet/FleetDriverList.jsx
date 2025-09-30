@@ -97,11 +97,12 @@ const DriverList = () => {
       setError(null);
       const data = await driversAPI.getAll();
       console.log('Drivers loaded successfully:', data);
-      setDrivers(data);
+      setDrivers(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Drivers yüklenirken hata:', err);
       console.error('Error details:', err.response?.data);
       setError('Sürücüler yüklenirken bir hata oluştu.');
+      setDrivers([]); // Set empty array on error
     } finally {
       setLoading(false);
     }

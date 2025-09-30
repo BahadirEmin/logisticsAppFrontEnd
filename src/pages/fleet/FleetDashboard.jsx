@@ -58,6 +58,31 @@ const FleetDashboard = () => {
       setDashboardData(fleetStats);
     } catch (error) {
       console.error('Dashboard verileri yüklenirken hata:', error);
+      // Set fallback data on error
+      setDashboardData({
+        vehicleStats: {
+          total: 0,
+          active: 0,
+          maintenance: 0,
+          available: 0,
+        },
+        driverStats: {
+          total: 0,
+          active: 0,
+          onLeave: 0,
+        },
+        trailerStats: {
+          total: 0,
+          active: 0,
+          maintenance: 0,
+        },
+        offerStats: {
+          total: 0,
+          pending: 0,
+          approved: 0,
+          completed: 0,
+        },
+      });
     } finally {
       setLoading(false);
     }
@@ -208,10 +233,10 @@ const FleetDashboard = () => {
                 <Grid item xs={6}>
                   <Box textAlign="center" p={2}>
                     <Typography variant="h4" color="error.main">
-                      {dashboardData.vehicleStats.total -
+                      {Math.max(0, dashboardData.vehicleStats.total -
                         dashboardData.vehicleStats.active -
                         dashboardData.vehicleStats.maintenance -
-                        dashboardData.vehicleStats.available}
+                        dashboardData.vehicleStats.available)}
                     </Typography>
                     <Typography variant="body2">Pasif</Typography>
                   </Box>

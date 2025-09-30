@@ -35,7 +35,6 @@ import {
 import {
   Search as SearchIcon,
   Visibility as VisibilityIcon,
-  FilterList as FilterListIcon,
   CheckCircle,
   Schedule,
   LocalShipping,
@@ -66,12 +65,14 @@ const FleetMyOffers = () => {
   });
   const { user } = useAuth();
 
-  // Fleet-specific status options
+  // Fleet-specific status options - using same standard as Sales and Operation
   const fleetStatusOptions = [
-    { value: 'pending', label: 'Beklemede', color: 'default', icon: <Schedule /> },
-    { value: 'approved', label: 'Onaylandı', color: 'success', icon: <CheckCircle /> },
-    { value: 'in_transit', label: 'Yolda', color: 'primary', icon: <LocalShipping /> },
-    { value: 'delivered', label: 'Teslim Edildi', color: 'info', icon: <CheckCircle /> },
+    { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması', color: 'warning', icon: <Schedule /> },
+    { value: 'ONAYLANAN_TEKLIF', label: 'Onaylanan Teklif', color: 'success', icon: <CheckCircle /> },
+    { value: 'YOLA_CIKTI', label: 'Yola Çıktı', color: 'info', icon: <LocalShipping /> },
+    { value: 'TESLIM_EDILDI', label: 'Teslim Edildi', color: 'success', icon: <CheckCircle /> },
+    { value: 'REDDEDILDI', label: 'Reddedildi', color: 'error', icon: <Schedule /> },
+    { value: 'IPTAL_EDILDI', label: 'İptal Edildi', color: 'error', icon: <Schedule /> },
   ];
 
   const loadFleetOffers = useCallback(async () => {
@@ -83,10 +84,14 @@ const FleetMyOffers = () => {
       console.log('Fetching orders for fleet person ID:', user.id);
       const data = await ordersAPI.getByFleetPersonId(user.id);
       console.log('Fleet My Offers API Response:', data);
-      setOffers(data);
+      
+      // Ensure data is an array and has proper structure
+      const processedOffers = Array.isArray(data) ? data : [];
+      setOffers(processedOffers);
     } catch (err) {
       console.error('Fleet teklifleri yüklenirken hata:', err);
       setError('Teklifler yüklenirken bir hata oluştu.');
+      setOffers([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -234,17 +239,20 @@ const FleetMyOffers = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
             <Typography variant="h4" color="warning.main" fontWeight="bold">
-              {offers.filter(o => (o.tripStatus || o.status) === 'pending').length}
+              {offers.filter(o => {
+                const status = o.tripStatus || o.status;
+                return status === 'TEKLIF_ASAMASI';
+              }).length}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Beklemede
+              Teklif Aşaması
             </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
             <Typography variant="h4" color="primary.main" fontWeight="bold">
-              {offers.filter(o => (o.tripStatus || o.status) === 'in_transit').length}
+              {offers.filter(o => (o.tripStatus || o.status) === 'YOLA_CIKTI').length}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Yolda
@@ -268,59 +276,6 @@ const FleetMyOffers = () => {
           {error}
         </Alert>
       )}
-
-      {/* Filters */}
-      <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={6}>
-            <TextField
-              fullWidth
-              size="small"
-              label="Arama"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
-              <InputLabel shrink>Durum Filtresi</InputLabel>
-              <Select
-                value={statusFilter}
-                onChange={e => setStatusFilter(e.target.value)}
-                label="Durum Filtresi"
-                notched
-              >
-                <MenuItem value="all">Tümü</MenuItem>
-                {fleetStatusOptions.map(status => (
-                  <MenuItem key={status.value} value={status.value}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      {status.icon}
-                      <Chip label={status.label} color={status.color} size="small" sx={{ ml: 1 }} />
-                    </Box>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Box display="flex" justifyContent="flex-end">
-              <Tooltip title="Filtreleri Temizle">
-                <IconButton
-                  onClick={() => {
-                    setSearchTerm('');
-                    setStatusFilter('all');
-                  }}
-                >
-                  <FilterListIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          </Grid>
-        </Grid>
-      </Paper>
 
       {/* Resource Icons Legend */}
       <Paper elevation={1} sx={{ p: 2, mb: 2, backgroundColor: '#f8f9fa' }}>
@@ -346,6 +301,45 @@ const FleetMyOffers = () => {
             <Typography variant="caption">Gri = Atanmamış</Typography>
           </Box>
         </Box>
+      </Paper>
+
+      {/* Filters */}
+      <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={8}>
+            <TextField
+              fullWidth
+              size="small"
+              label="Arama"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+              <InputLabel shrink>Durum Filtresi</InputLabel>
+              <Select
+                value={statusFilter}
+                onChange={e => setStatusFilter(e.target.value)}
+                label="Durum Filtresi"
+                notched
+              >
+                <MenuItem value="all">Tümü</MenuItem>
+                {fleetStatusOptions.map(status => (
+                  <MenuItem key={status.value} value={status.value}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {status.icon}
+                      <Typography sx={{ ml: 1 }}>{status.label}</Typography>
+                    </Box>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
       </Paper>
 
       {/* Offers Table */}

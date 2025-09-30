@@ -90,10 +90,13 @@ const FleetVehicleList = () => {
   const loadData = async () => {
     try {
       setLoading(true);
+      setError(null);
       const vehiclesData = await vehicleAPI.getAll();
-      setVehicles(vehiclesData);
+      setVehicles(Array.isArray(vehiclesData) ? vehiclesData : []);
     } catch (error) {
+      console.error('Error loading vehicles:', error);
       setError('Araç listesi yüklenirken hata oluştu');
+      setVehicles([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
