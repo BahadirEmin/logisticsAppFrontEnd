@@ -376,14 +376,15 @@ const OfferForm = () => {
         </Box>
         <Grid container spacing={2}>
           <Grid item xs={12} md={8}>
-            <FormControl fullWidth error={!!errors.customerId} size="small" sx={{ minWidth: 200 }}>
-              <InputLabel>Müşteri Seçin</InputLabel>
+            <FormControl fullWidth error={!!errors.customerId} size="small" variant="outlined" sx={{ minWidth: 200 }}>
+              <InputLabel shrink>Müşteri Seçin</InputLabel>
               <Select
                 name="customerId"
                 value={formData.customerId}
                 onChange={handleCustomerChange}
                 label="Müşteri Seçin"
                 disabled={loading}
+                notched
               >
                 {customers.map((customer) => (
                   <MenuItem key={customer.id} value={customer.id}>
@@ -455,7 +456,7 @@ const OfferForm = () => {
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={4}>
             <FormControl fullWidth error={!!errors['fromAddress.country']} size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Ülke</InputLabel>
+              <InputLabel shrink>Ülke</InputLabel>
               <Select
                 name="fromAddress.country"
                 value={formData.fromAddress.country}
@@ -488,6 +489,7 @@ const OfferForm = () => {
               required
               error={!!errors['fromAddress.city']}
               helperText={errors['fromAddress.city']}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
@@ -500,6 +502,7 @@ const OfferForm = () => {
               name="fromAddress.district"
               value={formData.fromAddress.district}
               onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
@@ -515,6 +518,7 @@ const OfferForm = () => {
               required
               error={!!errors['fromAddress.zipCode']}
               helperText={errors['fromAddress.zipCode']}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
@@ -529,6 +533,7 @@ const OfferForm = () => {
               onChange={handleInputChange}
               multiline
               rows={2}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
@@ -541,6 +546,7 @@ const OfferForm = () => {
               name="fromAddress.contactPerson"
               value={formData.fromAddress.contactPerson}
               onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
@@ -553,6 +559,7 @@ const OfferForm = () => {
               name="fromAddress.phone"
               value={formData.fromAddress.phone}
               onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
@@ -566,6 +573,7 @@ const OfferForm = () => {
               type="email"
               value={formData.fromAddress.email}
               onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
         </Grid>
@@ -581,7 +589,7 @@ const OfferForm = () => {
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={4}>
             <FormControl fullWidth error={!!errors['toAddress.country']} size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Ülke</InputLabel>
+              <InputLabel shrink>Ülke</InputLabel>
               <Select
                 name="toAddress.country"
                 value={formData.toAddress.country}
@@ -614,6 +622,7 @@ const OfferForm = () => {
               required
               error={!!errors['toAddress.city']}
               helperText={errors['toAddress.city']}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
@@ -626,6 +635,7 @@ const OfferForm = () => {
               name="toAddress.district"
               value={formData.toAddress.district}
               onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
@@ -641,6 +651,7 @@ const OfferForm = () => {
               required
               error={!!errors['toAddress.zipCode']}
               helperText={errors['toAddress.zipCode']}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
@@ -655,6 +666,7 @@ const OfferForm = () => {
               onChange={handleInputChange}
               multiline
               rows={2}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
@@ -667,6 +679,7 @@ const OfferForm = () => {
               name="toAddress.contactPerson"
               value={formData.toAddress.contactPerson}
               onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
@@ -679,6 +692,7 @@ const OfferForm = () => {
               name="toAddress.phone"
               value={formData.toAddress.phone}
               onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
@@ -692,6 +706,7 @@ const OfferForm = () => {
               type="email"
               value={formData.toAddress.email}
               onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
         </Grid>
@@ -747,6 +762,7 @@ const OfferForm = () => {
                   required
                   error={!!errors[`cargoItems.${index}.dimensions`]}
                   helperText={errors[`cargoItems.${index}.dimensions`] && "Uzunluk gerekli"}
+                  InputLabelProps={{ shrink: true }}
                 />
               </Grid>
               <Grid item xs={12} sm={4} md={4}>
@@ -761,6 +777,7 @@ const OfferForm = () => {
                   required
                   error={!!errors[`cargoItems.${index}.dimensions`]}
                   helperText={errors[`cargoItems.${index}.dimensions`] && "Genişlik gerekli"}
+                  InputLabelProps={{ shrink: true }}
                 />
               </Grid>
               <Grid item xs={12} sm={4} md={4}>
@@ -775,6 +792,7 @@ const OfferForm = () => {
                   required
                   error={!!errors[`cargoItems.${index}.dimensions`]}
                   helperText={errors[`cargoItems.${index}.dimensions`] && "Yükseklik gerekli"}
+                  InputLabelProps={{ shrink: true }}
                 />
               </Grid>
             </Grid>
@@ -785,12 +803,13 @@ const OfferForm = () => {
             </Typography>
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid item xs={12} sm={6} md={6}>
-                <FormControl fullWidth size="small" error={!!errors[`cargoItems.${index}.cargoType`]} required sx={{ minWidth: 150 }}>
-                  <InputLabel>Yük Tipi *</InputLabel>
+                <FormControl fullWidth size="small" variant="outlined" error={!!errors[`cargoItems.${index}.cargoType`]} required sx={{ minWidth: 150 }}>
+                  <InputLabel shrink>Yük Tipi</InputLabel>
                   <Select
                     value={item.cargoType}
                     onChange={(e) => handleCargoItemChange(index, 'cargoType', e.target.value)}
-                    label="Yük Tipi *"
+                    label="Yük Tipi"
+                    notched
                   >
                     {cargoTypes.map((type) => (
                       <MenuItem key={type} value={type}>
@@ -816,6 +835,7 @@ const OfferForm = () => {
                   required
                   error={!!errors[`cargoItems.${index}.weight`]}
                   helperText={errors[`cargoItems.${index}.weight`]}
+                  InputLabelProps={{ shrink: true }}
                 />
               </Grid>
             </Grid>
@@ -832,6 +852,7 @@ const OfferForm = () => {
                   rows={2}
                   value={item.description}
                   onChange={(e) => handleCargoItemChange(index, 'description', e.target.value)}
+                  InputLabelProps={{ shrink: true }}
                 />
               </Grid>
             </Grid>
@@ -1074,6 +1095,7 @@ const OfferForm = () => {
               value={formData.estimatedPrice}
               onChange={handleInputChange}
               name="estimatedPrice"
+              InputLabelProps={{ shrink: true }}
               InputProps={{
                 endAdornment: (
                   <Box sx={{ ml: 1 }}>
@@ -1085,13 +1107,14 @@ const OfferForm = () => {
           </Grid>
           
           <Grid item xs={12} md={6}>
-            <FormControl fullWidth size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Para Birimi</InputLabel>
+            <FormControl fullWidth size="small" variant="outlined" sx={{ minWidth: 150 }}>
+              <InputLabel shrink>Para Birimi</InputLabel>
               <Select
                 name="currency"
                 value={formData.currency}
                 onChange={handleInputChange}
                 label="Para Birimi"
+                notched
               >
                 {currencies.map((currency) => (
                   <MenuItem key={currency.value} value={currency.value}>
