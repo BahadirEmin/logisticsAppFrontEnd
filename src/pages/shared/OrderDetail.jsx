@@ -23,6 +23,7 @@ import {
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
+import { useAuth } from '../../contexts/AuthContext';
 
 const OrderDetail = () => {
   const [order, setOrder] = useState(null);
@@ -30,6 +31,7 @@ const OrderDetail = () => {
   const [error, setError] = useState(null);
   const { orderId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const tripStatusOptions = [
     { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması', color: 'warning' },
@@ -48,11 +50,32 @@ const OrderDetail = () => {
     try {
       setLoading(true);
       setError(null);
+      
+      if (!orderId) {
+        setError('Sipariş ID\'si bulunamadı.');
+        return;
+      }
+      
+      console.log('Loading order with ID:', orderId);
       const data = await ordersAPI.getById(orderId);
+      console.log('Order data loaded:', data);
       setOrder(data);
     } catch (err) {
       console.error('Sipariş detayları yüklenirken hata:', err);
-      setError('Sipariş detayları yüklenirken bir hata oluştu.');
+      
+      let errorMessage = 'Sipariş detayları yüklenirken bir hata oluştu.';
+      
+      if (err.response?.status === 404) {
+        errorMessage = 'Sipariş bulunamadı.';
+      } else if (err.response?.status === 403) {
+        errorMessage = 'Bu siparişi görüntüleme yetkiniz bulunmuyor.';
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.message) {
+        errorMessage = `Hata: ${err.message}`;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -71,6 +94,21 @@ const OrderDetail = () => {
   const formatDate = dateString => {
     if (!dateString) return 'Belirtilmemiş';
     return new Date(dateString).toLocaleDateString('tr-TR');
+  };
+
+  const handleBack = () => {
+    switch (user?.role) {
+      case 'fleet':
+        navigate('/fleet/tekliflerim');
+        break;
+      case 'operator':
+        navigate('/operator/onaylanan-teklifler');
+        break;
+      case 'sales':
+      default:
+        navigate('/sales/tekliflerim');
+        break;
+    }
   };
 
   const handleEdit = () => {
@@ -96,7 +134,7 @@ const OrderDetail = () => {
         <Button
           variant="outlined"
           startIcon={<ArrowBackIcon />}
-          onClick={() => navigate('/sales/tekliflerim')}
+          onClick={handleBack}
         >
           Geri Dön
         </Button>
@@ -128,7 +166,7 @@ const OrderDetail = () => {
           <Button
             variant="outlined"
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate('/sales/tekliflerim')}
+            onClick={handleBack}
           >
             Geri Dön
           </Button>
@@ -136,7 +174,7 @@ const OrderDetail = () => {
             Sipariş Detayı #{order.id}
           </Typography>
         </Box>
-        {order.tripStatus === 'TEKLIF_ASAMASI' && (
+        {order.tripStatus === 'TEKLIF_ASAMASI' && user?.role !== 'fleet' && (
           <Button variant="contained" startIcon={<EditIcon />} onClick={handleEdit} color="primary">
             Düzenle
           </Button>
@@ -442,10 +480,19 @@ const OrderDetail = () => {
             />
             <CardContent sx={{ pt: 0 }}>
               <Typography variant="body2" sx={{ mb: 1, mt: 1 }}>
+                <strong>Atanan Şoför:</strong>
+                <Chip
+                  label={order.assignedDriverId || order.driverId || order.driver?.name || 'Atanmamış'}
+                  color={order.assignedDriverId || order.driverId || order.driver ? 'success' : 'default'}
+                  size="small"
+                  sx={{ ml: 1 }}
+                />
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1, mt: 1 }}>
                 <strong>Atanan Tır:</strong>
                 <Chip
-                  label={order.assignedTruckId || 'Atanmamış'}
-                  color={order.assignedTruckId ? 'success' : 'default'}
+                  label={order.assignedTruckId || order.truckId || order.vehicleId || order.truck?.plateNumber || order.vehicle?.plateNumber || 'Atanmamış'}
+                  color={order.assignedTruckId || order.truckId || order.vehicleId || order.truck || order.vehicle ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
                 />
@@ -453,8 +500,8 @@ const OrderDetail = () => {
               <Typography variant="body2" sx={{ mb: 2 }}>
                 <strong>Atanan Romork:</strong>
                 <Chip
-                  label={order.assignedTrailerId || 'Atanmamış'}
-                  color={order.assignedTrailerId ? 'success' : 'default'}
+                  label={order.assignedTrailerId || order.trailerId || order.trailer?.plateNumber || 'Atanmamış'}
+                  color={order.assignedTrailerId || order.trailerId || order.trailer ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
                 />

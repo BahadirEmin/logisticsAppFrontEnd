@@ -21,17 +21,19 @@ import {
   Alert,
   CircularProgress,
   Grid,
+  TablePagination,
   InputAdornment,
+  Button
 } from '@mui/material';
 import {
-  Search as SearchIcon,
   Visibility as VisibilityIcon,
   Assignment as AssignmentIcon,
+  Search as SearchIcon
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
-import FleetResourceAssignment from '../../components/FleetResourceAssignment';
 import { STATUS_OPTIONS, getStatusColor, getStatusLabel, getStatusIcon } from '../../constants/statusConstants';
+import FleetResourceAssignment from '../../components/FleetResourceAssignment';
+import { useNavigate } from 'react-router-dom';
 
 const OfferList = () => {
   const [offers, setOffers] = useState([]);
@@ -119,8 +121,8 @@ const OfferList = () => {
     fetchOffers();
   }, [fetchOffers]);
 
-  const handleViewDetails = id => {
-    navigate(`/fleet/offers/${id}`);
+  const handleViewDetails = (id) => {
+    navigate(`/fleet/detay/${id}`);
   };
 
   const handleAssignResources = order => {
@@ -367,25 +369,24 @@ const OfferList = () => {
                     </TableCell>
                     <TableCell align="center">
                       <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                        <Tooltip title="Detayları Görüntüle">
-                          <IconButton
-                            size="small"
-                            onClick={() => handleViewDetails(offer.id)}
-                            color="primary"
-                          >
-                            <VisibilityIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
+                        <Button
+                          size="small"
+                          startIcon={<VisibilityIcon />}
+                          variant="outlined"
+                          onClick={() => handleViewDetails(offer.id)}
+                        >
+                          Detay
+                        </Button>
                         {(offer.status === 'ONAYLANAN_TEKLIF' || offer.tripStatus === 'ONAYLANAN_TEKLIF') && (
-                          <Tooltip title="Kaynak Ata">
-                            <IconButton
-                              size="small"
-                              onClick={() => handleAssignResources(offer)}
-                              color="success"
-                            >
-                              <AssignmentIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
+                          <Button
+                            size="small"
+                            startIcon={<AssignmentIcon />}
+                            variant="contained"
+                            color="primary"
+                            onClick={() => handleAssignResources(offer)}
+                          >
+                            Kaynak Ata
+                          </Button>
                         )}
                       </Box>
                     </TableCell>

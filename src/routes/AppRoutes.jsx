@@ -303,6 +303,16 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/fleet/detay/:orderId"
+          element={
+            <ProtectedRoute allowedRoles={['fleet']}>
+              <MainLayout>
+                <OrderDetail />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
 
         {/* Default redirect */}
         <Route path="/" element={<Navigate to="/login" replace />} />

@@ -20,6 +20,10 @@ import {
   Alert,
   CircularProgress,
   Tooltip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import {
   Search,
@@ -218,46 +222,53 @@ const ApprovedOffers = () => {
       </Grid>
 
       {/* Filters */}
-      <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={6}>
-            <TextField
-              fullWidth
-              size="small"
-              label="Ara"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              <Chip
-                label="Tümü"
-                onClick={() => setFilterStatus('all')}
-                color={filterStatus === 'all' ? 'primary' : 'default'}
-                variant={filterStatus === 'all' ? 'filled' : 'outlined'}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Ara"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search />
+                    </InputAdornment>
+                  ),
+                }}
               />
-              {STATUS_OPTIONS.map(status => (
-                <Chip
-                  key={status.value}
-                  icon={status.icon}
-                  label={status.label}
-                  onClick={() => setFilterStatus(status.value)}
-                  color={filterStatus === status.value ? status.color : 'default'}
-                  variant={filterStatus === status.value ? 'filled' : 'outlined'}
-                />
-              ))}
-            </Box>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+                <InputLabel shrink>Durum Filtresi</InputLabel>
+                <Select
+                  value={filterStatus}
+                  onChange={e => setFilterStatus(e.target.value)}
+                  label="Durum Filtresi"
+                  notched
+                >
+                  <MenuItem value="all">
+                    <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
+                  </MenuItem>
+                  {STATUS_OPTIONS.map(status => (
+                    <MenuItem key={status.value} value={status.value}>
+                      <Chip 
+                        icon={status.icon}
+                        label={status.label} 
+                        color={status.color} 
+                        size="small" 
+                      />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
           </Grid>
-        </Grid>
-      </Paper>
+        </CardContent>
+      </Card>
 
       {/* Offers Table */}
       <Paper elevation={2}>

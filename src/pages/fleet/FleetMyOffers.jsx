@@ -23,14 +23,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  List,
-  ListItem,
-  ListItemText,
+  Button
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -41,16 +34,13 @@ import {
   Assignment as AssignmentIcon,
   DirectionsCar as TruckIcon,
   Person as DriverIcon,
-  LocalShipping as TrailerIcon,
-  Close as CloseIcon,
-  LocationOn as LocationIcon,
-  Business as BusinessIcon,
-  CalendarToday as CalendarIcon,
+  LocalShipping as TrailerIcon
 } from '@mui/icons-material';
 import { ordersAPI } from '../../api/orders';
 import { useAuth } from '../../contexts/AuthContext';
 import FleetResourceAssignment from '../../components/FleetResourceAssignment';
 import { STATUS_OPTIONS, getStatusColor, getStatusLabel, getStatusIcon } from '../../constants/statusConstants';
+import { useNavigate } from 'react-router-dom';
 
 const FleetMyOffers = () => {
   const [offers, setOffers] = useState([]);
@@ -59,12 +49,8 @@ const FleetMyOffers = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [assignmentDialog, setAssignmentDialog] = useState({ open: false, order: null });
-  const [orderDetailsDialog, setOrderDetailsDialog] = useState({
-    open: false,
-    order: null,
-    loading: false,
-  });
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const loadFleetOffers = useCallback(async () => {
     try {
@@ -112,16 +98,8 @@ const FleetMyOffers = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const handleViewOffer = async offerId => {
-    try {
-      setOrderDetailsDialog({ open: true, order: null, loading: true });
-      const orderDetails = await ordersAPI.getById(offerId);
-      setOrderDetailsDialog({ open: true, order: orderDetails, loading: false });
-    } catch (err) {
-      console.error('Order details yüklenirken hata:', err);
-      setOrderDetailsDialog({ open: false, order: null, loading: false });
-      setError('Sipariş detayları yüklenirken bir hata oluştu.');
-    }
+  const handleViewOffer = (offerId) => {
+    navigate(`/fleet/detay/${offerId}`);
   };
 
   const handleAssignResources = order => {
@@ -130,10 +108,6 @@ const FleetMyOffers = () => {
 
   const handleCloseAssignment = () => {
     setAssignmentDialog({ open: false, order: null });
-  };
-
-  const handleCloseOrderDetails = () => {
-    setOrderDetailsDialog({ open: false, order: null, loading: false });
   };
 
   const handleAssignmentSuccess = () => {
@@ -401,20 +375,23 @@ const FleetMyOffers = () => {
                   </TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                      <Tooltip title="Detay Görüntüle">
-                        <IconButton size="small" onClick={() => handleViewOffer(offer.id)}>
-                          <VisibilityIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Kaynak Ata">
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={() => handleAssignResources(offer)}
-                        >
-                          <AssignmentIcon />
-                        </IconButton>
-                      </Tooltip>
+                      <Button
+                        size="small"
+                        startIcon={<VisibilityIcon />}
+                        variant="outlined"
+                        onClick={() => handleViewOffer(offer.id)}
+                      >
+                        Detay
+                      </Button>
+                      <Button
+                        size="small"
+                        startIcon={<AssignmentIcon />}
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleAssignResources(offer)}
+                      >
+                        Kaynak Ata
+                      </Button>
                     </Box>
                   </TableCell>
                 </TableRow>
@@ -424,300 +401,11 @@ const FleetMyOffers = () => {
         </TableContainer>
       </Paper>
 
-      {filteredOffers.length === 0 && (
+            {filteredOffers.length === 0 && (
         <Alert severity="info" sx={{ mt: 3 }}>
           Arama kriterlerinize uygun teklif bulunamadı.
         </Alert>
       )}
-
-      {/* Order Details Dialog */}
-      <Dialog
-        open={orderDetailsDialog.open}
-        onClose={handleCloseOrderDetails}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: { minHeight: '60vh' },
-        }}
-      >
-        <DialogTitle
-          sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-        >
-          <Typography variant="h6" component="div">
-            Sipariş Detayları
-          </Typography>
-          <IconButton onClick={handleCloseOrderDetails} size="small">
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          {orderDetailsDialog.loading ? (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-              <CircularProgress />
-            </Box>
-          ) : orderDetailsDialog.order ? (
-            <Box>
-              {/* Order Basic Info */}
-              <Grid container spacing={3} sx={{ mb: 3 }}>
-                <Grid item xs={12} md={6}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Typography
-                        variant="h6"
-                        gutterBottom
-                        sx={{ display: 'flex', alignItems: 'center' }}
-                      >
-                        <BusinessIcon sx={{ mr: 1 }} />
-                        Sipariş Bilgileri
-                      </Typography>
-                      <List dense>
-                        <ListItem>
-                          <ListItemText
-                            primary="Sipariş No"
-                            secondary={`#${orderDetailsDialog.order.id}`}
-                          />
-                        </ListItem>
-                        <ListItem>
-                          <ListItemText
-                            primary="Müşteri"
-                            secondary={
-                              orderDetailsDialog.order.customerName ||
-                              orderDetailsDialog.order.customer?.name ||
-                              'N/A'
-                            }
-                          />
-                        </ListItem>
-                        <ListItem>
-                          <ListItemText
-                            primary="Durum"
-                            secondary={
-                              <Chip
-                                icon={getStatusIcon(
-                                  orderDetailsDialog.order.tripStatus ||
-                                    orderDetailsDialog.order.status
-                                )}
-                                label={getStatusLabel(
-                                  orderDetailsDialog.order.tripStatus ||
-                                    orderDetailsDialog.order.status
-                                )}
-                                color={getStatusColor(
-                                  orderDetailsDialog.order.tripStatus ||
-                                    orderDetailsDialog.order.status
-                                )}
-                                size="small"
-                              />
-                            }
-                          />
-                        </ListItem>
-                        <ListItem>
-                          <ListItemText
-                            primary="Fiyat"
-                            secondary={
-                              <Typography variant="h6" color="success.main">
-                                ₺{orderDetailsDialog.order.price || 'N/A'}
-                              </Typography>
-                            }
-                          />
-                        </ListItem>
-                      </List>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Typography
-                        variant="h6"
-                        gutterBottom
-                        sx={{ display: 'flex', alignItems: 'center' }}
-                      >
-                        <LocationIcon sx={{ mr: 1 }} />
-                        Rota Bilgileri
-                      </Typography>
-                      <List dense>
-                        <ListItem>
-                          <ListItemText
-                            primary="Kalkış"
-                            secondary={
-                              orderDetailsDialog.order.departureCity ||
-                              orderDetailsDialog.order.departureAddress ||
-                              'N/A'
-                            }
-                          />
-                        </ListItem>
-                        <ListItem>
-                          <ListItemText
-                            primary="Varış"
-                            secondary={
-                              orderDetailsDialog.order.arrivalCity ||
-                              orderDetailsDialog.order.arrivalAddress ||
-                              'N/A'
-                            }
-                          />
-                        </ListItem>
-                        <ListItem>
-                          <ListItemText
-                            primary="Yük Türü"
-                            secondary={orderDetailsDialog.order.cargoType || 'N/A'}
-                          />
-                        </ListItem>
-                        <ListItem>
-                          <ListItemText
-                            primary="Yük Ağırlığı"
-                            secondary={
-                              orderDetailsDialog.order.cargoWeightKg
-                                ? `${orderDetailsDialog.order.cargoWeightKg} kg`
-                                : 'N/A'
-                            }
-                          />
-                        </ListItem>
-                      </List>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              </Grid>
-
-              {/* Assigned Resources */}
-              <Card variant="outlined" sx={{ mb: 3 }}>
-                <CardContent>
-                  <Typography
-                    variant="h6"
-                    gutterBottom
-                    sx={{ display: 'flex', alignItems: 'center' }}
-                  >
-                    <AssignmentIcon sx={{ mr: 1 }} />
-                    Atanan Kaynaklar
-                  </Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} md={4}>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          p: 2,
-                          border: '1px solid',
-                          borderColor: 'divider',
-                          borderRadius: 1,
-                        }}
-                      >
-                        <TruckIcon color="primary" sx={{ mr: 2 }} />
-                        <Box>
-                          <Typography variant="subtitle2">Araç</Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {orderDetailsDialog.order.vehicle?.plateNumber ||
-                              orderDetailsDialog.order.vehicleId ||
-                              'Atanmamış'}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          p: 2,
-                          border: '1px solid',
-                          borderColor: 'divider',
-                          borderRadius: 1,
-                        }}
-                      >
-                        <DriverIcon color="success" sx={{ mr: 2 }} />
-                        <Box>
-                          <Typography variant="subtitle2">Şoför</Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {orderDetailsDialog.order.driver?.name ||
-                              orderDetailsDialog.order.driverId ||
-                              'Atanmamış'}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          p: 2,
-                          border: '1px solid',
-                          borderColor: 'divider',
-                          borderRadius: 1,
-                        }}
-                      >
-                        <TrailerIcon color="warning" sx={{ mr: 2 }} />
-                        <Box>
-                          <Typography variant="subtitle2">Römork</Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {orderDetailsDialog.order.trailer?.plateNumber ||
-                              orderDetailsDialog.order.trailerId ||
-                              'Atanmamış'}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-
-              {/* Additional Details */}
-              <Card variant="outlined">
-                <CardContent>
-                  <Typography
-                    variant="h6"
-                    gutterBottom
-                    sx={{ display: 'flex', alignItems: 'center' }}
-                  >
-                    <CalendarIcon sx={{ mr: 1 }} />
-                    Tarih Bilgileri
-                  </Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="body2" color="text.secondary">
-                        Oluşturulma Tarihi
-                      </Typography>
-                      <Typography variant="body1">
-                        {orderDetailsDialog.order.createdAt
-                          ? new Date(orderDetailsDialog.order.createdAt).toLocaleDateString('tr-TR')
-                          : 'N/A'}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="body2" color="text.secondary">
-                        Tahmini Teslimat
-                      </Typography>
-                      <Typography variant="body1">
-                        {orderDetailsDialog.order.estimatedDeliveryDate
-                          ? new Date(
-                              orderDetailsDialog.order.estimatedDeliveryDate
-                            ).toLocaleDateString('tr-TR')
-                          : 'N/A'}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            </Box>
-          ) : null}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseOrderDetails} variant="outlined">
-            Kapat
-          </Button>
-          {orderDetailsDialog.order && (
-            <Button
-              onClick={() => {
-                handleCloseOrderDetails();
-                handleAssignResources(orderDetailsDialog.order);
-              }}
-              variant="contained"
-              startIcon={<AssignmentIcon />}
-            >
-              Kaynak Ata
-            </Button>
-          )}
-        </DialogActions>
-      </Dialog>
 
       {/* Fleet Resource Assignment Dialog */}
       <FleetResourceAssignment

@@ -215,7 +215,7 @@ const OperatorMyOffers = () => {
               {offers.filter(o => (o.tripStatus || o.status) === 'pending').length}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Beklemede
+              {getStatusLabel('pending')}
             </Typography>
           </Paper>
         </Grid>
