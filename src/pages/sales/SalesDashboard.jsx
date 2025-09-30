@@ -101,6 +101,31 @@ const SalesDashboard = () => {
       setDashboardData(salesStats);
       setRecentOffers(recentOffersData.offers || []);
       
+      // Recent offers'dan gerçek status breakdown hesapla
+      const actualStatusBreakdown = {
+        approved: 0,
+        pending: 0,
+        rejected: 0
+      };
+      
+      (recentOffersData.offers || []).forEach(offer => {
+        if (offer.status === 'approved') actualStatusBreakdown.approved++;
+        else if (offer.status === 'pending') actualStatusBreakdown.pending++;
+        else if (offer.status === 'rejected') actualStatusBreakdown.rejected++;
+      });
+      
+      // Dashboard data'yı gerçek değerlerle güncelle
+      setDashboardData(prev => ({
+        ...prev,
+        statusBreakdown: actualStatusBreakdown,
+        financial: {
+          ...prev.financial,
+          successRate: actualStatusBreakdown.approved + actualStatusBreakdown.pending + actualStatusBreakdown.rejected > 0 
+            ? actualStatusBreakdown.approved / (actualStatusBreakdown.approved + actualStatusBreakdown.pending + actualStatusBreakdown.rejected)
+            : 0
+        }
+      }));
+      
       // Operatör atanmamış teklifler için offer performance'dan veri al
       setApprovedOffersNeedingOperator(
         offerPerformance.needsAction?.needsOperatorAssignment || []
@@ -410,7 +435,20 @@ const SalesDashboard = () => {
                           {offer.departureCity} → {offer.arrivalCity}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          {offer.createdAt ? statisticsUtils.formatRelativeTime(offer.createdAt) : 'Bilinmiyor'}
+                          {offer.createdAt ? 
+                            (() => {
+                              try {
+                                const date = new Date(offer.createdAt);
+                                if (isNaN(date.getTime())) {
+                                  return 'Tarih bilinmiyor';
+                                }
+                                return statisticsUtils.formatRelativeTime(offer.createdAt);
+                              } catch (error) {
+                                return 'Tarih bilinmiyor';
+                              }
+                            })() 
+                            : 'Tarih bilinmiyor'
+                          }
                         </Typography>
                       </Box>
                     }
@@ -452,19 +490,304 @@ const SalesDashboard = () => {
             )}
           </Paper>
         </Box>
-      )}      {/* Performance Chart Placeholder */}
+      )}      {/* Performance Analytics */}
       <Box sx={{ mt: 4 }}>
         <Typography variant="h5" component="h2" gutterBottom sx={{ color: '#1976d2' }}>
-          Performans Özeti
+          Performans Analytics
         </Typography>
-        <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
-          <TrendingUp sx={{ fontSize: 60, color: '#1976d2', mb: 2 }} />
-          <Typography variant="h6" gutterBottom>
-            Bu Ay Başarı Oranı: %{Math.round(dashboardData.financial.successRate * 100)}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {dashboardData.totalStats?.thisMonth !== undefined ? dashboardData.totalStats.thisMonth : 0} tekliften {dashboardData.statusBreakdown?.approved || 0}'i onaylandı
-          </Typography>
+        
+        {/* Single Paper Container for All Charts */}
+        <Paper elevation={2} sx={{ p: 4 }}>
+          {/* Success Rate Chart - Full Width */}
+          <Box sx={{ mb: 6 }}>
+            <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 4 }}>
+              <TrendingUp color="primary" />
+              Genel Başarı Oranı
+            </Typography>
+            
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3 }}>
+              <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+                <CircularProgress
+                  variant="determinate"
+                  value={100}
+                  size={220}
+                  thickness={6}
+                  sx={{ color: '#e0e0e0', position: 'absolute' }}
+                />
+                <CircularProgress
+                  variant="determinate"
+                  value={dashboardData.financial.successRate * 100}
+                  size={220}
+                  thickness={6}
+                  sx={{ 
+                    color: dashboardData.financial.successRate >= 0.7 ? '#4caf50' : 
+                           dashboardData.financial.successRate >= 0.4 ? '#ff9800' : '#f44336',
+                    transform: 'rotate(-90deg) !important'
+                  }}
+                />
+                <Box
+                  sx={{
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                    position: 'absolute',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: 'column'
+                  }}
+                >
+                  <Typography variant="h2" component="div" color="text.primary" fontWeight="bold">
+                    %{Math.round(dashboardData.financial.successRate * 100)}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    Başarı Oranı
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+            
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography variant="body1" color="text.secondary">
+                {dashboardData.statusBreakdown.approved} onaylanan / {' '}
+                {dashboardData.statusBreakdown.approved + dashboardData.statusBreakdown.pending + dashboardData.statusBreakdown.rejected} toplam teklif
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* Other Charts in Single Row */}
+          <Grid container spacing={4} sx={{ justifyContent: 'space-between' }}>
+            {/* Status Breakdown - Left */}
+            <Grid item xs={12} md={3.8}>
+              <Box sx={{ height: '300px', textAlign: 'left' }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 1, mb: 3 }}>
+                  <AssignmentIcon color="primary" />
+                  Teklif Durumu Dağılımı
+                </Typography>
+                
+                <Box sx={{ mt: 3 }}>
+                  {/* Approved */}
+                  <Box sx={{ mb: 3 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <CheckCircle sx={{ color: '#4caf50', fontSize: 20 }} />
+                        <Typography variant="body1">Onaylanan</Typography>
+                      </Box>
+                      <Typography variant="h6" color="#4caf50" fontWeight="bold">
+                        {dashboardData.statusBreakdown.approved}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ bgcolor: '#e8f5e8', borderRadius: 1, height: 12, overflow: 'hidden' }}>
+                      <Box 
+                        sx={{ 
+                          bgcolor: '#4caf50', 
+                          height: '100%', 
+                          width: `${(dashboardData.statusBreakdown.approved / Math.max(1, dashboardData.statusBreakdown.approved + dashboardData.statusBreakdown.pending + dashboardData.statusBreakdown.rejected)) * 100}%`,
+                          transition: 'width 0.5s ease-in-out'
+                        }} 
+                      />
+                    </Box>
+                  </Box>
+
+                  {/* Pending */}
+                  <Box sx={{ mb: 3 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Pending sx={{ color: '#ff9800', fontSize: 20 }} />
+                        <Typography variant="body1">Bekleyen</Typography>
+                      </Box>
+                      <Typography variant="h6" color="#ff9800" fontWeight="bold">
+                        {dashboardData.statusBreakdown.pending}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ bgcolor: '#fff3e0', borderRadius: 1, height: 12, overflow: 'hidden' }}>
+                      <Box 
+                        sx={{ 
+                          bgcolor: '#ff9800', 
+                          height: '100%', 
+                          width: `${(dashboardData.statusBreakdown.pending / Math.max(1, dashboardData.statusBreakdown.approved + dashboardData.statusBreakdown.pending + dashboardData.statusBreakdown.rejected)) * 100}%`,
+                          transition: 'width 0.5s ease-in-out'
+                        }} 
+                      />
+                    </Box>
+                  </Box>
+
+                  {/* Rejected */}
+                  <Box sx={{ mb: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <WarningIcon sx={{ color: '#f44336', fontSize: 20 }} />
+                        <Typography variant="body1">Reddedilen</Typography>
+                      </Box>
+                      <Typography variant="h6" color="#f44336" fontWeight="bold">
+                        {dashboardData.statusBreakdown.rejected}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ bgcolor: '#ffebee', borderRadius: 1, height: 12, overflow: 'hidden' }}>
+                      <Box 
+                        sx={{ 
+                          bgcolor: '#f44336', 
+                          height: '100%', 
+                          width: `${(dashboardData.statusBreakdown.rejected / Math.max(1, dashboardData.statusBreakdown.approved + dashboardData.statusBreakdown.pending + dashboardData.statusBreakdown.rejected)) * 100}%`,
+                          transition: 'width 0.5s ease-in-out'
+                        }} 
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+            </Grid>
+
+            {/* Financial Performance - Center */}
+            <Grid item xs={12} md={3.8}>
+              <Box sx={{ height: '300px', textAlign: 'center' }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 3 }}>
+                  <AttachMoney color="primary" />
+                  Finansal Performans
+                </Typography>
+                
+                <Grid container spacing={2} sx={{ mt: 1 }}>
+                  <Grid item xs={12}>
+                    <Box sx={{ textAlign: 'center', p: 2, bgcolor: '#f3e5f5', borderRadius: 2, mb: 2 }}>
+                      <Typography variant="h5" color="#9c27b0" fontWeight="bold">
+                        {statisticsUtils.formatLargeNumber(dashboardData.financial.totalValue)}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Toplam Değer (₺)
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Box sx={{ textAlign: 'center', p: 2, bgcolor: '#e3f2fd', borderRadius: 2, mb: 2 }}>
+                      <Typography variant="h5" color="#1976d2" fontWeight="bold">
+                        {statisticsUtils.formatLargeNumber(dashboardData.financial.monthlyValue)}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Bu Ay (₺)
+                      </Typography>
+                    </Box>
+                  </Grid>
+                </Grid>
+
+                <Box sx={{ p: 2, bgcolor: '#f5f5f5', borderRadius: 2 }}>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    Ortalama Teklif Değeri
+                  </Typography>
+                  <Typography variant="h6" color="primary" fontWeight="bold">
+                    {dashboardData.totalStats?.totalOffers > 0 
+                      ? statisticsUtils.formatCurrency(dashboardData.financial.totalValue / dashboardData.totalStats.totalOffers)
+                      : '0 ₺'
+                    }
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+
+            {/* Quick Insights - Right */}
+            <Grid item xs={12} md={3.8}>
+              <Box sx={{ height: '300px', textAlign: 'right' }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 1, mb: 3 }}>
+                  <TrendingUp color="primary" />
+                  Hızlı İçgörüler
+                </Typography>
+                
+                <List dense>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemIcon sx={{ minWidth: 32 }}>
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: dashboardData.financial.successRate >= 0.7 ? '#4caf50' : 
+                                 dashboardData.financial.successRate >= 0.4 ? '#ff9800' : '#f44336'
+                        }}
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <Typography variant="body2">
+                          Genel başarı oranınız{' '}
+                          <strong>
+                            {dashboardData.financial.successRate >= 0.7 ? 'mükemmel' : 
+                             dashboardData.financial.successRate >= 0.4 ? 'orta' : 'geliştirilmeli'}
+                          </strong>{' '}
+                          seviyede
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemIcon sx={{ minWidth: 32 }}>
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: dashboardData.statusBreakdown.pending > 5 ? '#ff9800' : '#4caf50'
+                        }}
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <Typography variant="body2">
+                          {dashboardData.statusBreakdown.pending > 5 
+                            ? `${dashboardData.statusBreakdown.pending} bekleyen teklif takip edilmeli`
+                            : 'Bekleyen teklifler kontrol altında'
+                          }
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemIcon sx={{ minWidth: 32 }}>
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: approvedOffersNeedingOperator.length > 0 ? '#ff9800' : '#4caf50'
+                        }}
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <Typography variant="body2">
+                          {approvedOffersNeedingOperator.length > 0 
+                            ? `${approvedOffersNeedingOperator.length} teklif operatör ataması bekliyor`
+                            : 'Tüm onaylanan teklifler operatör atanmış'
+                          }
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemIcon sx={{ minWidth: 32 }}>
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: '#2196f3'
+                        }}
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <Typography variant="body2">
+                          Bu ay {dashboardData.totalStats?.thisMonth || 0} yeni teklif oluşturdunuz
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                </List>
+              </Box>
+            </Grid>
+          </Grid>
         </Paper>
       </Box>
     </Container>
