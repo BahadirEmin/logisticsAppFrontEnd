@@ -121,8 +121,8 @@ const OfferList = () => {
     fetchOffers();
   }, [fetchOffers]);
 
-  const handleViewDetails = (id) => {
-    navigate(`/fleet/detay/${id}`);
+  const handleViewDetails = (orderId) => {
+    navigate(`/fleet/detay/${orderId}`);
   };
 
   const handleAssignResources = order => {
