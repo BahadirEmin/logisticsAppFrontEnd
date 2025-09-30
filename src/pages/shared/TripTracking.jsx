@@ -11,12 +11,6 @@ import {
   Button,
   TextField,
   InputAdornment,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Alert,
   CircularProgress,
   LinearProgress,
@@ -30,9 +24,18 @@ import {
   Warning,
   DirectionsCar,
 } from '@mui/icons-material';
+import { statisticsAPI } from '../../api/statistics';
 
 const TripTracking = () => {
-  const [trips, setTrips] = useState([]);
+  const [tripData, setTripData] = useState({
+    summary: {
+      total: 0,
+      inProgress: 0,
+      completed: 0,
+      delayed: 0,
+    },
+    trips: [],
+  });
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -40,67 +43,43 @@ const TripTracking = () => {
     loadTrips();
   }, []);
 
+  // Auto-refresh her 30 saniyede bir
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadTrips();
+    }, 30000); // 30 saniye
+
+    return () => clearInterval(interval);
+  }, []);
+
   const loadTrips = async () => {
     try {
       setLoading(true);
-      // Mock data - in real app, this would be an API call
-      const mockTrips = [
-        {
-          id: 1,
-          tripNumber: 'TRP-2024-001',
-          driverName: 'Ahmet Yılmaz',
-          vehiclePlate: '34 ABC 123',
-          fromLocation: 'İstanbul, Türkiye',
-          toLocation: 'Ankara, Türkiye',
-          status: 'in_progress',
-          progress: 65,
-          startDate: '2024-01-15',
-          estimatedArrival: '2024-01-16',
-          currentLocation: 'Eskişehir, Türkiye',
-          cargoType: 'Genel Kargo',
-          weight: '1500 kg',
-          customer: 'ABC Şirketi',
-        },
-        {
-          id: 2,
-          tripNumber: 'TRP-2024-002',
-          driverName: 'Mehmet Demir',
-          vehiclePlate: '06 XYZ 789',
-          fromLocation: 'İzmir, Türkiye',
-          toLocation: 'Bursa, Türkiye',
-          status: 'completed',
-          progress: 100,
-          startDate: '2024-01-14',
-          estimatedArrival: '2024-01-15',
-          currentLocation: 'Bursa, Türkiye',
-          cargoType: 'Soğuk Zincir',
-          weight: '800 kg',
-          customer: 'XYZ Lojistik',
-        },
-        {
-          id: 3,
-          tripNumber: 'TRP-2024-003',
-          driverName: 'Ali Kaya',
-          vehiclePlate: '07 DEF 456',
-          fromLocation: 'Antalya, Türkiye',
-          toLocation: 'İstanbul, Türkiye',
-          status: 'delayed',
-          progress: 30,
-          startDate: '2024-01-13',
-          estimatedArrival: '2024-01-16',
-          currentLocation: 'Afyon, Türkiye',
-          cargoType: 'Tehlikeli Madde',
-          weight: '2000 kg',
-          customer: 'DEF Ticaret',
-        },
-      ];
-      setTrips(mockTrips);
+      const data = await statisticsAPI.getTripTrackingStats({ 
+        limit: 50,
+        search: searchTerm 
+      });
+      setTripData(data);
     } catch (error) {
       console.error('Error loading trips:', error);
+      // Fallback to empty data on error
+      setTripData({
+        summary: { total: 0, inProgress: 0, completed: 0, delayed: 0 },
+        trips: []
+      });
     } finally {
       setLoading(false);
     }
   };
+
+  // Search değiştiğinde debounced yükleme
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      loadTrips();
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
 
   const getStatusChip = status => {
     const statusConfig = {
@@ -135,12 +114,13 @@ const TripTracking = () => {
     }
   };
 
-  const filteredTrips = trips.filter(
+  // Client-side filtering for real-time search
+  const filteredTrips = tripData.trips.filter(
     trip =>
       trip.tripNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      trip.driverName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      trip.vehiclePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      trip.customer.toLowerCase().includes(searchTerm.toLowerCase())
+      trip.driver?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      trip.vehicle?.plate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      trip.customer?.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -168,7 +148,7 @@ const TripTracking = () => {
                 Toplam Sefer
               </Typography>
               <Typography variant="h4" component="div">
-                {trips.length}
+                {tripData.summary.total}
               </Typography>
             </CardContent>
           </Card>
@@ -180,7 +160,7 @@ const TripTracking = () => {
                 Yolda Olan
               </Typography>
               <Typography variant="h4" component="div" color="primary.main">
-                {trips.filter(t => t.status === 'in_progress').length}
+                {tripData.summary.inProgress}
               </Typography>
             </CardContent>
           </Card>
@@ -192,7 +172,7 @@ const TripTracking = () => {
                 Tamamlanan
               </Typography>
               <Typography variant="h4" component="div" color="success.main">
-                {trips.filter(t => t.status === 'completed').length}
+                {tripData.summary.completed}
               </Typography>
             </CardContent>
           </Card>
@@ -204,7 +184,7 @@ const TripTracking = () => {
                 Gecikmeli
               </Typography>
               <Typography variant="h4" component="div" color="warning.main">
-                {trips.filter(t => t.status === 'delayed').length}
+                {tripData.summary.delayed}
               </Typography>
             </CardContent>
           </Card>
@@ -252,32 +232,32 @@ const TripTracking = () => {
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
                     <DirectionsCar sx={{ fontSize: 16, mr: 1, verticalAlign: 'middle' }} />
-                    {trip.vehiclePlate}
+                    {trip.vehicle?.plate}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
                     <LocationOn sx={{ fontSize: 16, mr: 1, verticalAlign: 'middle' }} />
-                    {trip.driverName}
+                    {trip.driver?.name}
                   </Typography>
                 </Box>
 
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="body2" gutterBottom>
-                    <strong>Nereden:</strong> {trip.fromLocation}
+                    <strong>Nereden:</strong> {trip.route?.from}
                   </Typography>
                   <Typography variant="body2" gutterBottom>
-                    <strong>Nereye:</strong> {trip.toLocation}
+                    <strong>Nereye:</strong> {trip.route?.to}
                   </Typography>
                   <Typography variant="body2" gutterBottom>
-                    <strong>Mevcut Konum:</strong> {trip.currentLocation}
+                    <strong>Mevcut Konum:</strong> {trip.route?.currentLocation}
                   </Typography>
                 </Box>
 
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="body2" gutterBottom>
-                    <strong>Müşteri:</strong> {trip.customer}
+                    <strong>Müşteri:</strong> {trip.customer?.name}
                   </Typography>
                   <Typography variant="body2" gutterBottom>
-                    <strong>Yük:</strong> {trip.cargoType} - {trip.weight}
+                    <strong>Yük:</strong> {trip.cargo?.type} - {trip.cargo?.weight}
                   </Typography>
                 </Box>
 
@@ -301,10 +281,10 @@ const TripTracking = () => {
                 >
                   <Box>
                     <Typography variant="caption" display="block" color="text.secondary">
-                      Başlangıç: {new Date(trip.startDate).toLocaleDateString('tr-TR')}
+                      Başlangıç: {new Date(trip.dates?.startDate).toLocaleDateString('tr-TR')}
                     </Typography>
                     <Typography variant="caption" display="block" color="text.secondary">
-                      Tahmini: {new Date(trip.estimatedArrival).toLocaleDateString('tr-TR')}
+                      Tahmini: {new Date(trip.dates?.estimatedArrival).toLocaleDateString('tr-TR')}
                     </Typography>
                   </Box>
                   <Button size="small" variant="outlined" startIcon={<LocationOn />}>
@@ -317,9 +297,9 @@ const TripTracking = () => {
         ))}
       </Grid>
 
-      {filteredTrips.length === 0 && (
+      {filteredTrips.length === 0 && !loading && (
         <Alert severity="info" sx={{ mt: 3 }}>
-          Arama kriterlerinize uygun sefer bulunamadı.
+          {searchTerm ? 'Arama kriterlerinize uygun sefer bulunamadı.' : 'Henüz sefer bulunmuyor.'}
         </Alert>
       )}
     </Container>

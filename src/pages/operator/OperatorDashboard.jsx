@@ -20,17 +20,25 @@ import {
   Person,
   Assignment,
 } from '@mui/icons-material';
-import { vehicleAPI } from '../../api/vehicles';
-import { driversAPI } from '../../api/drivers';
-import { ordersAPI } from '../../api/orders';
+import { statisticsAPI } from '../../api/statistics';
 
 const OperatorDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState({
-    activeTrips: 0,
-    approvedOffers: 0,
-    activeVehicles: 0,
-    activeDrivers: 0,
+    tripStats: {
+      active: 0,
+      completedToday: 0,
+      delayed: 0,
+    },
+    resourceStats: {
+      activeVehicles: 0,
+      activeDrivers: 0,
+      approvedOffers: 0,
+    },
+    assignmentStats: {
+      pendingAssignments: 0,
+      todayAssignments: 0,
+    },
   });
 
   useEffect(() => {
@@ -41,29 +49,9 @@ const OperatorDashboard = () => {
     try {
       setLoading(true);
 
-      // Paralel olarak tüm verileri çek
-      const [vehicles, drivers, orders] = await Promise.all([
-        vehicleAPI.getAll(),
-        driversAPI.getAll(),
-        ordersAPI.getAll(),
-      ]);
-
-      // İstatistikleri hesapla
-      const activeTrips = orders.filter(
-        o => o.tripStatus === 'YOLA_CIKTI' || o.tripStatus === 'GUMRUKTE'
-      ).length;
-
-      const approvedOffers = orders.filter(o => o.tripStatus === 'ONAYLANDI').length;
-
-      const activeVehicles = vehicles.filter(v => v.isActive).length;
-      const activeDrivers = drivers.filter(d => d.isActive).length;
-
-      setDashboardData({
-        activeTrips,
-        approvedOffers,
-        activeVehicles,
-        activeDrivers,
-      });
+      // Operator dashboard stats'ı çek
+      const operatorStats = await statisticsAPI.getOperatorDashboardStats();
+      setDashboardData(operatorStats);
     } catch (error) {
       console.error('Dashboard verileri yüklenirken hata:', error);
     } finally {
@@ -96,7 +84,7 @@ const OperatorDashboard = () => {
                 component="div"
                 sx={{ fontWeight: 'bold', color: '#1976d2' }}
               >
-                {dashboardData.activeTrips}
+                {dashboardData.tripStats.active}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Aktif Seferler
@@ -111,7 +99,7 @@ const OperatorDashboard = () => {
                 component="div"
                 sx={{ fontWeight: 'bold', color: '#4caf50' }}
               >
-                {dashboardData.approvedOffers}
+                {dashboardData.resourceStats.approvedOffers}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Onaylanan Teklifler
@@ -126,7 +114,7 @@ const OperatorDashboard = () => {
                 component="div"
                 sx={{ fontWeight: 'bold', color: '#ff9800' }}
               >
-                {dashboardData.activeVehicles}
+                {dashboardData.resourceStats.activeVehicles}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Aktif Araçlar
@@ -141,7 +129,7 @@ const OperatorDashboard = () => {
                 component="div"
                 sx={{ fontWeight: 'bold', color: '#9c27b0' }}
               >
-                {dashboardData.activeDrivers}
+                {dashboardData.resourceStats.activeDrivers}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Aktif Sürücüler
@@ -232,74 +220,6 @@ const OperatorDashboard = () => {
           </Card>
         </Grid>
       </Grid>
-
-      {/* Recent Activity */}
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="h5" component="h2" gutterBottom sx={{ color: '#1976d2' }}>
-          Son Aktiviteler
-        </Typography>
-        <Paper elevation={2} sx={{ p: 3 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              mb: 2,
-              p: 2,
-              bgcolor: '#f5f5f5',
-              borderRadius: 1,
-            }}
-          >
-            <Assignment sx={{ mr: 2, color: '#1976d2' }} />
-            <Box>
-              <Typography variant="body1" fontWeight="medium">
-                Yeni sefer atandı - İstanbul-Ankara
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                2 saat önce
-              </Typography>
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              mb: 2,
-              p: 2,
-              bgcolor: '#f5f5f5',
-              borderRadius: 1,
-            }}
-          >
-            <CheckCircle sx={{ mr: 2, color: '#4caf50' }} />
-            <Box>
-              <Typography variant="body1" fontWeight="medium">
-                Teklif onaylandı - #TK-2024-001
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                4 saat önce
-              </Typography>
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              p: 2,
-              bgcolor: '#f5f5f5',
-              borderRadius: 1,
-            }}
-          >
-            <TrendingUp sx={{ mr: 2, color: '#ff9800' }} />
-            <Box>
-              <Typography variant="body1" fontWeight="medium">
-                Sefer tamamlandı - İzmir-Bursa
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                6 saat önce
-              </Typography>
-            </Box>
-          </Box>
-        </Paper>
-      </Box>
     </Container>
   );
 };

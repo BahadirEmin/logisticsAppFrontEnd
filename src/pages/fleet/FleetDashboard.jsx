@@ -6,11 +6,6 @@ import {
   CardContent,
   Typography,
   Box,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Divider,
   CircularProgress,
 } from '@mui/material';
 import {
@@ -18,35 +13,36 @@ import {
   Person as DriverIcon,
   DirectionsCar as TrailerIcon,
   Assignment as OfferIcon,
-  TrendingUp as TrendingUpIcon,
-  Schedule as ScheduleIcon,
-  CheckCircle as CheckCircleIcon,
-  Warning as WarningIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
-import { vehicleAPI } from '../../api/vehicles';
-import { driversAPI } from '../../api/drivers';
-import { trailerAPI } from '../../api/trailers';
-import { ordersAPI } from '../../api/orders';
+import { statisticsAPI, statisticsUtils } from '../../api/statistics';
 
 const FleetDashboard = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState({
-    totalTrucks: 0,
-    activeTrucks: 0,
-    maintenanceTrucks: 0,
-    availableTrucks: 0,
-    totalDrivers: 0,
-    activeDrivers: 0,
-    onLeaveDrivers: 0,
-    totalTrailers: 0,
-    activeTrailers: 0,
-    maintenanceTrailers: 0,
-    totalOffers: 0,
-    pendingOffers: 0,
-    approvedOffers: 0,
-    completedOffers: 0,
+    vehicleStats: {
+      total: 0,
+      active: 0,
+      maintenance: 0,
+      available: 0,
+    },
+    driverStats: {
+      total: 0,
+      active: 0,
+      onLeave: 0,
+    },
+    trailerStats: {
+      total: 0,
+      active: 0,
+      maintenance: 0,
+    },
+    offerStats: {
+      total: 0,
+      pending: 0,
+      approved: 0,
+      completed: 0,
+    },
   });
 
   useEffect(() => {
@@ -57,107 +53,13 @@ const FleetDashboard = () => {
     try {
       setLoading(true);
 
-      // Paralel olarak tüm verileri çek
-      const [vehicles, drivers, trailers, orders] = await Promise.all([
-        vehicleAPI.getAll(),
-        driversAPI.getAll(),
-        trailerAPI.getAll(),
-        ordersAPI.getAll(),
-      ]);
-
-      // Araç istatistikleri
-      const totalTrucks = vehicles.length;
-      const activeTrucks = vehicles.filter(v => v.isActive && v.status !== 'maintenance').length;
-      const maintenanceTrucks = vehicles.filter(v => v.status === 'maintenance').length;
-      const availableTrucks = vehicles.filter(v => v.isActive && v.status === 'available').length;
-
-      // Şoför istatistikleri
-      const totalDrivers = drivers.length;
-      const activeDrivers = drivers.filter(d => d.isActive).length;
-      const onLeaveDrivers = drivers.filter(d => d.status === 'on_leave').length;
-
-      // Römork istatistikleri
-      const totalTrailers = trailers.length;
-      const activeTrailers = trailers.filter(t => t.isActive).length;
-      const maintenanceTrailers = trailers.filter(t => t.status === 'maintenance').length;
-
-      // Teklif istatistikleri
-      const totalOffers = orders.length;
-      const pendingOffers = orders.filter(o => o.tripStatus === 'TEKLIF_ASAMASI').length;
-      const approvedOffers = orders.filter(o => o.tripStatus === 'ONAYLANDI').length;
-      const completedOffers = orders.filter(o => o.tripStatus === 'TAMAMLANDI').length;
-
-      setDashboardData({
-        totalTrucks,
-        activeTrucks,
-        maintenanceTrucks,
-        availableTrucks,
-        totalDrivers,
-        activeDrivers,
-        onLeaveDrivers,
-        totalTrailers,
-        activeTrailers,
-        maintenanceTrailers,
-        totalOffers,
-        pendingOffers,
-        approvedOffers,
-        completedOffers,
-      });
+      // Sadece dashboard stats'ı çek
+      const fleetStats = await statisticsAPI.getFleetDashboardStats(user?.id);
+      setDashboardData(fleetStats);
     } catch (error) {
       console.error('Dashboard verileri yüklenirken hata:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const recentActivities = [
-    {
-      id: 1,
-      type: 'truck',
-      message: 'Tır #TRK-001 bakımdan döndü',
-      time: '2 saat önce',
-      status: 'success',
-    },
-    {
-      id: 2,
-      type: 'driver',
-      message: 'Sürücü Ahmet Yılmaz izin aldı',
-      time: '4 saat önce',
-      status: 'warning',
-    },
-    {
-      id: 3,
-      type: 'offer',
-      message: 'Teklif #OF-123 onaylandı',
-      time: '6 saat önce',
-      status: 'success',
-    },
-    {
-      id: 4,
-      type: 'trailer',
-      message: 'Römork #TRL-005 bakıma alındı',
-      time: '1 gün önce',
-      status: 'warning',
-    },
-    {
-      id: 5,
-      type: 'truck',
-      message: 'Tır #TRK-015 yola çıktı',
-      time: '1 gün önce',
-      status: 'info',
-    },
-  ];
-
-  const getStatusIcon = status => {
-    switch (status) {
-      case 'success':
-        return <CheckCircleIcon color="success" />;
-      case 'warning':
-        return <WarningIcon color="warning" />;
-      case 'info':
-        return <TrendingUpIcon color="info" />;
-      default:
-        return <ScheduleIcon color="action" />;
     }
   };
 
@@ -190,10 +92,10 @@ const FleetDashboard = () => {
                     Toplam Tır
                   </Typography>
                   <Typography variant="h4" component="div">
-                    {dashboardData.totalTrucks}
+                    {dashboardData.vehicleStats.total}
                   </Typography>
                   <Typography variant="body2" color="success.main">
-                    {dashboardData.activeTrucks} Aktif
+                    {dashboardData.vehicleStats.active} Aktif
                   </Typography>
                 </Box>
                 <TruckIcon sx={{ fontSize: 40, color: 'primary.main' }} />
@@ -212,10 +114,10 @@ const FleetDashboard = () => {
                     Toplam Sürücü
                   </Typography>
                   <Typography variant="h4" component="div">
-                    {dashboardData.totalDrivers}
+                    {dashboardData.driverStats.total}
                   </Typography>
                   <Typography variant="body2" color="success.main">
-                    {dashboardData.activeDrivers} Aktif
+                    {dashboardData.driverStats.active} Aktif
                   </Typography>
                 </Box>
                 <DriverIcon sx={{ fontSize: 40, color: 'primary.main' }} />
@@ -234,10 +136,10 @@ const FleetDashboard = () => {
                     Toplam Römork
                   </Typography>
                   <Typography variant="h4" component="div">
-                    {dashboardData.totalTrailers}
+                    {dashboardData.trailerStats.total}
                   </Typography>
                   <Typography variant="body2" color="success.main">
-                    {dashboardData.activeTrailers} Aktif
+                    {dashboardData.trailerStats.active} Aktif
                   </Typography>
                 </Box>
                 <TrailerIcon sx={{ fontSize: 40, color: 'primary.main' }} />
@@ -256,10 +158,10 @@ const FleetDashboard = () => {
                     Toplam Teklif
                   </Typography>
                   <Typography variant="h4" component="div">
-                    {dashboardData.totalOffers}
+                    {dashboardData.offerStats.total}
                   </Typography>
                   <Typography variant="body2" color="success.main">
-                    {dashboardData.approvedOffers} Onaylı
+                    {dashboardData.offerStats.approved} Onaylı
                   </Typography>
                 </Box>
                 <OfferIcon sx={{ fontSize: 40, color: 'primary.main' }} />
@@ -282,7 +184,7 @@ const FleetDashboard = () => {
                 <Grid item xs={6}>
                   <Box textAlign="center" p={2}>
                     <Typography variant="h4" color="success.main">
-                      {dashboardData.activeTrucks}
+                      {dashboardData.vehicleStats.active}
                     </Typography>
                     <Typography variant="body2">Aktif</Typography>
                   </Box>
@@ -290,7 +192,7 @@ const FleetDashboard = () => {
                 <Grid item xs={6}>
                   <Box textAlign="center" p={2}>
                     <Typography variant="h4" color="warning.main">
-                      {dashboardData.maintenanceTrucks}
+                      {dashboardData.vehicleStats.maintenance}
                     </Typography>
                     <Typography variant="body2">Bakımda</Typography>
                   </Box>
@@ -298,7 +200,7 @@ const FleetDashboard = () => {
                 <Grid item xs={6}>
                   <Box textAlign="center" p={2}>
                     <Typography variant="h4" color="info.main">
-                      {dashboardData.availableTrucks}
+                      {dashboardData.vehicleStats.available}
                     </Typography>
                     <Typography variant="body2">Müsait</Typography>
                   </Box>
@@ -306,10 +208,10 @@ const FleetDashboard = () => {
                 <Grid item xs={6}>
                   <Box textAlign="center" p={2}>
                     <Typography variant="h4" color="error.main">
-                      {dashboardData.totalTrucks -
-                        dashboardData.activeTrucks -
-                        dashboardData.maintenanceTrucks -
-                        dashboardData.availableTrucks}
+                      {dashboardData.vehicleStats.total -
+                        dashboardData.vehicleStats.active -
+                        dashboardData.vehicleStats.maintenance -
+                        dashboardData.vehicleStats.available}
                     </Typography>
                     <Typography variant="body2">Pasif</Typography>
                   </Box>
@@ -330,7 +232,7 @@ const FleetDashboard = () => {
                 <Grid item xs={6}>
                   <Box textAlign="center" p={2}>
                     <Typography variant="h4" color="success.main">
-                      {dashboardData.activeDrivers}
+                      {dashboardData.driverStats.active}
                     </Typography>
                     <Typography variant="body2">Aktif</Typography>
                   </Box>
@@ -338,7 +240,7 @@ const FleetDashboard = () => {
                 <Grid item xs={6}>
                   <Box textAlign="center" p={2}>
                     <Typography variant="h4" color="warning.main">
-                      {dashboardData.onLeaveDrivers}
+                      {dashboardData.driverStats.onLeave}
                     </Typography>
                     <Typography variant="body2">İzinde</Typography>
                   </Box>
@@ -346,9 +248,9 @@ const FleetDashboard = () => {
                 <Grid item xs={6}>
                   <Box textAlign="center" p={2}>
                     <Typography variant="h4" color="info.main">
-                      {dashboardData.totalDrivers -
-                        dashboardData.activeDrivers -
-                        dashboardData.onLeaveDrivers}
+                      {dashboardData.driverStats.total -
+                        dashboardData.driverStats.active -
+                        dashboardData.driverStats.onLeave}
                     </Typography>
                     <Typography variant="body2">Müsait</Typography>
                   </Box>
@@ -362,30 +264,6 @@ const FleetDashboard = () => {
                   </Box>
                 </Grid>
               </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
-      {/* Recent Activities */}
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Son Aktiviteler
-              </Typography>
-              <List>
-                {recentActivities.map((activity, index) => (
-                  <React.Fragment key={activity.id}>
-                    <ListItem>
-                      <ListItemIcon>{getStatusIcon(activity.status)}</ListItemIcon>
-                      <ListItemText primary={activity.message} secondary={activity.time} />
-                    </ListItem>
-                    {index < recentActivities.length - 1 && <Divider />}
-                  </React.Fragment>
-                ))}
-              </List>
             </CardContent>
           </Card>
         </Grid>
