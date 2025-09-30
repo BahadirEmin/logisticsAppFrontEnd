@@ -353,10 +353,10 @@ const OfferForm = () => {
       <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
         Rota ve Yük Bilgileri
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 4, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+      {/* <Typography variant="body2" color="text.secondary" sx={{ mb: 4, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
         <strong>Önemli:</strong> Ülke, şehir, posta kodu ve yük ölçüleri (uzunluk, genişlik, yükseklik) ile yük tipi ve ağırlığı zorunlu alanlardir. 
         Bu bilgiler diğer satışçıların benzer işler için fiyat referansı görebilmesi açısından gereklidir.
-      </Typography>
+      </Typography> */}
       
       {/* Customer Selection */}
       <Box sx={{ mb: 4 }}>
@@ -375,8 +375,8 @@ const OfferForm = () => {
           </Button>
         </Box>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
-            <FormControl fullWidth error={!!errors.customerId} size="small">
+          <Grid item xs={12} md={8}>
+            <FormControl fullWidth error={!!errors.customerId} size="small" sx={{ minWidth: 200 }}>
               <InputLabel>Müşteri Seçin</InputLabel>
               <Select
                 name="customerId"
@@ -409,7 +409,7 @@ const OfferForm = () => {
           </Grid>
           
           {formData.customerId && (
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <Box sx={{ p: 2, border: '1px solid #e0e0e0', borderRadius: 1, bgcolor: '#fafafa' }}>
                 <Typography variant="subtitle2" gutterBottom>
                   Seçilen Müşteri Bilgileri:
@@ -453,8 +453,8 @@ const OfferForm = () => {
           Nereden (Alış Adresi) - Ülke, Şehir, Posta Kodu Zorunlu
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormControl fullWidth error={!!errors['fromAddress.country']} size="small">
+          <Grid item xs={12} sm={6} md={4}>
+            <FormControl fullWidth error={!!errors['fromAddress.country']} size="small" sx={{ minWidth: 150 }}>
               <InputLabel>Ülke</InputLabel>
               <Select
                 name="fromAddress.country"
@@ -476,7 +476,7 @@ const OfferForm = () => {
             </FormControl>
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
               size="small"
@@ -490,7 +490,7 @@ const OfferForm = () => {
             />
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
               size="small"
@@ -501,7 +501,7 @@ const OfferForm = () => {
             />
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
               size="small"
@@ -572,8 +572,8 @@ const OfferForm = () => {
           Nereye (Teslimat Adresi) - Ülke, Şehir, Posta Kodu Zorunlu
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormControl fullWidth error={!!errors['toAddress.country']} size="small">
+          <Grid item xs={12} sm={6} md={4}>
+            <FormControl fullWidth error={!!errors['toAddress.country']} size="small" sx={{ minWidth: 150 }}>
               <InputLabel>Ülke</InputLabel>
               <Select
                 name="toAddress.country"
@@ -595,7 +595,7 @@ const OfferForm = () => {
             </FormControl>
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
               size="small"
@@ -609,7 +609,7 @@ const OfferForm = () => {
             />
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
               size="small"
@@ -620,7 +620,7 @@ const OfferForm = () => {
             />
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
               size="small"
@@ -768,7 +768,7 @@ const OfferForm = () => {
             </Typography>
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid item xs={12} sm={6} md={6}>
-                <FormControl fullWidth size="small" error={!!errors[`cargoItems.${index}.cargoType`]} required>
+                <FormControl fullWidth size="small" error={!!errors[`cargoItems.${index}.cargoType`]} required sx={{ minWidth: 150 }}>
                   <InputLabel>Yük Tipi *</InputLabel>
                   <Select
                     value={item.cargoType}
@@ -1065,7 +1065,7 @@ const OfferForm = () => {
           </Grid>
           
           <Grid item xs={12} md={6}>
-            <FormControl fullWidth size="small">
+            <FormControl fullWidth size="small" sx={{ minWidth: 150 }}>
               <InputLabel>Para Birimi</InputLabel>
               <Select
                 name="currency"

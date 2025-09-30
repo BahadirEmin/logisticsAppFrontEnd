@@ -40,7 +40,6 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
-import { useAuth } from '../../contexts/AuthContext';
 
 const OfferList = () => {
   const [offers, setOffers] = useState([]);
@@ -52,11 +51,10 @@ const OfferList = () => {
   const [approvalDialog, setApprovalDialog] = useState({ open: false, offer: null });
   const [approving, setApproving] = useState(false);
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   // Trip status options
   const tripStatusOptions = [
-    { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması', color: 'default' },
+    { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması', color: 'warning' },
     { value: 'ONAYLANAN_TEKLIF', label: 'Onaylanan Teklif', color: 'success' },
     { value: 'YOLA_CIKTI', label: 'Yola Çıktı', color: 'info' },
     { value: 'TESLIM_EDILDI', label: 'Teslim Edildi', color: 'success' },
@@ -180,7 +178,7 @@ const OfferList = () => {
   };
 
   const handleCreateOffer = () => {
-    navigate('/sales/teklif-olustur');
+    navigate('/sales/teklif-ver');
   };
 
   if (loading) {
@@ -221,7 +219,7 @@ const OfferList = () => {
             />
           </Grid>
           <Grid item xs={12} md={3}>
-            <FormControl fullWidth size="small">
+            <FormControl fullWidth size="small" sx={{ minWidth: 150 }}>
               <InputLabel>Durum Filtresi</InputLabel>
               <Select
                 value={statusFilter}
@@ -230,14 +228,12 @@ const OfferList = () => {
               >
                 <MenuItem value="">Tümü</MenuItem>
                 {tripStatusOptions.map((status) => (
-                  <MenuItem key={status.value} value={status.value}>
+                  <MenuItem key={status.value} value={status.value} sx={{ justifyContent: 'flex-start' }}>
                     <Chip 
                       label={status.label} 
                       color={status.color} 
                       size="small" 
-                      sx={{ mr: 1 }}
                     />
-                    {status.label}
                   </MenuItem>
                 ))}
               </Select>
