@@ -52,7 +52,7 @@ const OfferList = () => {
 
   // Trip status options
   const tripStatusOptions = [
-    { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması', color: 'default' },
+    { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması', color: 'warning' },
     { value: 'ONAYLANDI', label: 'Onaylandı', color: 'success' },
     { value: 'YOLA_CIKTI', label: 'Yola Çıktı', color: 'info' },
     { value: 'GUMRUKTE', label: 'Gümrükte', color: 'warning' },
@@ -234,7 +234,7 @@ const OfferList = () => {
             />
           </Grid>
           <Grid item xs={12} md={3}>
-            <FormControl fullWidth size="small">
+            <FormControl fullWidth size="small" sx={{ minWidth: 150 }}>
               <InputLabel>Durum Filtresi</InputLabel>
               <Select
                 value={statusFilter}
@@ -243,14 +243,12 @@ const OfferList = () => {
               >
                 <MenuItem value="">Tümü</MenuItem>
                 {tripStatusOptions.map((status) => (
-                  <MenuItem key={status.value} value={status.value}>
+                  <MenuItem key={status.value} value={status.value} sx={{ justifyContent: 'flex-start' }}>
                     <Chip 
                       label={status.label} 
                       color={status.color} 
                       size="small" 
-                      sx={{ mr: 1 }}
                     />
-                    {status.label}
                   </MenuItem>
                 ))}
               </Select>

@@ -58,7 +58,7 @@ const OperatorOrderDetail = () => {
   };
 
   const tripStatusOptions = [
-    { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması', color: 'default' },
+    { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması', color: 'warning' },
     { value: 'ONAYLANDI', label: 'Onaylandı', color: 'success' },
     { value: 'YOLA_CIKTI', label: 'Yola Çıktı', color: 'info' },
     { value: 'GUMRUKTE', label: 'Gümrükte', color: 'warning' },

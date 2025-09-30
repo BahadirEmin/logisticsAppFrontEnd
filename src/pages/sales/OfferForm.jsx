@@ -239,38 +239,39 @@ const OfferForm = () => {
     }
     
     // Validate from address - Zorunlu alanlar: Ülke, Şehir, Posta kodu
-    // if (!formData.fromAddress.country.trim()) {
-    //   newErrors['fromAddress.country'] = 'Ülke seçimi zorunludur';
-    // }
-    // if (!formData.fromAddress.city.trim()) {
-    //   newErrors['fromAddress.city'] = 'Şehir alanı zorunludur';
-    // }
-    // if (!formData.fromAddress.zipCode.trim()) {
-    //   newErrors['fromAddress.zipCode'] = 'Posta kodu zorunludur';
-    // }
+    if (!formData.fromAddress.country.trim()) {
+      newErrors['fromAddress.country'] = 'Kalkış ülkesi seçimi zorunludur';
+    }
+    if (!formData.fromAddress.city.trim()) {
+      newErrors['fromAddress.city'] = 'Kalkış şehri zorunludur';
+    }
+    if (!formData.fromAddress.zipCode.trim()) {
+      newErrors['fromAddress.zipCode'] = 'Kalkış posta kodu zorunludur';
+    }
     
-    // // Validate to address - Zorunlu alanlar: Ülke, Şehir, Posta kodu
-    // if (!formData.toAddress.country.trim()) {
-    //   newErrors['toAddress.country'] = 'Ülke seçimi zorunludur';
-    // }
-    // if (!formData.toAddress.city.trim()) {
-    //   newErrors['toAddress.city'] = 'Şehir alanı zorunludur';
-    // }
-    // if (!formData.toAddress.zipCode.trim()) {
-    //   newErrors['toAddress.zipCode'] = 'Posta kodu zorunludur';
-    // }
+    // Validate to address - Zorunlu alanlar: Ülke, Şehir, Posta kodu
+    if (!formData.toAddress.country.trim()) {
+      newErrors['toAddress.country'] = 'Varış ülkesi seçimi zorunludur';
+    }
+    if (!formData.toAddress.city.trim()) {
+      newErrors['toAddress.city'] = 'Varış şehri zorunludur';
+    }
+    if (!formData.toAddress.zipCode.trim()) {
+      newErrors['toAddress.zipCode'] = 'Varış posta kodu zorunludur';
+    }
     
-    // formData.cargoItems.forEach((item, index) => {
-    //   if (!item.dimensions.length || !item.dimensions.width || !item.dimensions.height) {
-    //     newErrors[`cargoItems.${index}.dimensions`] = 'Tüm ölçü alanları zorunludur';
-    //   }
-    //   if (!item.cargoType) {
-    //     newErrors[`cargoItems.${index}.cargoType`] = 'Yük tipi seçimi zorunludur';
-    //   }
-    //   if (!item.weight || parseFloat(parseNumber(item.weight)) <= 0) {
-    //     newErrors[`cargoItems.${index}.weight`] = 'Geçerli bir ağırlık giriniz';
-    //   }
-    // });
+    // Validate cargo items - Zorunlu alanlar: Ölçüler, Yük tipi, Ağırlık
+    formData.cargoItems.forEach((item, index) => {
+      if (!item.dimensions.length || !item.dimensions.width || !item.dimensions.height) {
+        newErrors[`cargoItems.${index}.dimensions`] = 'Tüm ölçü alanları zorunludur (uzunluk, genişlik, yükseklik)';
+      }
+      if (!item.cargoType) {
+        newErrors[`cargoItems.${index}.cargoType`] = 'Yük tipi seçimi zorunludur';
+      }
+      if (!item.weight || parseFloat(parseNumber(item.weight)) <= 0) {
+        newErrors[`cargoItems.${index}.weight`] = 'Geçerli bir ağırlık giriniz';
+      }
+    });
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -349,9 +350,13 @@ const OfferForm = () => {
 
   const renderStep1 = () => (
     <Box>
-      <Typography variant="h6" gutterBottom sx={{ mb: 4 }}>
+      <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
         Rota ve Yük Bilgileri
       </Typography>
+      {/* <Typography variant="body2" color="text.secondary" sx={{ mb: 4, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+        <strong>Önemli:</strong> Ülke, şehir, posta kodu ve yük ölçüleri (uzunluk, genişlik, yükseklik) ile yük tipi ve ağırlığı zorunlu alanlardir. 
+        Bu bilgiler diğer satışçıların benzer işler için fiyat referansı görebilmesi açısından gereklidir.
+      </Typography> */}
       
       {/* Customer Selection */}
       <Box sx={{ mb: 4 }}>
@@ -370,8 +375,8 @@ const OfferForm = () => {
           </Button>
         </Box>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
-            <FormControl fullWidth error={!!errors.customerId} size="small">
+          <Grid item xs={12} md={8}>
+            <FormControl fullWidth error={!!errors.customerId} size="small" sx={{ minWidth: 200 }}>
               <InputLabel>Müşteri Seçin</InputLabel>
               <Select
                 name="customerId"
@@ -404,7 +409,7 @@ const OfferForm = () => {
           </Grid>
           
           {formData.customerId && (
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <Box sx={{ p: 2, border: '1px solid #e0e0e0', borderRadius: 1, bgcolor: '#fafafa' }}>
                 <Typography variant="subtitle2" gutterBottom>
                   Seçilen Müşteri Bilgileri:
@@ -445,11 +450,11 @@ const OfferForm = () => {
       {/* From Address */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h6" gutterBottom sx={{ mb: 2, color: '#1976d2' }}>
-          Nereden (Alış Adresi)
+          Nereden (Alış Adresi) - Ülke, Şehir, Posta Kodu Zorunlu
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormControl fullWidth error={!!errors['fromAddress.country']} size="small">
+          <Grid item xs={12} sm={6} md={4}>
+            <FormControl fullWidth error={!!errors['fromAddress.country']} size="small" sx={{ minWidth: 150 }}>
               <InputLabel>Ülke</InputLabel>
               <Select
                 name="fromAddress.country"
@@ -471,7 +476,7 @@ const OfferForm = () => {
             </FormControl>
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
               size="small"
@@ -479,10 +484,13 @@ const OfferForm = () => {
               name="fromAddress.city"
               value={formData.fromAddress.city}
               onChange={handleInputChange}
+              required
+              error={!!errors['fromAddress.city']}
+              helperText={errors['fromAddress.city']}
             />
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
               size="small"
@@ -493,7 +501,7 @@ const OfferForm = () => {
             />
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
               size="small"
@@ -501,6 +509,9 @@ const OfferForm = () => {
               name="fromAddress.zipCode"
               value={formData.fromAddress.zipCode}
               onChange={handleInputChange}
+              required
+              error={!!errors['fromAddress.zipCode']}
+              helperText={errors['fromAddress.zipCode']}
             />
           </Grid>
           
@@ -558,11 +569,11 @@ const OfferForm = () => {
       {/* To Address */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h6" gutterBottom sx={{ mb: 2, color: '#1976d2' }}>
-          Nereye (Teslimat Adresi)
+          Nereye (Teslimat Adresi) - Ülke, Şehir, Posta Kodu Zorunlu
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormControl fullWidth error={!!errors['toAddress.country']} size="small">
+          <Grid item xs={12} sm={6} md={4}>
+            <FormControl fullWidth error={!!errors['toAddress.country']} size="small" sx={{ minWidth: 150 }}>
               <InputLabel>Ülke</InputLabel>
               <Select
                 name="toAddress.country"
@@ -584,7 +595,7 @@ const OfferForm = () => {
             </FormControl>
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
               size="small"
@@ -592,10 +603,13 @@ const OfferForm = () => {
               name="toAddress.city"
               value={formData.toAddress.city}
               onChange={handleInputChange}
+              required
+              error={!!errors['toAddress.city']}
+              helperText={errors['toAddress.city']}
             />
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
               size="small"
@@ -606,7 +620,7 @@ const OfferForm = () => {
             />
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
               size="small"
@@ -614,6 +628,9 @@ const OfferForm = () => {
               name="toAddress.zipCode"
               value={formData.toAddress.zipCode}
               onChange={handleInputChange}
+              required
+              error={!!errors['toAddress.zipCode']}
+              helperText={errors['toAddress.zipCode']}
             />
           </Grid>
           
@@ -670,7 +687,7 @@ const OfferForm = () => {
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6" gutterBottom sx={{ color: '#1976d2' }}>
-            Yük Bilgileri
+            Yük Bilgileri - Ölçüler, Tip ve Ağırlık Zorunlu
           </Typography>
           <Button
             variant="outlined"
@@ -699,9 +716,9 @@ const OfferForm = () => {
               )}
             </Box>
 
-            {/* Cargo Dimensions - Artık Opsiyonel */}
+            {/* Cargo Dimensions - Zorunlu Alanlar */}
             <Typography variant="body2" gutterBottom sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-              Yük Ölçüleri
+              Yük Ölçüleri *
             </Typography>
             <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid item xs={12} sm={4} md={4}>
@@ -712,6 +729,9 @@ const OfferForm = () => {
                   type="number"
                   value={item.dimensions.length}
                   onChange={(e) => handleCargoItemChange(index, 'dimensions.length', e.target.value)}
+                  required
+                  error={!!errors[`cargoItems.${index}.dimensions`]}
+                  helperText={errors[`cargoItems.${index}.dimensions`] && "Uzunluk gerekli"}
                 />
               </Grid>
               <Grid item xs={12} sm={4} md={4}>
@@ -722,6 +742,9 @@ const OfferForm = () => {
                   type="number"
                   value={item.dimensions.width}
                   onChange={(e) => handleCargoItemChange(index, 'dimensions.width', e.target.value)}
+                  required
+                  error={!!errors[`cargoItems.${index}.dimensions`]}
+                  helperText={errors[`cargoItems.${index}.dimensions`] && "Genişlik gerekli"}
                 />
               </Grid>
               <Grid item xs={12} sm={4} md={4}>
@@ -732,22 +755,25 @@ const OfferForm = () => {
                   type="number"
                   value={item.dimensions.height}
                   onChange={(e) => handleCargoItemChange(index, 'dimensions.height', e.target.value)}
+                  required
+                  error={!!errors[`cargoItems.${index}.dimensions`]}
+                  helperText={errors[`cargoItems.${index}.dimensions`] && "Yükseklik gerekli"}
                 />
               </Grid>
             </Grid>
 
-            {/* Cargo Type and Weight - Artık Opsiyonel */}
+            {/* Cargo Type and Weight - Zorunlu Alanlar */}
             <Typography variant="body2" gutterBottom sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-              Yük Detayları
+              Yük Detayları *
             </Typography>
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid item xs={12} sm={6} md={6}>
-                <FormControl fullWidth size="small">
-                  <InputLabel>Yük Tipi</InputLabel>
+                <FormControl fullWidth size="small" error={!!errors[`cargoItems.${index}.cargoType`]} required sx={{ minWidth: 150 }}>
+                  <InputLabel>Yük Tipi *</InputLabel>
                   <Select
                     value={item.cargoType}
                     onChange={(e) => handleCargoItemChange(index, 'cargoType', e.target.value)}
-                    label="Yük Tipi"
+                    label="Yük Tipi *"
                   >
                     {cargoTypes.map((type) => (
                       <MenuItem key={type} value={type}>
@@ -755,6 +781,11 @@ const OfferForm = () => {
                       </MenuItem>
                     ))}
                   </Select>
+                  {errors[`cargoItems.${index}.cargoType`] && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                      {errors[`cargoItems.${index}.cargoType`]}
+                    </Typography>
+                  )}
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={6} md={6}>
@@ -764,6 +795,9 @@ const OfferForm = () => {
                   label="Ağırlık (kg)"
                   value={item.weight}
                   onChange={(e) => handleCargoItemChange(index, 'weight', e.target.value)}
+                  required
+                  error={!!errors[`cargoItems.${index}.weight`]}
+                  helperText={errors[`cargoItems.${index}.weight`]}
                 />
               </Grid>
             </Grid>
@@ -1031,7 +1065,7 @@ const OfferForm = () => {
           </Grid>
           
           <Grid item xs={12} md={6}>
-            <FormControl fullWidth size="small">
+            <FormControl fullWidth size="small" sx={{ minWidth: 150 }}>
               <InputLabel>Para Birimi</InputLabel>
               <Select
                 name="currency"

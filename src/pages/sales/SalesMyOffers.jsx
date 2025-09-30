@@ -33,7 +33,8 @@ import {
   Visibility as VisibilityIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  CheckCircle as CheckCircleIcon
+  CheckCircle as CheckCircleIcon,
+  Add as AddIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
@@ -49,7 +50,7 @@ const SalesMyOffers = () => {
   const navigate = useNavigate();
 
   const tripStatusOptions = [
-    { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması', color: 'default' },
+    { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması', color: 'warning' },
     { value: 'ONAYLANAN_TEKLIF', label: 'Onaylanan Teklif', color: 'success' },
     { value: 'YOLA_CIKTI', label: 'Yola Çıktı', color: 'info' },
     { value: 'TESLIM_EDILDI', label: 'Teslim Edildi', color: 'success' },
@@ -183,9 +184,19 @@ const SalesMyOffers = () => {
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Tekliflerim
-      </Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Typography variant="h4" component="h1">
+          Tekliflerim
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => navigate('/sales/teklif-ver')}
+          sx={{ minWidth: 'auto' }}
+        >
+          Yeni Teklif
+        </Button>
+      </Box>
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
@@ -195,7 +206,7 @@ const SalesMyOffers = () => {
 
       <Paper sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <TextField
               fullWidth
               size="small"
@@ -207,8 +218,8 @@ const SalesMyOffers = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} md={4}>
-            <FormControl fullWidth size="small">
+          <Grid item xs={12} md={3}>
+            <FormControl fullWidth size="small" sx={{ minWidth: 150 }}>
               <InputLabel>Durum Filtresi</InputLabel>
               <Select
                 value={statusFilter}
@@ -217,14 +228,12 @@ const SalesMyOffers = () => {
               >
                 <MenuItem value="">Tümü</MenuItem>
                 {tripStatusOptions.map((status) => (
-                  <MenuItem key={status.value} value={status.value}>
+                  <MenuItem key={status.value} value={status.value} sx={{ justifyContent: 'flex-start' }}>
                     <Chip
                       label={status.label}
                       color={status.color}
                       size="small"
-                      sx={{ mr: 1 }}
                     />
-                    {status.label}
                   </MenuItem>
                 ))}
               </Select>
