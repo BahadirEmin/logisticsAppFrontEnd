@@ -1,11 +1,11 @@
-import api from "./axios";
+import api from './axios';
 
 // Trailer API functions
 export const trailerAPI = {
   // Get all trailers
   getAll: async () => {
     try {
-      const response = await api.get("/v1/trailers");
+      const response = await api.get('/v1/trailers');
       return response.data;
     } catch (error) {
       throw error;
@@ -13,7 +13,7 @@ export const trailerAPI = {
   },
 
   // Get trailer by ID
-  getById: async (id) => {
+  getById: async id => {
     try {
       const response = await api.get(`/v1/trailers/${id}`);
       return response.data;
@@ -23,9 +23,9 @@ export const trailerAPI = {
   },
 
   // Create new trailer
-  create: async (trailerData) => {
+  create: async trailerData => {
     try {
-      const response = await api.post("/v1/trailers", trailerData);
+      const response = await api.post('/v1/trailers', trailerData);
       return response.data;
     } catch (error) {
       throw error;
@@ -43,7 +43,7 @@ export const trailerAPI = {
   },
 
   // Delete trailer
-  delete: async (id) => {
+  delete: async id => {
     try {
       const response = await api.delete(`/v1/trailers/${id}`);
       return response.data;

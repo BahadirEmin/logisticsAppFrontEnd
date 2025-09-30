@@ -29,14 +29,14 @@ import {
   InputAdornment,
   Grid,
   Card,
-  CardContent
+  CardContent,
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   Search as SearchIcon,
-  LocalShipping as TruckIcon
+  LocalShipping as TruckIcon,
 } from '@mui/icons-material';
 import { vehicleAPI } from '../../api/vehicles';
 
@@ -46,13 +46,13 @@ const VehicleList = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterActive, setFilterActive] = useState('');
-  
+
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [vehicleToDelete, setVehicleToDelete] = useState(null);
-  
+
   // Form state
   const [formData, setFormData] = useState({
     plateNo: '',
@@ -75,7 +75,7 @@ const VehicleList = () => {
     inspectionExpiryDate: '',
     ownershipTypeId: 1,
     isActive: true,
-    notes: ''
+    notes: '',
   });
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
@@ -100,31 +100,33 @@ const VehicleList = () => {
 
   // Filter vehicles
   const filteredVehicles = vehicles.filter(vehicle => {
-    const matchesSearch = vehicle.plateNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         vehicle.make?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         vehicle.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         vehicle.vin?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesActive = filterActive === '' || 
-                         (filterActive === 'true' && vehicle.isActive) ||
-                         (filterActive === 'false' && !vehicle.isActive);
-    
+    const matchesSearch =
+      vehicle.plateNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vehicle.make?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vehicle.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vehicle.vin?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesActive =
+      filterActive === '' ||
+      (filterActive === 'true' && vehicle.isActive) ||
+      (filterActive === 'false' && !vehicle.isActive);
+
     return matchesSearch && matchesActive;
   });
 
   // Handle form input changes
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value, checked, type } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
-    
+
     // Clear error when user types
     if (formErrors[name]) {
       setFormErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
@@ -174,14 +176,14 @@ const VehicleList = () => {
       inspectionExpiryDate: '',
       ownershipTypeId: 1,
       isActive: true,
-      notes: ''
+      notes: '',
     });
     setFormErrors({});
     setDialogOpen(true);
   };
 
   // Open edit vehicle dialog
-  const handleEditVehicle = (vehicle) => {
+  const handleEditVehicle = vehicle => {
     setEditingVehicle(vehicle);
     setFormData({
       plateNo: vehicle.plateNo || '',
@@ -200,11 +202,15 @@ const VehicleList = () => {
       purchaseDate: vehicle.purchaseDate ? vehicle.purchaseDate.split('T')[0] : '',
       purchasePrice: vehicle.purchasePrice || '',
       currentValue: vehicle.currentValue || '',
-      insuranceExpiryDate: vehicle.insuranceExpiryDate ? vehicle.insuranceExpiryDate.split('T')[0] : '',
-      inspectionExpiryDate: vehicle.inspectionExpiryDate ? vehicle.inspectionExpiryDate.split('T')[0] : '',
+      insuranceExpiryDate: vehicle.insuranceExpiryDate
+        ? vehicle.insuranceExpiryDate.split('T')[0]
+        : '',
+      inspectionExpiryDate: vehicle.inspectionExpiryDate
+        ? vehicle.inspectionExpiryDate.split('T')[0]
+        : '',
       ownershipTypeId: vehicle.ownershipTypeId || 1,
       isActive: vehicle.isActive !== undefined ? vehicle.isActive : true,
-      notes: vehicle.notes || ''
+      notes: vehicle.notes || '',
     });
     setFormErrors({});
     setDialogOpen(true);
@@ -229,7 +235,7 @@ const VehicleList = () => {
         purchasePrice: formData.purchasePrice ? Number(formData.purchasePrice) : null,
         currentValue: formData.currentValue ? Number(formData.currentValue) : null,
         ownershipTypeId: Number(formData.ownershipTypeId),
-        isActive: Boolean(formData.isActive)
+        isActive: Boolean(formData.isActive),
       };
 
       if (editingVehicle) {
@@ -242,7 +248,10 @@ const VehicleList = () => {
       await loadData();
     } catch (error) {
       console.error('Save vehicle error:', error);
-      const backendMessage = error?.response?.data?.message || error?.response?.data?.error || 'Araç kaydedilirken hata oluştu';
+      const backendMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        'Araç kaydedilirken hata oluştu';
       setError(backendMessage);
     } finally {
       setSaving(false);
@@ -250,7 +259,7 @@ const VehicleList = () => {
   };
 
   // Handle delete vehicle
-  const handleDeleteVehicle = (vehicle) => {
+  const handleDeleteVehicle = vehicle => {
     setVehicleToDelete(vehicle);
     setDeleteDialogOpen(true);
   };
@@ -278,7 +287,10 @@ const VehicleList = () => {
       await loadData();
     } catch (error) {
       console.error('Inline delete error:', error);
-      const backendMessage = error?.response?.data?.message || error?.response?.data?.error || 'Araç silinirken hata oluştu';
+      const backendMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        'Araç silinirken hata oluştu';
       setError(backendMessage);
     } finally {
       setDeletingInline(false);
@@ -286,17 +298,17 @@ const VehicleList = () => {
   };
 
   // Format date
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('tr-TR');
   };
 
   // Format currency
-  const formatCurrency = (amount) => {
+  const formatCurrency = amount => {
     if (!amount) return '-';
     return new Intl.NumberFormat('tr-TR', {
       style: 'currency',
-      currency: 'TRY'
+      currency: 'TRY',
     }).format(amount);
   };
 
@@ -342,7 +354,7 @@ const VehicleList = () => {
                 size="small"
                 label="Araç Ara"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -357,7 +369,7 @@ const VehicleList = () => {
                 <InputLabel shrink>Durum</InputLabel>
                 <Select
                   value={filterActive}
-                  onChange={(e) => setFilterActive(e.target.value)}
+                  onChange={e => setFilterActive(e.target.value)}
                   label="Durum"
                   notched
                 >
@@ -375,19 +387,37 @@ const VehicleList = () => {
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                <TableCell><strong>Plaka</strong></TableCell>
-                <TableCell><strong>Marka/Model</strong></TableCell>
-                <TableCell><strong>VIN</strong></TableCell>
-                <TableCell><strong>Model Yılı</strong></TableCell>
-                <TableCell><strong>Kilometre</strong></TableCell>
-                <TableCell><strong>Durum</strong></TableCell>
-                <TableCell><strong>Sigorta</strong></TableCell>
-                <TableCell><strong>Muayene</strong></TableCell>
-                <TableCell><strong>İşlemler</strong></TableCell>
+                <TableCell>
+                  <strong>Plaka</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Marka/Model</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>VIN</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Model Yılı</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Kilometre</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Durum</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Sigorta</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Muayene</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>İşlemler</strong>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredVehicles.map((vehicle) => (
+              {filteredVehicles.map(vehicle => (
                 <TableRow key={vehicle.id} hover>
                   <TableCell>
                     <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
@@ -419,12 +449,24 @@ const VehicleList = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2" color={new Date(vehicle.insuranceExpiryDate) < new Date() ? 'error' : 'textPrimary'}>
+                    <Typography
+                      variant="body2"
+                      color={
+                        new Date(vehicle.insuranceExpiryDate) < new Date() ? 'error' : 'textPrimary'
+                      }
+                    >
                       {formatDate(vehicle.insuranceExpiryDate)}
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2" color={new Date(vehicle.inspectionExpiryDate) < new Date() ? 'error' : 'textPrimary'}>
+                    <Typography
+                      variant="body2"
+                      color={
+                        new Date(vehicle.inspectionExpiryDate) < new Date()
+                          ? 'error'
+                          : 'textPrimary'
+                      }
+                    >
                       {formatDate(vehicle.inspectionExpiryDate)}
                     </Typography>
                   </TableCell>
@@ -457,16 +499,16 @@ const VehicleList = () => {
               Araç bulunamadı
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {searchTerm || filterActive !== '' ? 'Arama kriterlerinizi değiştirmeyi deneyin.' : 'Henüz araç eklenmemiş.'}
+              {searchTerm || filterActive !== ''
+                ? 'Arama kriterlerinizi değiştirmeyi deneyin.'
+                : 'Henüz araç eklenmemiş.'}
             </Typography>
           </Box>
         )}
 
         {/* Add/Edit Vehicle Dialog */}
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-          <DialogTitle>
-            {editingVehicle ? 'Araç Düzenle' : 'Yeni Araç Ekle'}
-          </DialogTitle>
+          <DialogTitle>{editingVehicle ? 'Araç Düzenle' : 'Yeni Araç Ekle'}</DialogTitle>
           <DialogContent>
             <Grid container spacing={2} sx={{ mt: 1 }}>
               {/* Basic Information */}
@@ -475,7 +517,7 @@ const VehicleList = () => {
                   Temel Bilgiler
                 </Typography>
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -487,7 +529,7 @@ const VehicleList = () => {
                   helperText={formErrors.plateNo}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -499,7 +541,7 @@ const VehicleList = () => {
                   helperText={formErrors.vin}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -511,7 +553,7 @@ const VehicleList = () => {
                   helperText={formErrors.make}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -523,7 +565,7 @@ const VehicleList = () => {
                   helperText={formErrors.model}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -536,7 +578,7 @@ const VehicleList = () => {
                   helperText={formErrors.modelYear}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -546,7 +588,7 @@ const VehicleList = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -556,7 +598,7 @@ const VehicleList = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -566,7 +608,7 @@ const VehicleList = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -576,7 +618,7 @@ const VehicleList = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -586,7 +628,7 @@ const VehicleList = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -597,7 +639,7 @@ const VehicleList = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -608,7 +650,7 @@ const VehicleList = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -619,7 +661,7 @@ const VehicleList = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <FormControlLabel
                   control={
@@ -639,7 +681,7 @@ const VehicleList = () => {
                   Finansal Bilgiler
                 </Typography>
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -651,7 +693,7 @@ const VehicleList = () => {
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -662,7 +704,7 @@ const VehicleList = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -673,7 +715,7 @@ const VehicleList = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -691,7 +733,7 @@ const VehicleList = () => {
                   Yasal Bilgiler
                 </Typography>
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -703,7 +745,7 @@ const VehicleList = () => {
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -715,7 +757,7 @@ const VehicleList = () => {
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
-              
+
               <Grid item xs={12}>
                 <TextField
                   fullWidth
@@ -741,15 +783,9 @@ const VehicleList = () => {
               </Button>
             )}
             <Box sx={{ flexGrow: 1 }} />
-            <Button onClick={() => setDialogOpen(false)}>
-              İptal
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              variant="contained"
-              disabled={saving}
-            >
-              {saving ? 'Kaydediliyor...' : (editingVehicle ? 'Güncelle' : 'Kaydet')}
+            <Button onClick={() => setDialogOpen(false)}>İptal</Button>
+            <Button onClick={handleSubmit} variant="contained" disabled={saving}>
+              {saving ? 'Kaydediliyor...' : editingVehicle ? 'Güncelle' : 'Kaydet'}
             </Button>
           </DialogActions>
         </Dialog>
@@ -763,9 +799,7 @@ const VehicleList = () => {
             </Typography>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDeleteDialogOpen(false)}>
-              İptal
-            </Button>
+            <Button onClick={() => setDeleteDialogOpen(false)}>İptal</Button>
             <Button onClick={confirmDelete} color="error" variant="contained">
               Sil
             </Button>

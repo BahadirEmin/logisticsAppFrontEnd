@@ -11,7 +11,7 @@ import {
   ListItemText,
   ListItemIcon,
   Divider,
-  CircularProgress
+  CircularProgress,
 } from '@mui/material';
 import {
   LocalShipping as TruckIcon,
@@ -21,7 +21,7 @@ import {
   TrendingUp as TrendingUpIcon,
   Schedule as ScheduleIcon,
   CheckCircle as CheckCircleIcon,
-  Warning as WarningIcon
+  Warning as WarningIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { vehicleAPI } from '../../api/vehicles';
@@ -46,7 +46,7 @@ const FleetDashboard = () => {
     totalOffers: 0,
     pendingOffers: 0,
     approvedOffers: 0,
-    completedOffers: 0
+    completedOffers: 0,
   });
 
   useEffect(() => {
@@ -56,13 +56,13 @@ const FleetDashboard = () => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Paralel olarak tüm verileri çek
       const [vehicles, drivers, trailers, orders] = await Promise.all([
         vehicleAPI.getAll(),
         driversAPI.getAll(),
         trailerAPI.getAll(),
-        ordersAPI.getAll()
+        ordersAPI.getAll(),
       ]);
 
       // Araç istatistikleri
@@ -101,7 +101,7 @@ const FleetDashboard = () => {
         totalOffers,
         pendingOffers,
         approvedOffers,
-        completedOffers
+        completedOffers,
       });
     } catch (error) {
       console.error('Dashboard verileri yüklenirken hata:', error);
@@ -111,14 +111,44 @@ const FleetDashboard = () => {
   };
 
   const recentActivities = [
-    { id: 1, type: 'truck', message: 'Tır #TRK-001 bakımdan döndü', time: '2 saat önce', status: 'success' },
-    { id: 2, type: 'driver', message: 'Sürücü Ahmet Yılmaz izin aldı', time: '4 saat önce', status: 'warning' },
-    { id: 3, type: 'offer', message: 'Teklif #OF-123 onaylandı', time: '6 saat önce', status: 'success' },
-    { id: 4, type: 'trailer', message: 'Römork #TRL-005 bakıma alındı', time: '1 gün önce', status: 'warning' },
-    { id: 5, type: 'truck', message: 'Tır #TRK-015 yola çıktı', time: '1 gün önce', status: 'info' }
+    {
+      id: 1,
+      type: 'truck',
+      message: 'Tır #TRK-001 bakımdan döndü',
+      time: '2 saat önce',
+      status: 'success',
+    },
+    {
+      id: 2,
+      type: 'driver',
+      message: 'Sürücü Ahmet Yılmaz izin aldı',
+      time: '4 saat önce',
+      status: 'warning',
+    },
+    {
+      id: 3,
+      type: 'offer',
+      message: 'Teklif #OF-123 onaylandı',
+      time: '6 saat önce',
+      status: 'success',
+    },
+    {
+      id: 4,
+      type: 'trailer',
+      message: 'Römork #TRL-005 bakıma alındı',
+      time: '1 gün önce',
+      status: 'warning',
+    },
+    {
+      id: 5,
+      type: 'truck',
+      message: 'Tır #TRK-015 yola çıktı',
+      time: '1 gün önce',
+      status: 'info',
+    },
   ];
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
       case 'success':
         return <CheckCircleIcon color="success" />;
@@ -276,7 +306,10 @@ const FleetDashboard = () => {
                 <Grid item xs={6}>
                   <Box textAlign="center" p={2}>
                     <Typography variant="h4" color="error.main">
-                      {dashboardData.totalTrucks - dashboardData.activeTrucks - dashboardData.maintenanceTrucks - dashboardData.availableTrucks}
+                      {dashboardData.totalTrucks -
+                        dashboardData.activeTrucks -
+                        dashboardData.maintenanceTrucks -
+                        dashboardData.availableTrucks}
                     </Typography>
                     <Typography variant="body2">Pasif</Typography>
                   </Box>
@@ -313,7 +346,9 @@ const FleetDashboard = () => {
                 <Grid item xs={6}>
                   <Box textAlign="center" p={2}>
                     <Typography variant="h4" color="info.main">
-                      {dashboardData.totalDrivers - dashboardData.activeDrivers - dashboardData.onLeaveDrivers}
+                      {dashboardData.totalDrivers -
+                        dashboardData.activeDrivers -
+                        dashboardData.onLeaveDrivers}
                     </Typography>
                     <Typography variant="body2">Müsait</Typography>
                   </Box>
@@ -344,13 +379,8 @@ const FleetDashboard = () => {
                 {recentActivities.map((activity, index) => (
                   <React.Fragment key={activity.id}>
                     <ListItem>
-                      <ListItemIcon>
-                        {getStatusIcon(activity.status)}
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={activity.message}
-                        secondary={activity.time}
-                      />
+                      <ListItemIcon>{getStatusIcon(activity.status)}</ListItemIcon>
+                      <ListItemText primary={activity.message} secondary={activity.time} />
                     </ListItem>
                     {index < recentActivities.length - 1 && <Divider />}
                   </React.Fragment>
@@ -364,4 +394,4 @@ const FleetDashboard = () => {
   );
 };
 
-export default FleetDashboard; 
+export default FleetDashboard;

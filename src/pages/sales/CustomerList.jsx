@@ -29,7 +29,7 @@ import {
   InputAdornment,
   Grid,
   Card,
-  CardContent
+  CardContent,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -37,7 +37,7 @@ import {
   Delete as DeleteIcon,
   Search as SearchIcon,
   Warning as WarningIcon,
-  Gavel as LawsuitIcon
+  Gavel as LawsuitIcon,
 } from '@mui/icons-material';
 import { customerAPI } from '../../api/customers';
 import { useFormattedInput } from '../../hooks/useFormattedInput';
@@ -50,13 +50,13 @@ const CustomerList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRiskStatus, setFilterRiskStatus] = useState('');
   const [filterBlacklisted, setFilterBlacklisted] = useState('');
-  
+
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState(null);
-  
+
   // Form state
   const [formData, setFormData] = useState({
     name: '',
@@ -67,7 +67,7 @@ const CustomerList = () => {
     riskStatusId: '',
     isBlacklisted: false,
     isInLawsuit: false,
-    creditLimit: ''
+    creditLimit: '',
   });
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false); // kayıt/güncelleme durumu
@@ -81,15 +81,14 @@ const CustomerList = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      
+
       // Load customers and risk statuses separately to debug
       const customersData = await customerAPI.getAll();
-      
+
       const riskStatusesData = await customerAPI.getRiskStatuses();
-      
+
       setCustomers(customersData);
       setRiskStatuses(riskStatusesData);
-      
     } catch (error) {
       setError('Müşteri listesi yüklenirken hata oluştu');
     } finally {
@@ -99,16 +98,19 @@ const CustomerList = () => {
 
   // Filter customers
   const filteredCustomers = customers.filter(customer => {
-    const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         customer.taxNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         customer.contactName?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesRiskStatus = !filterRiskStatus || customer.riskStatusId === parseInt(filterRiskStatus);
-    
-    const matchesBlacklisted = filterBlacklisted === '' || 
-                              (filterBlacklisted === 'true' && customer.isBlacklisted) ||
-                              (filterBlacklisted === 'false' && !customer.isBlacklisted);
-    
+    const matchesSearch =
+      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.taxNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.contactName?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesRiskStatus =
+      !filterRiskStatus || customer.riskStatusId === parseInt(filterRiskStatus);
+
+    const matchesBlacklisted =
+      filterBlacklisted === '' ||
+      (filterBlacklisted === 'true' && customer.isBlacklisted) ||
+      (filterBlacklisted === 'false' && !customer.isBlacklisted);
+
     return matchesSearch && matchesRiskStatus && matchesBlacklisted;
   });
 
@@ -139,14 +141,14 @@ const CustomerList = () => {
       riskStatusId: '',
       isBlacklisted: false,
       isInLawsuit: false,
-      creditLimit: ''
+      creditLimit: '',
     });
     setFormErrors({});
     setDialogOpen(true);
   };
 
   // Open edit customer dialog
-  const handleEditCustomer = (customer) => {
+  const handleEditCustomer = customer => {
     setEditingCustomer(customer);
     setFormData({
       name: customer.name,
@@ -157,7 +159,7 @@ const CustomerList = () => {
       riskStatusId: customer.riskStatusId,
       isBlacklisted: customer.isBlacklisted || false,
       isInLawsuit: customer.isInLawsuit || false,
-      creditLimit: customer.creditLimit || ''
+      creditLimit: customer.creditLimit || '',
     });
     setFormErrors({});
     setDialogOpen(true);
@@ -193,7 +195,10 @@ const CustomerList = () => {
       await loadData(); // Reload data
     } catch (error) {
       console.error('Save customer error:', error);
-      const backendMessage = error?.response?.data?.message || error?.response?.data?.error || 'Müşteri kaydedilirken hata oluştu';
+      const backendMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        'Müşteri kaydedilirken hata oluştu';
       setError(backendMessage);
     } finally {
       setSaving(false);
@@ -201,7 +206,7 @@ const CustomerList = () => {
   };
 
   // Handle delete customer
-  const handleDeleteCustomer = (customer) => {
+  const handleDeleteCustomer = customer => {
     setCustomerToDelete(customer);
     setDeleteDialogOpen(true);
   };
@@ -229,7 +234,10 @@ const CustomerList = () => {
       await loadData();
     } catch (error) {
       console.error('Inline delete error:', error);
-      const backendMessage = error?.response?.data?.message || error?.response?.data?.error || 'Müşteri silinirken hata oluştu';
+      const backendMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        'Müşteri silinirken hata oluştu';
       setError(backendMessage);
     } finally {
       setDeletingInline(false);
@@ -237,13 +245,13 @@ const CustomerList = () => {
   };
 
   // Get risk status name by ID
-  const getRiskStatusName = (riskStatusId) => {
+  const getRiskStatusName = riskStatusId => {
     const riskStatus = riskStatuses.find(rs => rs.id === riskStatusId);
     return riskStatus ? riskStatus.name : 'Bilinmiyor';
   };
 
   // Get risk status color by ID
-  const getRiskStatusColor = (riskStatusId) => {
+  const getRiskStatusColor = riskStatusId => {
     switch (riskStatusId) {
       case 1: // Düşük Risk
         return 'success';
@@ -259,7 +267,7 @@ const CustomerList = () => {
   };
 
   // Format date
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     return new Date(dateString).toLocaleDateString('tr-TR');
   };
 
@@ -305,7 +313,7 @@ const CustomerList = () => {
                   size="small"
                   label="Ara"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={e => setSearchTerm(e.target.value)}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -320,19 +328,19 @@ const CustomerList = () => {
                   <InputLabel shrink>Risk Durumu</InputLabel>
                   <Select
                     value={filterRiskStatus}
-                    onChange={(e) => setFilterRiskStatus(e.target.value)}
+                    onChange={e => setFilterRiskStatus(e.target.value)}
                     label="Risk Durumu"
                     notched
                   >
                     <MenuItem value="">Tümü</MenuItem>
-                    {riskStatuses.map((status) => (
+                    {riskStatuses.map(status => (
                       <MenuItem key={status.id} value={status.id}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Chip 
+                          <Chip
                             label={status.name}
                             color={getRiskStatusColor(status.id)}
                             size="small"
-                            variant={status.id === 4 ? "filled" : "outlined"}
+                            variant={status.id === 4 ? 'filled' : 'outlined'}
                           />
                         </Box>
                       </MenuItem>
@@ -345,7 +353,7 @@ const CustomerList = () => {
                   <InputLabel shrink>Kara Liste Durumu</InputLabel>
                   <Select
                     value={filterBlacklisted}
-                    onChange={(e) => setFilterBlacklisted(e.target.value)}
+                    onChange={e => setFilterBlacklisted(e.target.value)}
                     label="Kara Liste Durumu"
                     notched
                   >
@@ -369,19 +377,37 @@ const CustomerList = () => {
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                <TableCell><strong>Müşteri Adı</strong></TableCell>
-                <TableCell><strong>Vergi No</strong></TableCell>
-                <TableCell><strong>İletişim Kişisi</strong></TableCell>
-                <TableCell><strong>Telefon</strong></TableCell>
-                <TableCell><strong>Risk Durumu</strong></TableCell>
-                <TableCell><strong>Kredi Limiti</strong></TableCell>
-                <TableCell><strong>Durum</strong></TableCell>
-                <TableCell><strong>Kayıt Tarihi</strong></TableCell>
-                <TableCell><strong>İşlemler</strong></TableCell>
+                <TableCell>
+                  <strong>Müşteri Adı</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Vergi No</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>İletişim Kişisi</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Telefon</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Risk Durumu</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Kredi Limiti</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Durum</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Kayıt Tarihi</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>İşlemler</strong>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredCustomers.map((customer) => (
+              {filteredCustomers.map(customer => (
                 <TableRow key={customer.id} hover>
                   <TableCell>
                     <Box>
@@ -399,23 +425,22 @@ const CustomerList = () => {
                   <TableCell>{customer.contactName || '-'}</TableCell>
                   <TableCell>{customer.phoneNumber || '-'}</TableCell>
                   <TableCell>
-                    <Chip 
+                    <Chip
                       label={getRiskStatusName(customer.riskStatusId)}
                       color={getRiskStatusColor(customer.riskStatusId)}
                       size="small"
-                      variant={customer.riskStatusId === 4 ? "filled" : "outlined"}
+                      variant={customer.riskStatusId === 4 ? 'filled' : 'outlined'}
                     />
                   </TableCell>
                   <TableCell>
-                    {customer.creditLimit ? 
-                      `${customer.creditLimit.toLocaleString('tr-TR')} ₺` : 
-                      '-'
-                    }
+                    {customer.creditLimit
+                      ? `${customer.creditLimit.toLocaleString('tr-TR')} ₺`
+                      : '-'}
                   </TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', gap: 1 }}>
                       {customer.isBlacklisted && (
-                        <Chip 
+                        <Chip
                           icon={<WarningIcon />}
                           label="Kara Liste"
                           color="error"
@@ -423,12 +448,7 @@ const CustomerList = () => {
                         />
                       )}
                       {customer.isInLawsuit && (
-                        <Chip 
-                          icon={<LawsuitIcon />}
-                          label="Dava"
-                          color="warning"
-                          size="small"
-                        />
+                        <Chip icon={<LawsuitIcon />} label="Dava" color="warning" size="small" />
                       )}
                     </Box>
                   </TableCell>
@@ -459,9 +479,7 @@ const CustomerList = () => {
 
         {/* Add/Edit Customer Dialog */}
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-          <DialogTitle>
-            {editingCustomer ? 'Müşteri Düzenle' : 'Yeni Müşteri Ekle'}
-          </DialogTitle>
+          <DialogTitle>{editingCustomer ? 'Müşteri Düzenle' : 'Yeni Müşteri Ekle'}</DialogTitle>
           <DialogContent>
             <Grid container spacing={3} sx={{ mt: 1 }}>
               <Grid item xs={12} md={6}>
@@ -514,7 +532,12 @@ const CustomerList = () => {
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <FormControl fullWidth error={!!formErrors.riskStatusId} size="small" sx={{ minWidth: 200 }}>
+                <FormControl
+                  fullWidth
+                  error={!!formErrors.riskStatusId}
+                  size="small"
+                  sx={{ minWidth: 200 }}
+                >
                   <InputLabel shrink>Risk Durumu *</InputLabel>
                   <Select
                     name="riskStatusId"
@@ -525,14 +548,14 @@ const CustomerList = () => {
                   >
                     {console.log('Risk statuses in form:', riskStatuses)}
                     {riskStatuses.length > 0 ? (
-                      riskStatuses.map((status) => (
+                      riskStatuses.map(status => (
                         <MenuItem key={status.id} value={status.id}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Chip 
+                            <Chip
                               label={status.name}
                               color={getRiskStatusColor(status.id)}
                               size="small"
-                              variant={status.id === 4 ? "filled" : "outlined"}
+                              variant={status.id === 4 ? 'filled' : 'outlined'}
                             />
                           </Box>
                         </MenuItem>
@@ -597,9 +620,17 @@ const CustomerList = () => {
                 {deletingInline ? 'Siliniyor...' : 'Sil'}
               </Button>
             )}
-            <Button onClick={() => setDialogOpen(false)} disabled={saving || deletingInline}>İptal</Button>
+            <Button onClick={() => setDialogOpen(false)} disabled={saving || deletingInline}>
+              İptal
+            </Button>
             <Button onClick={handleSubmit} variant="contained" disabled={saving || deletingInline}>
-              {saving ? (editingCustomer ? 'Güncelleniyor...' : 'Kaydediliyor...') : (editingCustomer ? 'Güncelle' : 'Kaydet')}
+              {saving
+                ? editingCustomer
+                  ? 'Güncelleniyor...'
+                  : 'Kaydediliyor...'
+                : editingCustomer
+                  ? 'Güncelle'
+                  : 'Kaydet'}
             </Button>
           </DialogActions>
         </Dialog>
@@ -609,7 +640,7 @@ const CustomerList = () => {
           <DialogTitle>Müşteri Sil</DialogTitle>
           <DialogContent>
             <Typography>
-              "{customerToDelete?.name}" müşterisini silmek istediğinizden emin misiniz?
+              &quot;{customerToDelete?.name}&quot; müşterisini silmek istediğinizden emin misiniz?
               Bu işlem geri alınamaz.
             </Typography>
           </DialogContent>

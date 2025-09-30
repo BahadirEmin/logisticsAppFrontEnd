@@ -1,11 +1,11 @@
-import api from "./axios";
+import api from './axios';
 
 // Supplier API functions
 export const supplierAPI = {
   // Get all suppliers
   getAll: async () => {
     try {
-      const response = await api.get("/v1/suppliers");
+      const response = await api.get('/v1/suppliers');
       return response.data;
     } catch (error) {
       throw error;
@@ -13,7 +13,7 @@ export const supplierAPI = {
   },
 
   // Get supplier by ID
-  getById: async (id) => {
+  getById: async id => {
     try {
       const response = await api.get(`/v1/suppliers/${id}`);
       return response.data;
@@ -23,9 +23,9 @@ export const supplierAPI = {
   },
 
   // Create new supplier
-  create: async (supplierData) => {
+  create: async supplierData => {
     try {
-      const response = await api.post("/v1/suppliers", supplierData);
+      const response = await api.post('/v1/suppliers', supplierData);
       return response.data;
     } catch (error) {
       throw error;
@@ -43,7 +43,7 @@ export const supplierAPI = {
   },
 
   // Delete supplier
-  delete: async (id) => {
+  delete: async id => {
     try {
       const response = await api.delete(`/v1/suppliers/${id}`);
       return response.data;

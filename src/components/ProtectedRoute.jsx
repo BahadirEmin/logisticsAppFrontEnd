@@ -12,18 +12,13 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     loading,
     userRole: user?.role,
     allowedRoles,
-    currentPath: location.pathname
+    currentPath: location.pathname,
   });
 
   // Show loading spinner while checking authentication
   if (loading) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-      >
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
         <CircularProgress size={60} />
       </Box>
     );
@@ -56,4 +51,4 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   return children;
 };
 
-export default ProtectedRoute; 
+export default ProtectedRoute;

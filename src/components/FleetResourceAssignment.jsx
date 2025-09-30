@@ -14,25 +14,19 @@ import {
   Alert,
   CircularProgress,
   Grid,
-  Chip
+  Chip,
 } from '@mui/material';
 import {
   LocalShipping as VehicleIcon,
   Person as DriverIcon,
-  DirectionsCar as TrailerIcon
+  DirectionsCar as TrailerIcon,
 } from '@mui/icons-material';
 import { vehicleAPI } from '../api/vehicles';
 import { driversAPI } from '../api/drivers';
 import { trailerAPI } from '../api/trailers';
 import { ordersAPI } from '../api/orders';
 
-const FleetResourceAssignment = ({ 
-  open, 
-  onClose, 
-  orderId, 
-  orderInfo,
-  onSuccess 
-}) => {
+const FleetResourceAssignment = ({ open, onClose, orderId, orderInfo, onSuccess }) => {
   const [vehicles, setVehicles] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [trailers, setTrailers] = useState([]);
@@ -62,12 +56,12 @@ const FleetResourceAssignment = ({
   const loadResources = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const [vehiclesData, driversData, trailersData] = await Promise.all([
         vehicleAPI.getAll(),
         driversAPI.getAll(),
-        trailerAPI.getAll()
+        trailerAPI.getAll(),
       ]);
 
       setVehicles(vehiclesData || []);
@@ -99,15 +93,14 @@ const FleetResourceAssignment = ({
       if (selectedTrailer) resources.trailerId = selectedTrailer;
 
       await ordersAPI.assignFleetResources(orderId, resources);
-      
+
       setSuccess('Kaynaklar başarıyla atandı!');
-      
+
       // Call success callback after a short delay
       setTimeout(() => {
         if (onSuccess) onSuccess();
         onClose();
       }, 1500);
-      
     } catch (err) {
       console.error('Error assigning resources:', err);
       setError(err.response?.data?.message || 'Kaynaklar atanırken bir hata oluştu.');
@@ -123,18 +116,11 @@ const FleetResourceAssignment = ({
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={handleClose}
-      maxWidth="md"
-      fullWidth
-    >
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle>
         <Box display="flex" alignItems="center" gap={1}>
           <VehicleIcon color="primary" />
-          <Typography variant="h6">
-            Fleet Kaynak Ataması
-          </Typography>
+          <Typography variant="h6">Fleet Kaynak Ataması</Typography>
         </Box>
         {orderInfo && (
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
@@ -173,14 +159,14 @@ const FleetResourceAssignment = ({
                 <Select
                   labelId="vehicle-select-label"
                   value={selectedVehicle}
-                  onChange={(e) => setSelectedVehicle(e.target.value)}
+                  onChange={e => setSelectedVehicle(e.target.value)}
                   label="Araç Seçin"
                   notched
                 >
                   <MenuItem value="">
                     <em>Araç seçmeyin</em>
                   </MenuItem>
-                  {vehicles.map((vehicle) => (
+                  {vehicles.map(vehicle => (
                     <MenuItem key={vehicle.id} value={vehicle.id}>
                       <Box>
                         <Typography variant="body2" fontWeight="medium">
@@ -205,14 +191,14 @@ const FleetResourceAssignment = ({
                 <Select
                   labelId="driver-select-label"
                   value={selectedDriver}
-                  onChange={(e) => setSelectedDriver(e.target.value)}
+                  onChange={e => setSelectedDriver(e.target.value)}
                   label="Şoför Seçin"
                   notched
                 >
                   <MenuItem value="">
                     <em>Şoför seçmeyin</em>
                   </MenuItem>
-                  {drivers.map((driver) => (
+                  {drivers.map(driver => (
                     <MenuItem key={driver.id} value={driver.id}>
                       <Box>
                         <Typography variant="body2" fontWeight="medium">
@@ -237,14 +223,14 @@ const FleetResourceAssignment = ({
                 <Select
                   labelId="trailer-select-label"
                   value={selectedTrailer}
-                  onChange={(e) => setSelectedTrailer(e.target.value)}
+                  onChange={e => setSelectedTrailer(e.target.value)}
                   label="Römork Seçin"
                   notched
                 >
                   <MenuItem value="">
                     <em>Römork seçmeyin</em>
                   </MenuItem>
-                  {trailers.map((trailer) => (
+                  {trailers.map(trailer => (
                     <MenuItem key={trailer.id} value={trailer.id}>
                       <Box>
                         <Typography variant="body2" fontWeight="medium">
@@ -299,13 +285,10 @@ const FleetResourceAssignment = ({
       </DialogContent>
 
       <DialogActions>
-        <Button 
-          onClick={handleClose} 
-          disabled={submitting}
-        >
+        <Button onClick={handleClose} disabled={submitting}>
           İptal
         </Button>
-        <Button 
+        <Button
           onClick={handleSubmit}
           variant="contained"
           disabled={submitting || (!selectedVehicle && !selectedDriver && !selectedTrailer)}

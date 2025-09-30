@@ -19,19 +19,19 @@ import {
   CardContent,
   Alert,
   CircularProgress,
-  Tooltip
+  Tooltip,
 } from '@mui/material';
 import {
-  Search, 
-  LocalShipping, 
-  LocationOn, 
-  Schedule, 
+  Search,
+  LocalShipping,
+  LocationOn,
+  Schedule,
   CheckCircle,
   Warning,
   DirectionsCar,
   Assignment,
   Visibility,
-  Person as PersonIcon
+  Person as PersonIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
@@ -54,7 +54,7 @@ const ApprovedOffers = () => {
     { value: 'pending', label: 'Beklemede' },
     { value: 'approved', label: 'Onaylandı' },
     { value: 'in_transit', label: 'Yolda' },
-    { value: 'delivered', label: 'Teslim Edildi' }
+    { value: 'delivered', label: 'Teslim Edildi' },
   ];
 
   useEffect(() => {
@@ -65,7 +65,7 @@ const ApprovedOffers = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Make real API call to get all orders
       const data = await ordersAPI.getAll();
       setOffers(data);
@@ -77,46 +77,53 @@ const ApprovedOffers = () => {
     }
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     const statusConfig = {
       approved: <CheckCircle />,
       in_transit: <LocalShipping />,
       delivered: <CheckCircle />,
-      pending: <Schedule />
+      pending: <Schedule />,
     };
     return statusConfig[status] || <Schedule />;
   };
 
-  const getStatusLabel = (status) => {
+  const getStatusLabel = status => {
     const statusConfig = {
       approved: 'Onaylandı',
       in_transit: 'Yolda',
       delivered: 'Teslim Edildi',
-      pending: 'Beklemede'
+      pending: 'Beklemede',
     };
     return statusConfig[status] || 'Beklemede';
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     const statusConfig = {
       approved: 'success',
       in_transit: 'warning',
       delivered: 'info',
-      pending: 'default'
+      pending: 'default',
     };
     return statusConfig[status] || 'default';
   };
 
   const filteredOffers = offers.filter(offer => {
-    const matchesSearch = 
-      (offer.customerName || offer.customer?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (offer.departureCity || offer.departureAddress || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (offer.arrivalCity || offer.arrivalAddress || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch =
+      (offer.customerName || offer.customer?.name || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (offer.departureCity || offer.departureAddress || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (offer.arrivalCity || offer.arrivalAddress || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       (offer.cargoType || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       offer.id?.toString().includes(searchTerm);
-    
-    const matchesStatus = filterStatus === 'all' || (offer.tripStatus || offer.status) === filterStatus;
-    
+
+    const matchesStatus =
+      filterStatus === 'all' || (offer.tripStatus || offer.status) === filterStatus;
+
     return matchesSearch && matchesStatus;
   });
 
@@ -130,14 +137,14 @@ const ApprovedOffers = () => {
     );
   }
 
-  const handleViewOffer = (offerId) => {
+  const handleViewOffer = offerId => {
     navigate(`/operator/teklifler/${offerId}`);
   };
 
-  const handleAssignToMe = async (offerId) => {
+  const handleAssignToMe = async offerId => {
     try {
       setAssigningOrderId(offerId);
-      
+
       if (!user?.id) {
         alert('Kullanıcı bilgisi bulunamadı. Lütfen tekrar giriş yapın.');
         return;
@@ -148,7 +155,9 @@ const ApprovedOffers = () => {
         await usersAPI.validateUser(user.id);
       } catch (validationError) {
         console.error('User validation failed:', validationError);
-        alert('Kullanıcı ID\'niz users tablosunda bulunamadı. Lütfen sistem yöneticisi ile iletişime geçin.');
+        alert(
+          "Kullanıcı ID'niz users tablosunda bulunamadı. Lütfen sistem yöneticisi ile iletişime geçin."
+        );
         return;
       }
 
@@ -162,24 +171,25 @@ const ApprovedOffers = () => {
         alert('Bu işlem için yetkiniz bulunmamaktadır.');
         return;
       }
-      
+
       // Reload the offers list
       await loadApprovedOffers();
     } catch (error) {
       console.error('Teklif atama hatası:', error);
-      
+
       let errorMessage = 'Teklif atanırken bir hata oluştu.';
-      
+
       if (error.response?.data?.error) {
         if (error.response.data.error.includes('foreign key constraint')) {
-          errorMessage = 'Kullanıcı ID\'niz personel tablosunda bulunamadı. Lütfen sistem yöneticisi ile iletişime geçin.';
+          errorMessage =
+            "Kullanıcı ID'niz personel tablosunda bulunamadı. Lütfen sistem yöneticisi ile iletişime geçin.";
         } else {
           errorMessage = error.response.data.error;
         }
       } else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       }
-      
+
       alert(errorMessage);
     } finally {
       setAssigningOrderId(null);
@@ -191,7 +201,6 @@ const ApprovedOffers = () => {
       <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#1976d2', mb: 4 }}>
         Onaylanan Teklifler
       </Typography>
-      
 
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -254,7 +263,7 @@ const ApprovedOffers = () => {
               size="small"
               label="Ara..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -266,7 +275,7 @@ const ApprovedOffers = () => {
           </Grid>
           <Grid item xs={12} md={6}>
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              {statusOptions.map((status) => (
+              {statusOptions.map(status => (
                 <Chip
                   key={status.value}
                   label={status.label}
@@ -286,20 +295,40 @@ const ApprovedOffers = () => {
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                <TableCell><strong>ID</strong></TableCell>
-                <TableCell><strong>Müşteri</strong></TableCell>
-                <TableCell><strong>Nereden</strong></TableCell>
-                <TableCell><strong>Nereye</strong></TableCell>
-                <TableCell><strong>Yük Tipi</strong></TableCell>
-                <TableCell><strong>Durum</strong></TableCell>
-                <TableCell><strong>Onay Tarihi</strong></TableCell>
-                <TableCell><strong>Tahmini Teslimat</strong></TableCell>
-                <TableCell><strong>Fiyat</strong></TableCell>
-                <TableCell><strong>İşlemler</strong></TableCell>
+                <TableCell>
+                  <strong>ID</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Müşteri</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Nereden</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Nereye</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Yük Tipi</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Durum</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Onay Tarihi</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Tahmini Teslimat</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Fiyat</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>İşlemler</strong>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredOffers.map((offer) => (
+              {filteredOffers.map(offer => (
                 <TableRow key={offer.id} hover>
                   <TableCell>#{offer.id}</TableCell>
                   <TableCell>{offer.customerName || offer.customer?.name || 'N/A'}</TableCell>
@@ -314,9 +343,7 @@ const ApprovedOffers = () => {
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2">
-                      {offer.cargoType || 'N/A'}
-                    </Typography>
+                    <Typography variant="body2">{offer.cargoType || 'N/A'}</Typography>
                     <Typography variant="caption" color="text.secondary">
                       {offer.cargoWeightKg ? `${offer.cargoWeightKg} kg` : 'N/A'}
                     </Typography>
@@ -331,10 +358,14 @@ const ApprovedOffers = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    {offer.createdAt ? new Date(offer.createdAt).toLocaleDateString('tr-TR') : 'N/A'}
+                    {offer.createdAt
+                      ? new Date(offer.createdAt).toLocaleDateString('tr-TR')
+                      : 'N/A'}
                   </TableCell>
                   <TableCell>
-                    {offer.estimatedDeliveryDate ? new Date(offer.estimatedDeliveryDate).toLocaleDateString('tr-TR') : 'N/A'}
+                    {offer.estimatedDeliveryDate
+                      ? new Date(offer.estimatedDeliveryDate).toLocaleDateString('tr-TR')
+                      : 'N/A'}
                   </TableCell>
                   <TableCell>
                     <strong>{offer.price ? `₺${offer.price}` : 'N/A'}</strong>
@@ -349,24 +380,35 @@ const ApprovedOffers = () => {
                       >
                         Detay
                       </Button>
-                      
+
                       {/* Show assign button only for unassigned offers */}
-                      {(user?.role === 'operator' || user?.role === 'operation' || user?.role === 'fleet') && 
-                       !(offer.operationPersonId === user?.id || offer.fleetPersonId === user?.id) && (
-                        <Button
-                          size="small"
-                          startIcon={assigningOrderId === offer.id ? <CircularProgress size={16} /> : <Assignment />}
-                          variant="contained"
-                          color="primary"
-                          onClick={() => handleAssignToMe(offer.id)}
-                          disabled={assigningOrderId === offer.id}
-                        >
-                          {assigningOrderId === offer.id ? 'Atanıyor...' : 'Üzerine Al'}
-                        </Button>
-                      )}
-                      
+                      {(user?.role === 'operator' ||
+                        user?.role === 'operation' ||
+                        user?.role === 'fleet') &&
+                        !(
+                          offer.operationPersonId === user?.id || offer.fleetPersonId === user?.id
+                        ) && (
+                          <Button
+                            size="small"
+                            startIcon={
+                              assigningOrderId === offer.id ? (
+                                <CircularProgress size={16} />
+                              ) : (
+                                <Assignment />
+                              )
+                            }
+                            variant="contained"
+                            color="primary"
+                            onClick={() => handleAssignToMe(offer.id)}
+                            disabled={assigningOrderId === offer.id}
+                          >
+                            {assigningOrderId === offer.id ? 'Atanıyor...' : 'Üzerine Al'}
+                          </Button>
+                        )}
+
                       {/* Show "Sizin Üzerinizde" icon for assigned offers */}
-                      {(offer.operationPersonId === user?.id || offer.fleetPersonId === user?.id) && (
+                      {(offer.operationPersonId === user?.id ||
+                        offer.fleetPersonId === user?.id) && (
                         <Tooltip title="Sizin Üzerinizde">
                           <PersonIcon color="success" fontSize="small" />
                         </Tooltip>
@@ -389,4 +431,4 @@ const ApprovedOffers = () => {
   );
 };
 
-export default ApprovedOffers; 
+export default ApprovedOffers;

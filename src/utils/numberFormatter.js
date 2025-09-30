@@ -4,23 +4,21 @@
  */
 
 // Format number with thousands separator (100000 -> 100.000)
-export const formatNumber = (num) => {
+export const formatNumber = num => {
   if (!num) return '';
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 };
 
 // Parse formatted number back to plain number (100.000 -> 100000)
-export const parseNumber = (str) => {
+export const parseNumber = str => {
   if (!str) return '';
   return str.replace(/\./g, '');
 };
 
-
-
 // Handle input change with automatic number formatting
 export const handleNumberInput = (value, shouldFormat = true) => {
   if (!shouldFormat) return value;
-  
+
   const numericValue = value.replace(/[^0-9]/g, '');
   if (numericValue) {
     return formatNumber(numericValue);
@@ -28,36 +26,42 @@ export const handleNumberInput = (value, shouldFormat = true) => {
   return '';
 };
 
-
-
 // Check if field should be formatted as price/money
-export const shouldFormatField = (fieldName) => {
+export const shouldFormatField = fieldName => {
   const priceFields = [
-    'price', 'cost', 'amount', 'value', 'fiyat', 'tutar',
-    'estimatedPrice', 'totalPrice', 'purchasePrice', 'currentValue',
-    'satinAlmaFiyati', 'guncelDeger', 'deger'
+    'price',
+    'cost',
+    'amount',
+    'value',
+    'fiyat',
+    'tutar',
+    'estimatedPrice',
+    'totalPrice',
+    'purchasePrice',
+    'currentValue',
+    'satinAlmaFiyati',
+    'guncelDeger',
+    'deger',
   ];
-  
-  return priceFields.some(field => 
-    fieldName.toLowerCase().includes(field.toLowerCase())
-  );
+
+  return priceFields.some(field => fieldName.toLowerCase().includes(field.toLowerCase()));
 };
 
 // Format currency display
 export const formatCurrency = (amount, currency = 'TRY', showSymbol = true) => {
   if (!amount) return showSymbol ? '0 ₺' : '0';
-  
+
   const formatted = formatNumber(amount);
-  
+
   if (!showSymbol) return formatted;
-  
+
   const symbols = {
-    'TRY': '₺',
-    'EUR': '€', 
-    'USD': '$',
-    'GBP': '£'
+    TRY: '₺',
+    EUR: '€',
+    USD: '$',
+    GBP: '£',
   };
-  
+
   const symbol = symbols[currency] || '₺';
   return `${formatted} ${symbol}`;
 };
@@ -65,10 +69,10 @@ export const formatCurrency = (amount, currency = 'TRY', showSymbol = true) => {
 // Create enhanced TextField component props for number fields
 export const getNumberFieldProps = (value, onChange, fieldName) => {
   const shouldFormat = shouldFormatField(fieldName);
-  
+
   return {
     value: shouldFormat ? (value ? formatNumber(value.toString()) : '') : value,
-    onChange: (e) => {
+    onChange: e => {
       const inputValue = e.target.value;
       if (shouldFormat) {
         const formatted = handleNumberInput(inputValue, true);
@@ -77,9 +81,11 @@ export const getNumberFieldProps = (value, onChange, fieldName) => {
         onChange(inputValue);
       }
     },
-    inputProps: shouldFormat ? {
-      inputMode: 'numeric',
-      pattern: '[0-9.]*'
-    } : {}
+    inputProps: shouldFormat
+      ? {
+          inputMode: 'numeric',
+          pattern: '[0-9.]*',
+        }
+      : {},
   };
 };

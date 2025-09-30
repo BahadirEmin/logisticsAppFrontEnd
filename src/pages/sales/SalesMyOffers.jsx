@@ -26,7 +26,7 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Divider
+  Divider,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -34,7 +34,7 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   CheckCircle as CheckCircleIcon,
-  Add as AddIcon
+  Add as AddIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
@@ -55,7 +55,7 @@ const SalesMyOffers = () => {
     { value: 'YOLA_CIKTI', label: 'Yola Çıktı', color: 'info' },
     { value: 'TESLIM_EDILDI', label: 'Teslim Edildi', color: 'success' },
     { value: 'REDDEDILDI', label: 'Reddedildi', color: 'error' },
-    { value: 'IPTAL_EDILDI', label: 'İptal Edildi', color: 'error' }
+    { value: 'IPTAL_EDILDI', label: 'İptal Edildi', color: 'error' },
   ];
 
   useEffect(() => {
@@ -76,12 +76,12 @@ const SalesMyOffers = () => {
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     const statusOption = tripStatusOptions.find(option => option.value === status);
     return statusOption ? statusOption.color : 'default';
   };
 
-  const getStatusLabel = (status) => {
+  const getStatusLabel = status => {
     const statusOption = tripStatusOptions.find(option => option.value === status);
     return statusOption ? statusOption.label : status;
   };
@@ -99,15 +99,15 @@ const SalesMyOffers = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const handleViewOffer = (offerId) => {
+  const handleViewOffer = offerId => {
     navigate(`/sales/teklifler/${offerId}`);
   };
 
-  const handleEditOffer = (offerId) => {
+  const handleEditOffer = offerId => {
     navigate(`/sales/teklifler/${offerId}/duzenle`);
   };
 
-  const handleDeleteOffer = async (offerId) => {
+  const handleDeleteOffer = async offerId => {
     if (window.confirm('Bu teklifi silmek istediğinizden emin misiniz?')) {
       try {
         await ordersAPI.delete(offerId);
@@ -119,16 +119,16 @@ const SalesMyOffers = () => {
     }
   };
 
-  const handleApproveOffer = (offer) => {
+  const handleApproveOffer = offer => {
     setApprovalDialog({ open: true, offer });
   };
 
   const handleConfirmApproval = async () => {
     if (!approvalDialog.offer) return;
-    
+
     try {
       setApproving(true);
-      
+
       // Update order with all required fields, changing tripStatus to 'ONAYLANAN_TEKLIF'
       const updateData = {
         tripStatus: 'ONAYLANAN_TEKLIF',
@@ -143,21 +143,22 @@ const SalesMyOffers = () => {
         pickupDate: approvalDialog.offer.pickupDate,
         deliveryDate: approvalDialog.offer.deliveryDate,
         pickupAddress: approvalDialog.offer.departureAddress || approvalDialog.offer.pickupAddress,
-        deliveryAddress: approvalDialog.offer.arrivalAddress || approvalDialog.offer.deliveryAddress,
+        deliveryAddress:
+          approvalDialog.offer.arrivalAddress || approvalDialog.offer.deliveryAddress,
         cargoDescription: approvalDialog.offer.cargoType || approvalDialog.offer.cargoDescription,
         weight: approvalDialog.offer.cargoWeightKg || approvalDialog.offer.weight,
         volume: approvalDialog.offer.volume,
         price: approvalDialog.offer.quotePrice || approvalDialog.offer.price,
         currency: approvalDialog.offer.currency || 'TRY',
-        notes: approvalDialog.offer.notes
+        notes: approvalDialog.offer.notes,
       };
-      
+
       await ordersAPI.update(approvalDialog.offer.id, updateData);
-      
+
       // Close dialog and refresh offers
       setApprovalDialog({ open: false, offer: null });
       await loadOffers();
-      
+
       // Show success message
       setError(null);
     } catch (err) {
@@ -245,8 +246,9 @@ const SalesMyOffers = () => {
       {/* Info Alert about order status management */}
       <Alert severity="info" sx={{ mb: 2 }}>
         <Typography variant="body2">
-          <strong>Bilgi:</strong> Onayladığınız siparişlerin durumunu sadece görüntüleyebilir, değiştiremezsiniz. 
-          Sipariş durumu değişiklikleri operasyon ekibi tarafından yönetilmektedir.
+          <strong>Bilgi:</strong> Onayladığınız siparişlerin durumunu sadece görüntüleyebilir,
+          değiştiremezsiniz. Sipariş durumu değişiklikleri operasyon ekibi tarafından
+          yönetilmektedir.
         </Typography>
       </Alert>
 
@@ -265,9 +267,9 @@ const SalesMyOffers = () => {
               size="small"
               label="Arama"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               InputProps={{
-                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
               }}
             />
           </Grid>
@@ -276,18 +278,18 @@ const SalesMyOffers = () => {
               <InputLabel shrink>Durum Filtresi</InputLabel>
               <Select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={e => setStatusFilter(e.target.value)}
                 label="Durum Filtresi"
                 notched
               >
                 <MenuItem value="">Tümü</MenuItem>
-                {tripStatusOptions.map((status) => (
-                  <MenuItem key={status.value} value={status.value} sx={{ justifyContent: 'flex-start' }}>
-                    <Chip
-                      label={status.label}
-                      color={status.color}
-                      size="small"
-                    />
+                {tripStatusOptions.map(status => (
+                  <MenuItem
+                    key={status.value}
+                    value={status.value}
+                    sx={{ justifyContent: 'flex-start' }}
+                  >
+                    <Chip label={status.label} color={status.color} size="small" />
                   </MenuItem>
                 ))}
               </Select>
@@ -323,7 +325,7 @@ const SalesMyOffers = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredOffers.map((offer) => (
+                filteredOffers.map(offer => (
                   <TableRow key={offer.id} hover>
                     <TableCell>
                       <Typography variant="body2" fontWeight="bold">
@@ -355,12 +357,12 @@ const SalesMyOffers = () => {
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2">
-                        {offer.cargoType}
-                      </Typography>
+                      <Typography variant="body2">{offer.cargoType}</Typography>
                       <Typography variant="caption" color="textSecondary">
                         {offer.cargoWeightKg} kg
-                        {offer.cargoWidth && offer.cargoLength && offer.cargoHeight &&
+                        {offer.cargoWidth &&
+                          offer.cargoLength &&
+                          offer.cargoHeight &&
                           ` • ${offer.cargoWidth}x${offer.cargoLength}x${offer.cargoHeight}m`}
                       </Typography>
                     </TableCell>
@@ -433,48 +435,54 @@ const SalesMyOffers = () => {
       </Paper>
 
       {/* Approval Confirmation Dialog */}
-      <Dialog
-        open={approvalDialog.open}
-        onClose={handleCancelApproval}
-        maxWidth="md"
-        fullWidth
-      >
+      <Dialog open={approvalDialog.open} onClose={handleCancelApproval} maxWidth="md" fullWidth>
         <DialogTitle>
           <Box display="flex" alignItems="center" gap={1}>
             <CheckCircleIcon color="success" />
             <Typography variant="h6">Teklifi Onayla</Typography>
           </Box>
         </DialogTitle>
-        
+
         <DialogContent>
           {approvalDialog.offer && (
             <Box>
               <Alert severity="warning" sx={{ mb: 3 }}>
-                Bu teklifi onaylamak istediğinizden emin misiniz? Onaylandıktan sonra teklif durumu "Onaylanan Teklif" olarak değişecektir.
+                Bu teklifi onaylamak istediğinizden emin misiniz? Onaylandıktan sonra teklif durumu
+                "Onaylanan Teklif" olarak değişecektir.
               </Alert>
 
               <Paper elevation={2} sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom color="primary">
                   Teklif Detayları
                 </Typography>
-                
+
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">Teklif No:</Typography>
-                    <Typography variant="body1" fontWeight="bold">#{approvalDialog.offer.id}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Teklif No:
+                    </Typography>
+                    <Typography variant="body1" fontWeight="bold">
+                      #{approvalDialog.offer.id}
+                    </Typography>
                   </Grid>
-                  
+
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">Müşteri:</Typography>
-                    <Typography variant="body1" fontWeight="medium">{approvalDialog.offer.customerName}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Müşteri:
+                    </Typography>
+                    <Typography variant="body1" fontWeight="medium">
+                      {approvalDialog.offer.customerName}
+                    </Typography>
                   </Grid>
-                  
+
                   <Grid item xs={12}>
                     <Divider sx={{ my: 1 }} />
                   </Grid>
-                  
+
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">Nereden:</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Nereden:
+                    </Typography>
                     <Typography variant="body1">
                       {approvalDialog.offer.departureCity}, {approvalDialog.offer.departureCountry}
                     </Typography>
@@ -482,9 +490,11 @@ const SalesMyOffers = () => {
                       {approvalDialog.offer.departureAddress}
                     </Typography>
                   </Grid>
-                  
+
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">Nereye:</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Nereye:
+                    </Typography>
                     <Typography variant="body1">
                       {approvalDialog.offer.arrivalCity}, {approvalDialog.offer.arrivalCountry}
                     </Typography>
@@ -492,47 +502,60 @@ const SalesMyOffers = () => {
                       {approvalDialog.offer.arrivalAddress}
                     </Typography>
                   </Grid>
-                  
+
                   <Grid item xs={12}>
                     <Divider sx={{ my: 1 }} />
                   </Grid>
-                  
+
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">Yük Tipi:</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Yük Tipi:
+                    </Typography>
                     <Typography variant="body1">{approvalDialog.offer.cargoType}</Typography>
                   </Grid>
-                  
+
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">Ağırlık:</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Ağırlık:
+                    </Typography>
                     <Typography variant="body1">{approvalDialog.offer.cargoWeightKg} kg</Typography>
                   </Grid>
-                  
-                  {approvalDialog.offer.cargoWidth && approvalDialog.offer.cargoLength && approvalDialog.offer.cargoHeight && (
-                    <Grid item xs={12}>
-                      <Typography variant="body2" color="text.secondary">Ölçüler:</Typography>
-                      <Typography variant="body1">
-                        {approvalDialog.offer.cargoWidth} x {approvalDialog.offer.cargoLength} x {approvalDialog.offer.cargoHeight} m
-                      </Typography>
-                    </Grid>
-                  )}
-                  
+
+                  {approvalDialog.offer.cargoWidth &&
+                    approvalDialog.offer.cargoLength &&
+                    approvalDialog.offer.cargoHeight && (
+                      <Grid item xs={12}>
+                        <Typography variant="body2" color="text.secondary">
+                          Ölçüler:
+                        </Typography>
+                        <Typography variant="body1">
+                          {approvalDialog.offer.cargoWidth} x {approvalDialog.offer.cargoLength} x{' '}
+                          {approvalDialog.offer.cargoHeight} m
+                        </Typography>
+                      </Grid>
+                    )}
+
                   {approvalDialog.offer.quotePrice && (
                     <Grid item xs={12}>
-                      <Typography variant="body2" color="text.secondary">Teklif Fiyatı:</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Teklif Fiyatı:
+                      </Typography>
                       <Typography variant="body1" fontWeight="bold" color="success.main">
                         {approvalDialog.offer.quotePrice.toLocaleString('tr-TR')} TL
                       </Typography>
                     </Grid>
                   )}
-                  
+
                   <Grid item xs={12}>
                     <Divider sx={{ my: 1 }} />
                   </Grid>
-                  
+
                   <Grid item xs={12}>
-                    <Typography variant="body2" color="text.secondary">Oluşturulma Tarihi:</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Oluşturulma Tarihi:
+                    </Typography>
                     <Typography variant="body1">
-                      {new Date(approvalDialog.offer.createdAt).toLocaleDateString('tr-TR')} - 
+                      {new Date(approvalDialog.offer.createdAt).toLocaleDateString('tr-TR')} -
                       {new Date(approvalDialog.offer.createdAt).toLocaleTimeString('tr-TR')}
                     </Typography>
                   </Grid>
@@ -541,13 +564,9 @@ const SalesMyOffers = () => {
             </Box>
           )}
         </DialogContent>
-        
+
         <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button
-            onClick={handleCancelApproval}
-            disabled={approving}
-            color="inherit"
-          >
+          <Button onClick={handleCancelApproval} disabled={approving} color="inherit">
             İptal
           </Button>
           <Button

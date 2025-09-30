@@ -29,14 +29,14 @@ import {
   InputAdornment,
   Grid,
   Card,
-  CardContent
+  CardContent,
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   Search as SearchIcon,
-  LocalShipping as TrailerIcon
+  LocalShipping as TrailerIcon,
 } from '@mui/icons-material';
 import { trailerAPI } from '../../api/trailers';
 
@@ -46,13 +46,13 @@ const TrailerList = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterActive, setFilterActive] = useState('');
-  
+
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTrailer, setEditingTrailer] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [trailerToDelete, setTrailerToDelete] = useState(null);
-  
+
   // Form state
   const [formData, setFormData] = useState({
     trailerNo: '',
@@ -67,7 +67,7 @@ const TrailerList = () => {
     height: '',
     purchaseDate: '',
     ownershipTypeId: 1,
-    isActive: true
+    isActive: true,
   });
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
@@ -92,31 +92,33 @@ const TrailerList = () => {
 
   // Filter trailers
   const filteredTrailers = trailers.filter(trailer => {
-    const matchesSearch = trailer.trailerNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         trailer.make?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         trailer.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         trailer.vin?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesActive = filterActive === '' || 
-                         (filterActive === 'true' && trailer.isActive) ||
-                         (filterActive === 'false' && !trailer.isActive);
-    
+    const matchesSearch =
+      trailer.trailerNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      trailer.make?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      trailer.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      trailer.vin?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesActive =
+      filterActive === '' ||
+      (filterActive === 'true' && trailer.isActive) ||
+      (filterActive === 'false' && !trailer.isActive);
+
     return matchesSearch && matchesActive;
   });
 
   // Handle form input changes
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value, checked, type } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
-    
+
     // Clear error when user types
     if (formErrors[name]) {
       setFormErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
@@ -161,14 +163,14 @@ const TrailerList = () => {
       height: '',
       purchaseDate: '',
       ownershipTypeId: 1,
-      isActive: true
+      isActive: true,
     });
     setFormErrors({});
     setDialogOpen(true);
   };
 
   // Open edit trailer dialog
-  const handleEditTrailer = (trailer) => {
+  const handleEditTrailer = trailer => {
     setEditingTrailer(trailer);
     setFormData({
       trailerNo: trailer.trailerNo || '',
@@ -183,7 +185,7 @@ const TrailerList = () => {
       height: trailer.height || '',
       purchaseDate: trailer.purchaseDate ? trailer.purchaseDate.split('T')[0] : '',
       ownershipTypeId: trailer.ownershipTypeId || 1,
-      isActive: trailer.isActive !== undefined ? trailer.isActive : true
+      isActive: trailer.isActive !== undefined ? trailer.isActive : true,
     });
     setFormErrors({});
     setDialogOpen(true);
@@ -207,7 +209,7 @@ const TrailerList = () => {
         width: formData.width ? Number(formData.width) : null,
         height: formData.height ? Number(formData.height) : null,
         ownershipTypeId: Number(formData.ownershipTypeId),
-        isActive: Boolean(formData.isActive)
+        isActive: Boolean(formData.isActive),
       };
 
       if (editingTrailer) {
@@ -220,7 +222,10 @@ const TrailerList = () => {
       await loadData();
     } catch (error) {
       console.error('Save trailer error:', error);
-      const backendMessage = error?.response?.data?.message || error?.response?.data?.error || 'Römork kaydedilirken hata oluştu';
+      const backendMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        'Römork kaydedilirken hata oluştu';
       setError(backendMessage);
     } finally {
       setSaving(false);
@@ -228,7 +233,7 @@ const TrailerList = () => {
   };
 
   // Handle delete trailer
-  const handleDeleteTrailer = (trailer) => {
+  const handleDeleteTrailer = trailer => {
     setTrailerToDelete(trailer);
     setDeleteDialogOpen(true);
   };
@@ -256,7 +261,10 @@ const TrailerList = () => {
       await loadData();
     } catch (error) {
       console.error('Inline delete error:', error);
-      const backendMessage = error?.response?.data?.message || error?.response?.data?.error || 'Römork silinirken hata oluştu';
+      const backendMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        'Römork silinirken hata oluştu';
       setError(backendMessage);
     } finally {
       setDeletingInline(false);
@@ -264,7 +272,7 @@ const TrailerList = () => {
   };
 
   // Format date
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('tr-TR');
   };
@@ -317,7 +325,7 @@ const TrailerList = () => {
                 size="small"
                 label="Römork Ara"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -332,7 +340,7 @@ const TrailerList = () => {
                 <InputLabel shrink>Durum</InputLabel>
                 <Select
                   value={filterActive}
-                  onChange={(e) => setFilterActive(e.target.value)}
+                  onChange={e => setFilterActive(e.target.value)}
                   label="Durum"
                   notched
                 >
@@ -350,19 +358,37 @@ const TrailerList = () => {
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                <TableCell><strong>Römork No</strong></TableCell>
-                <TableCell><strong>Marka/Model</strong></TableCell>
-                <TableCell><strong>VIN</strong></TableCell>
-                <TableCell><strong>Tip</strong></TableCell>
-                <TableCell><strong>Kapasite</strong></TableCell>
-                <TableCell><strong>Boyutlar</strong></TableCell>
-                <TableCell><strong>Model Yılı</strong></TableCell>
-                <TableCell><strong>Durum</strong></TableCell>
-                <TableCell><strong>İşlemler</strong></TableCell>
+                <TableCell>
+                  <strong>Römork No</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Marka/Model</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>VIN</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Tip</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Kapasite</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Boyutlar</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Model Yılı</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Durum</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>İşlemler</strong>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredTrailers.map((trailer) => (
+              {filteredTrailers.map(trailer => (
                 <TableRow key={trailer.id} hover>
                   <TableCell>
                     <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
@@ -387,12 +413,11 @@ const TrailerList = () => {
                       variant="outlined"
                     />
                   </TableCell>
-                  <TableCell>
-                    {trailer.capacity ? `${trailer.capacity} ton` : '-'}
-                  </TableCell>
+                  <TableCell>{trailer.capacity ? `${trailer.capacity} ton` : '-'}</TableCell>
                   <TableCell>
                     <Typography variant="body2">
-                      {formatDimension(trailer.length, 'm')} × {formatDimension(trailer.width, 'm')} × {formatDimension(trailer.height, 'm')}
+                      {formatDimension(trailer.length, 'm')} × {formatDimension(trailer.width, 'm')}{' '}
+                      × {formatDimension(trailer.height, 'm')}
                     </Typography>
                   </TableCell>
                   <TableCell>{trailer.modelYear}</TableCell>
@@ -432,16 +457,16 @@ const TrailerList = () => {
               Römork bulunamadı
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {searchTerm || filterActive !== '' ? 'Arama kriterlerinizi değiştirmeyi deneyin.' : 'Henüz römork eklenmemiş.'}
+              {searchTerm || filterActive !== ''
+                ? 'Arama kriterlerinizi değiştirmeyi deneyin.'
+                : 'Henüz römork eklenmemiş.'}
             </Typography>
           </Box>
         )}
 
         {/* Add/Edit Trailer Dialog */}
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-          <DialogTitle>
-            {editingTrailer ? 'Römork Düzenle' : 'Yeni Römork Ekle'}
-          </DialogTitle>
+          <DialogTitle>{editingTrailer ? 'Römork Düzenle' : 'Yeni Römork Ekle'}</DialogTitle>
           <DialogContent>
             <Grid container spacing={2} sx={{ mt: 1 }}>
               {/* Basic Information */}
@@ -450,7 +475,7 @@ const TrailerList = () => {
                   Temel Bilgiler
                 </Typography>
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -462,7 +487,7 @@ const TrailerList = () => {
                   helperText={formErrors.trailerNo}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -474,7 +499,7 @@ const TrailerList = () => {
                   helperText={formErrors.vin}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -486,7 +511,7 @@ const TrailerList = () => {
                   helperText={formErrors.make}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -498,7 +523,7 @@ const TrailerList = () => {
                   helperText={formErrors.model}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -511,7 +536,7 @@ const TrailerList = () => {
                   helperText={formErrors.modelYear}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -524,7 +549,7 @@ const TrailerList = () => {
                   placeholder="Flatbed, Container, etc."
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -542,7 +567,7 @@ const TrailerList = () => {
                   Boyutlar
                 </Typography>
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -553,7 +578,7 @@ const TrailerList = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -564,7 +589,7 @@ const TrailerList = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -582,7 +607,7 @@ const TrailerList = () => {
                   Finansal Bilgiler
                 </Typography>
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -594,7 +619,7 @@ const TrailerList = () => {
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -605,7 +630,7 @@ const TrailerList = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              
+
               <Grid item xs={12}>
                 <FormControlLabel
                   control={
@@ -632,15 +657,9 @@ const TrailerList = () => {
               </Button>
             )}
             <Box sx={{ flexGrow: 1 }} />
-            <Button onClick={() => setDialogOpen(false)}>
-              İptal
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              variant="contained"
-              disabled={saving}
-            >
-              {saving ? 'Kaydediliyor...' : (editingTrailer ? 'Güncelle' : 'Kaydet')}
+            <Button onClick={() => setDialogOpen(false)}>İptal</Button>
+            <Button onClick={handleSubmit} variant="contained" disabled={saving}>
+              {saving ? 'Kaydediliyor...' : editingTrailer ? 'Güncelle' : 'Kaydet'}
             </Button>
           </DialogActions>
         </Dialog>
@@ -654,9 +673,7 @@ const TrailerList = () => {
             </Typography>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDeleteDialogOpen(false)}>
-              İptal
-            </Button>
+            <Button onClick={() => setDeleteDialogOpen(false)}>İptal</Button>
             <Button onClick={confirmDelete} color="error" variant="contained">
               Sil
             </Button>
@@ -667,4 +684,4 @@ const TrailerList = () => {
   );
 };
 
-export default TrailerList; 
+export default TrailerList;

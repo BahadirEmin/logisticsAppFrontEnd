@@ -24,7 +24,7 @@ export const countriesAPI = {
   },
 
   // Get country by ID
-  getById: async (id) => {
+  getById: async id => {
     try {
       const response = await axiosInstance.get(`/v1/country-codes/${id}`);
       return response.data;
@@ -35,7 +35,7 @@ export const countriesAPI = {
   },
 
   // Get country by ISO code
-  getByIso: async (isoCode) => {
+  getByIso: async isoCode => {
     try {
       const response = await axiosInstance.get(`/v1/country-codes/iso/${isoCode}`);
       return response.data;
@@ -46,7 +46,7 @@ export const countriesAPI = {
   },
 
   // Get country by numeric code
-  getByNumeric: async (numericCode) => {
+  getByNumeric: async numericCode => {
     try {
       const response = await axiosInstance.get(`/v1/country-codes/numeric/${numericCode}`);
       return response.data;
@@ -57,7 +57,7 @@ export const countriesAPI = {
   },
 
   // Search countries
-  search: async (params) => {
+  search: async params => {
     try {
       const queryString = new URLSearchParams(params).toString();
       const response = await axiosInstance.get(`/v1/country-codes/search?${queryString}`);
@@ -69,9 +69,11 @@ export const countriesAPI = {
   },
 
   // Find country by any name (multi-language)
-  findByName: async (countryName) => {
+  findByName: async countryName => {
     try {
-      const response = await axiosInstance.get(`/v1/country-codes/find/${encodeURIComponent(countryName)}`);
+      const response = await axiosInstance.get(
+        `/v1/country-codes/find/${encodeURIComponent(countryName)}`
+      );
       return response.data;
     } catch (error) {
       console.error('Country find by name API error:', error);
@@ -80,7 +82,7 @@ export const countriesAPI = {
   },
 
   // Create new country
-  create: async (countryData) => {
+  create: async countryData => {
     try {
       const response = await axiosInstance.post('/v1/country-codes', countryData);
       return response.data;
@@ -102,12 +104,12 @@ export const countriesAPI = {
   },
 
   // Delete country (soft delete)
-  delete: async (id) => {
+  delete: async id => {
     try {
       await axiosInstance.delete(`/v1/country-codes/${id}`);
     } catch (error) {
       console.error('Country delete API error:', error);
       throw error;
     }
-  }
+  },
 };

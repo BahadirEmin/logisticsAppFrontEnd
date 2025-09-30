@@ -21,20 +21,17 @@ import {
   Alert,
   CircularProgress,
   Grid,
-  InputAdornment
+  InputAdornment,
 } from '@mui/material';
 import {
   Search as SearchIcon,
   Visibility as VisibilityIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Add as AddIcon,
   Assignment as AssignmentIcon,
-  LocalShipping as VehicleIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
-import { useAuth } from '../../contexts/AuthContext';
 import FleetResourceAssignment from '../../components/FleetResourceAssignment';
 
 const OfferList = () => {
@@ -43,39 +40,30 @@ const OfferList = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [assigningOrder, setAssigningOrder] = useState(null);
   const [assignmentDialog, setAssignmentDialog] = useState({ open: false, order: null });
   const navigate = useNavigate();
-  const { user } = useAuth();
-
-  const tripStatuses = [
-    { value: 'Assigned', label: 'Atanmış' },
-    { value: 'InProgress', label: 'Devam Ediyor' },
-    { value: 'Completed', label: 'Tamamlandı' },
-    { value: 'Cancelled', label: 'İptal Edildi' }
-  ];
 
   // Offer status translation
-  const getStatusTranslation = (status) => {
+  const getStatusTranslation = status => {
     const translations = {
-      'Pending': 'Beklemede',
-      'Approved': 'Onaylandı',
-      'Rejected': 'Reddedildi',
-      'Quote': 'Teklif Aşamasında',
-      'Negotiation': 'Müzakere',
-      'Finalized': 'Kesinleşmiş'
+      Pending: 'Beklemede',
+      Approved: 'Onaylandı',
+      Rejected: 'Reddedildi',
+      Quote: 'Teklif Aşamasında',
+      Negotiation: 'Müzakere',
+      Finalized: 'Kesinleşmiş',
     };
     return translations[status] || status;
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     const colors = {
-      'Pending': 'warning',
-      'Approved': 'success',
-      'Rejected': 'error',
-      'Quote': 'info',
-      'Negotiation': 'primary',
-      'Finalized': 'success'
+      Pending: 'warning',
+      Approved: 'success',
+      Rejected: 'error',
+      Quote: 'info',
+      Negotiation: 'primary',
+      Finalized: 'success',
     };
     return colors[status] || 'default';
   };
@@ -97,15 +85,15 @@ const OfferList = () => {
     fetchOffers();
   }, [fetchOffers]);
 
-  const handleViewDetails = (id) => {
+  const handleViewDetails = id => {
     navigate(`/fleet/offers/${id}`);
   };
 
-  const handleEditOffer = (id) => {
+  const handleEditOffer = id => {
     navigate(`/fleet/offers/${id}/edit`);
   };
 
-  const handleDeleteOffer = async (id) => {
+  const handleDeleteOffer = async id => {
     if (!window.confirm('Bu teklifi silmek istediğinizden emin misiniz?')) {
       return;
     }
@@ -119,7 +107,7 @@ const OfferList = () => {
     }
   };
 
-  const handleAssignResources = (order) => {
+  const handleAssignResources = order => {
     setAssignmentDialog({ open: true, order });
   };
 
@@ -134,14 +122,15 @@ const OfferList = () => {
 
   // Filter offers based on search term and status
   const filteredOffers = offers.filter(offer => {
-    const matchesSearch = !searchTerm || 
+    const matchesSearch =
+      !searchTerm ||
       offer.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       offer.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       offer.pickupLocation?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       offer.deliveryLocation?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = !statusFilter || offer.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -224,7 +213,7 @@ const OfferList = () => {
                 variant="outlined"
                 size="small"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -237,12 +226,10 @@ const OfferList = () => {
             </Grid>
             <Grid item xs={12} md={3}>
               <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
-                <InputLabel shrink>
-                  Durum
-                </InputLabel>
+                <InputLabel shrink>Durum</InputLabel>
                 <Select
                   value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
+                  onChange={e => setStatusFilter(e.target.value)}
                   notched
                   label="Durum"
                 >
@@ -263,14 +250,30 @@ const OfferList = () => {
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: 'grey.50' }}>
-                <TableCell><strong>Sipariş No</strong></TableCell>
-                <TableCell><strong>Müşteri</strong></TableCell>
-                <TableCell><strong>Nereden</strong></TableCell>
-                <TableCell><strong>Nereye</strong></TableCell>
-                <TableCell><strong>Tarih</strong></TableCell>
-                <TableCell><strong>Durum</strong></TableCell>
-                <TableCell><strong>Tutar</strong></TableCell>
-                <TableCell align="center"><strong>İşlemler</strong></TableCell>
+                <TableCell>
+                  <strong>Sipariş No</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Müşteri</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Nereden</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Nereye</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Tarih</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Durum</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Tutar</strong>
+                </TableCell>
+                <TableCell align="center">
+                  <strong>İşlemler</strong>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -283,7 +286,7 @@ const OfferList = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredOffers.map((offer) => (
+                filteredOffers.map(offer => (
                   <TableRow key={offer.id} hover>
                     <TableCell>
                       <Typography variant="body2" fontWeight="medium">
@@ -294,7 +297,9 @@ const OfferList = () => {
                     <TableCell>{offer.pickupLocation}</TableCell>
                     <TableCell>{offer.deliveryLocation}</TableCell>
                     <TableCell>
-                      {offer.pickupDate ? new Date(offer.pickupDate).toLocaleDateString('tr-TR') : '-'}
+                      {offer.pickupDate
+                        ? new Date(offer.pickupDate).toLocaleDateString('tr-TR')
+                        : '-'}
                     </TableCell>
                     <TableCell>
                       <Chip
@@ -371,4 +376,4 @@ const OfferList = () => {
   );
 };
 
-export default OfferList; 
+export default OfferList;

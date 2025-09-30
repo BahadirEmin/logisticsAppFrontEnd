@@ -1,3 +1,3 @@
-import "./SideNavbar.css";
+import './SideNavbar.css';
 
-export { default } from "./SideNavbar";
+export { default } from './SideNavbar';

@@ -25,7 +25,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -36,7 +36,7 @@ import {
   Assignment as AssignmentIcon,
   Download as DownloadIcon,
   Person as PersonIcon,
-  Edit as EditIcon
+  Edit as EditIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
@@ -62,14 +62,14 @@ const OperatorMyOffers = () => {
     { value: 'YOLA_CIKTI', label: 'Yola Çıktı', color: 'primary', icon: <LocalShippingIcon /> },
     { value: 'GUMRUKTE', label: 'Gümrükte', color: 'warning', icon: <ScheduleIcon /> },
     { value: 'TAMAMLANDI', label: 'Tamamlandı', color: 'success', icon: <CheckCircleIcon /> },
-    { value: 'IPTAL_EDILDI', label: 'İptal Edildi', color: 'error', icon: <ScheduleIcon /> }
+    { value: 'IPTAL_EDILDI', label: 'İptal Edildi', color: 'error', icon: <ScheduleIcon /> },
   ];
 
   // Priority options
   const priorityOptions = [
     { value: 'YUKSEK', label: 'Yüksek', color: 'error' },
     { value: 'ORTA', label: 'Orta', color: 'warning' },
-    { value: 'DUSUK', label: 'Düşük', color: 'success' }
+    { value: 'DUSUK', label: 'Düşük', color: 'success' },
   ];
 
   useEffect(() => {
@@ -80,9 +80,9 @@ const OperatorMyOffers = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       let data;
-      
+
       // Get orders based on user role
       if (user?.role === 'operator' || user?.role === 'operation') {
         // For operators, get orders assigned to them
@@ -94,7 +94,7 @@ const OperatorMyOffers = () => {
         // For other roles, get all orders (fallback)
         data = await ordersAPI.getAll();
       }
-      
+
       setOffers(data);
     } catch (err) {
       console.error('Operatör teklifleri yüklenirken hata:', err);
@@ -104,55 +104,62 @@ const OperatorMyOffers = () => {
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     const statusOption = operatorStatusOptions.find(option => option.value === status);
     return statusOption ? statusOption.color : 'default';
   };
 
-  const getStatusLabel = (status) => {
+  const getStatusLabel = status => {
     const statusOption = operatorStatusOptions.find(option => option.value === status);
     return statusOption ? statusOption.label : status;
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     const statusOption = operatorStatusOptions.find(option => option.value === status);
     return statusOption ? statusOption.icon : <ScheduleIcon />;
   };
 
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = priority => {
     const priorityOption = priorityOptions.find(option => option.value === priority);
     return priorityOption ? priorityOption.color : 'default';
   };
 
-  const getPriorityLabel = (priority) => {
+  const getPriorityLabel = priority => {
     const priorityOption = priorityOptions.find(option => option.value === priority);
     return priorityOption ? priorityOption.label : priority;
   };
 
   const filteredOffers = offers.filter(offer => {
-    const matchesSearch = 
-      (offer.customerName || offer.customer?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (offer.departureCity || offer.departureAddress || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (offer.arrivalCity || offer.arrivalAddress || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch =
+      (offer.customerName || offer.customer?.name || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (offer.departureCity || offer.departureAddress || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (offer.arrivalCity || offer.arrivalAddress || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       (offer.cargoType || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       offer.id?.toString().includes(searchTerm);
-    
-    const matchesStatus = statusFilter === 'all' || (offer.tripStatus || offer.status) === statusFilter;
-    
+
+    const matchesStatus =
+      statusFilter === 'all' || (offer.tripStatus || offer.status) === statusFilter;
+
     return matchesSearch && matchesStatus;
   });
 
-  const handleViewOffer = (offerId) => {
-    navigate(`/operator/teklifler/${offerId}`, { 
-      state: { from: '/operator/tekliflerim' } 
+  const handleViewOffer = offerId => {
+    navigate(`/operator/teklifler/${offerId}`, {
+      state: { from: '/operator/tekliflerim' },
     });
   };
 
-  const handleTrackTrip = (offerId) => {
+  const handleTrackTrip = offerId => {
     navigate(`/operator/sefer-takip?orderId=${offerId}`);
   };
 
-  const handleEditOffer = (offer) => {
+  const handleEditOffer = offer => {
     setEditDialog({ open: true, offer: { ...offer } });
   };
 
@@ -162,7 +169,7 @@ const OperatorMyOffers = () => {
 
   const handleSaveOffer = async () => {
     if (!editDialog.offer) return;
-    
+
     try {
       setSaving(true);
       await ordersAPI.update(editDialog.offer.id, editDialog.offer);
@@ -181,13 +188,12 @@ const OperatorMyOffers = () => {
       ...prev,
       offer: {
         ...prev.offer,
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
   };
 
-
-  const handleDownloadDriverDocument = async (orderId) => {
+  const handleDownloadDriverDocument = async orderId => {
     try {
       await ordersAPI.downloadDriverInformationDocument(orderId);
       console.log('Driver information document downloaded successfully');
@@ -272,9 +278,9 @@ const OperatorMyOffers = () => {
               size="small"
               label="Arama"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               InputProps={{
-                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
               }}
             />
           </Grid>
@@ -283,18 +289,14 @@ const OperatorMyOffers = () => {
               <InputLabel shrink>Durum Filtresi</InputLabel>
               <Select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={e => setStatusFilter(e.target.value)}
                 label="Durum Filtresi"
                 notched
               >
                 <MenuItem value="all">Tümü</MenuItem>
-                {operatorStatusOptions.map((status) => (
+                {operatorStatusOptions.map(status => (
                   <MenuItem key={status.value} value={status.value}>
-                    <Chip 
-                      label={status.label} 
-                      color={status.color} 
-                      size="small"
-                    />
+                    <Chip label={status.label} color={status.color} size="small" />
                   </MenuItem>
                 ))}
               </Select>
@@ -309,41 +311,58 @@ const OperatorMyOffers = () => {
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                <TableCell><strong>Teklif No</strong></TableCell>
-                <TableCell><strong>Müşteri</strong></TableCell>
-                <TableCell><strong>Rota</strong></TableCell>
-                <TableCell><strong>Yük Bilgisi</strong></TableCell>
-                <TableCell><strong>Durum</strong></TableCell>
-                <TableCell><strong>Atanma Tarihi</strong></TableCell>
-                <TableCell><strong>Tahmini Teslimat</strong></TableCell>
-                <TableCell><strong>Fiyat</strong></TableCell>
-                <TableCell><strong>İşlemler</strong></TableCell>
+                <TableCell>
+                  <strong>Teklif No</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Müşteri</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Rota</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Yük Bilgisi</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Durum</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Atanma Tarihi</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Tahmini Teslimat</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Fiyat</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>İşlemler</strong>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredOffers.map((offer) => (
-                <TableRow 
-                  key={offer.id} 
-                  hover 
+              {filteredOffers.map(offer => (
+                <TableRow
+                  key={offer.id}
+                  hover
                   onDoubleClick={() => handleTrackTrip(offer.id)}
-                  sx={{ 
+                  sx={{
                     cursor: 'pointer',
                     '&:hover': {
-                      backgroundColor: '#f5f5f5'
-                    }
+                      backgroundColor: '#f5f5f5',
+                    },
                   }}
                 >
                   <TableCell>#{offer.id}</TableCell>
                   <TableCell>{offer.customerName || offer.customer?.name || 'N/A'}</TableCell>
                   <TableCell>
                     <Typography variant="body2">
-                      {offer.departureCity || offer.departureAddress || 'N/A'} → {offer.arrivalCity || offer.arrivalAddress || 'N/A'}
+                      {offer.departureCity || offer.departureAddress || 'N/A'} →{' '}
+                      {offer.arrivalCity || offer.arrivalAddress || 'N/A'}
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2">
-                      {offer.cargoType || 'N/A'}
-                    </Typography>
+                    <Typography variant="body2">{offer.cargoType || 'N/A'}</Typography>
                     <Typography variant="caption" color="text.secondary">
                       {offer.cargoWeightKg ? `${offer.cargoWeightKg} kg` : 'N/A'}
                     </Typography>
@@ -358,10 +377,14 @@ const OperatorMyOffers = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    {offer.createdAt ? new Date(offer.createdAt).toLocaleDateString('tr-TR') : 'N/A'}
+                    {offer.createdAt
+                      ? new Date(offer.createdAt).toLocaleDateString('tr-TR')
+                      : 'N/A'}
                   </TableCell>
                   <TableCell>
-                    {offer.estimatedDeliveryDate ? new Date(offer.estimatedDeliveryDate).toLocaleDateString('tr-TR') : 'N/A'}
+                    {offer.estimatedDeliveryDate
+                      ? new Date(offer.estimatedDeliveryDate).toLocaleDateString('tr-TR')
+                      : 'N/A'}
                   </TableCell>
                   <TableCell>
                     <strong>{offer.price ? `₺${offer.price}` : 'N/A'}</strong>
@@ -369,10 +392,7 @@ const OperatorMyOffers = () => {
                   <TableCell>
                     <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                       <Tooltip title="Detay Görüntüle">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleViewOffer(offer.id)}
-                        >
+                        <IconButton size="small" onClick={() => handleViewOffer(offer.id)}>
                           <VisibilityIcon />
                         </IconButton>
                       </Tooltip>
@@ -386,7 +406,8 @@ const OperatorMyOffers = () => {
                         </IconButton>
                       </Tooltip>
                       {/* Show edit button for assigned offers */}
-                      {(offer.operationPersonId === user?.id || offer.fleetPersonId === user?.id) && (
+                      {(offer.operationPersonId === user?.id ||
+                        offer.fleetPersonId === user?.id) && (
                         <Tooltip title="Düzenle">
                           <IconButton
                             size="small"
@@ -398,7 +419,8 @@ const OperatorMyOffers = () => {
                         </Tooltip>
                       )}
                       {/* Show "Sizin Üzerinizde" icon for assigned offers */}
-                      {(offer.operationPersonId === user?.id || offer.fleetPersonId === user?.id) && (
+                      {(offer.operationPersonId === user?.id ||
+                        offer.fleetPersonId === user?.id) && (
                         <Tooltip title="Sizin Üzerinizde">
                           <PersonIcon color="success" fontSize="small" />
                         </Tooltip>
@@ -419,19 +441,14 @@ const OperatorMyOffers = () => {
       )}
 
       {/* Edit Dialog */}
-      <Dialog
-        open={editDialog.open}
-        onClose={handleCloseEditDialog}
-        maxWidth="md"
-        fullWidth
-      >
+      <Dialog open={editDialog.open} onClose={handleCloseEditDialog} maxWidth="md" fullWidth>
         <DialogTitle>
           <Box display="flex" alignItems="center" gap={1}>
             <EditIcon color="primary" />
             <Typography variant="h6">Teklifi Düzenle</Typography>
           </Box>
         </DialogTitle>
-        
+
         <DialogContent>
           {editDialog.offer && (
             <Box sx={{ mt: 2 }}>
@@ -442,18 +459,18 @@ const OperatorMyOffers = () => {
                     <InputLabel shrink>Durum</InputLabel>
                     <Select
                       value={editDialog.offer.tripStatus || editDialog.offer.status || ''}
-                      onChange={(e) => handleEditInputChange('tripStatus', e.target.value)}
+                      onChange={e => handleEditInputChange('tripStatus', e.target.value)}
                       label="Durum"
                       notched
                     >
-                      {operatorStatusOptions.map((status) => (
+                      {operatorStatusOptions.map(status => (
                         <MenuItem key={status.value} value={status.value}>
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             {status.icon}
-                            <Chip 
-                              label={status.label} 
-                              color={status.color} 
-                              size="small" 
+                            <Chip
+                              label={status.label}
+                              color={status.color}
+                              size="small"
                               sx={{ ml: 1 }}
                             />
                           </Box>
@@ -469,7 +486,7 @@ const OperatorMyOffers = () => {
                     fullWidth
                     label="Kalkış Adresi"
                     value={editDialog.offer.departureAddress || ''}
-                    onChange={(e) => handleEditInputChange('departureAddress', e.target.value)}
+                    onChange={e => handleEditInputChange('departureAddress', e.target.value)}
                     multiline
                     rows={2}
                   />
@@ -481,7 +498,7 @@ const OperatorMyOffers = () => {
                     fullWidth
                     label="Varış Adresi"
                     value={editDialog.offer.arrivalAddress || ''}
-                    onChange={(e) => handleEditInputChange('arrivalAddress', e.target.value)}
+                    onChange={e => handleEditInputChange('arrivalAddress', e.target.value)}
                     multiline
                     rows={2}
                   />
@@ -493,7 +510,7 @@ const OperatorMyOffers = () => {
                     fullWidth
                     label="Yük Tipi"
                     value={editDialog.offer.cargoType || ''}
-                    onChange={(e) => handleEditInputChange('cargoType', e.target.value)}
+                    onChange={e => handleEditInputChange('cargoType', e.target.value)}
                   />
                 </Grid>
 
@@ -504,7 +521,7 @@ const OperatorMyOffers = () => {
                     label="Ağırlık (kg)"
                     type="number"
                     value={editDialog.offer.cargoWeightKg || ''}
-                    onChange={(e) => handleEditInputChange('cargoWeightKg', Number(e.target.value))}
+                    onChange={e => handleEditInputChange('cargoWeightKg', Number(e.target.value))}
                   />
                 </Grid>
 
@@ -515,7 +532,7 @@ const OperatorMyOffers = () => {
                     label="Fiyat (₺)"
                     type="number"
                     value={editDialog.offer.price || editDialog.offer.quotePrice || ''}
-                    onChange={(e) => handleEditInputChange('price', Number(e.target.value))}
+                    onChange={e => handleEditInputChange('price', Number(e.target.value))}
                   />
                 </Grid>
 
@@ -525,8 +542,12 @@ const OperatorMyOffers = () => {
                     fullWidth
                     label="Tahmini Teslimat Tarihi"
                     type="date"
-                    value={editDialog.offer.estimatedDeliveryDate ? editDialog.offer.estimatedDeliveryDate.split('T')[0] : ''}
-                    onChange={(e) => handleEditInputChange('estimatedDeliveryDate', e.target.value)}
+                    value={
+                      editDialog.offer.estimatedDeliveryDate
+                        ? editDialog.offer.estimatedDeliveryDate.split('T')[0]
+                        : ''
+                    }
+                    onChange={e => handleEditInputChange('estimatedDeliveryDate', e.target.value)}
                     InputLabelProps={{ shrink: true }}
                   />
                 </Grid>
@@ -537,7 +558,7 @@ const OperatorMyOffers = () => {
                     fullWidth
                     label="Notlar"
                     value={editDialog.offer.notes || ''}
-                    onChange={(e) => handleEditInputChange('notes', e.target.value)}
+                    onChange={e => handleEditInputChange('notes', e.target.value)}
                     multiline
                     rows={3}
                   />
@@ -546,13 +567,9 @@ const OperatorMyOffers = () => {
             </Box>
           )}
         </DialogContent>
-        
+
         <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button
-            onClick={handleCloseEditDialog}
-            disabled={saving}
-            color="inherit"
-          >
+          <Button onClick={handleCloseEditDialog} disabled={saving} color="inherit">
             İptal
           </Button>
           <Button
@@ -570,4 +587,4 @@ const OperatorMyOffers = () => {
   );
 };
 
-export default OperatorMyOffers; 
+export default OperatorMyOffers;

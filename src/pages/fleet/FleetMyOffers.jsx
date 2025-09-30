@@ -30,7 +30,7 @@ import {
   Button,
   List,
   ListItem,
-  ListItemText
+  ListItemText,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -46,7 +46,7 @@ import {
   Close as CloseIcon,
   LocationOn as LocationIcon,
   Business as BusinessIcon,
-  CalendarToday as CalendarIcon
+  CalendarToday as CalendarIcon,
 } from '@mui/icons-material';
 import { ordersAPI } from '../../api/orders';
 import { useAuth } from '../../contexts/AuthContext';
@@ -59,7 +59,11 @@ const FleetMyOffers = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [assignmentDialog, setAssignmentDialog] = useState({ open: false, order: null });
-  const [orderDetailsDialog, setOrderDetailsDialog] = useState({ open: false, order: null, loading: false });
+  const [orderDetailsDialog, setOrderDetailsDialog] = useState({
+    open: false,
+    order: null,
+    loading: false,
+  });
   const { user } = useAuth();
 
   // Fleet-specific status options
@@ -67,14 +71,14 @@ const FleetMyOffers = () => {
     { value: 'pending', label: 'Beklemede', color: 'default', icon: <Schedule /> },
     { value: 'approved', label: 'Onaylandı', color: 'success', icon: <CheckCircle /> },
     { value: 'in_transit', label: 'Yolda', color: 'primary', icon: <LocalShipping /> },
-    { value: 'delivered', label: 'Teslim Edildi', color: 'info', icon: <CheckCircle /> }
+    { value: 'delivered', label: 'Teslim Edildi', color: 'info', icon: <CheckCircle /> },
   ];
 
   const loadFleetOffers = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Get orders assigned to fleet user
       console.log('Fetching orders for fleet person ID:', user.id);
       const data = await ordersAPI.getByFleetPersonId(user.id);
@@ -92,35 +96,42 @@ const FleetMyOffers = () => {
     loadFleetOffers();
   }, [loadFleetOffers]);
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     const statusOption = fleetStatusOptions.find(option => option.value === status);
     return statusOption ? statusOption.icon : <Schedule />;
   };
 
-  const getStatusLabel = (status) => {
+  const getStatusLabel = status => {
     const statusOption = fleetStatusOptions.find(option => option.value === status);
     return statusOption ? statusOption.label : status;
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     const statusOption = fleetStatusOptions.find(option => option.value === status);
     return statusOption ? statusOption.color : 'default';
   };
 
   const filteredOffers = offers.filter(offer => {
-    const matchesSearch = 
-      (offer.customerName || offer.customer?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (offer.departureCity || offer.departureAddress || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (offer.arrivalCity || offer.arrivalAddress || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch =
+      (offer.customerName || offer.customer?.name || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (offer.departureCity || offer.departureAddress || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (offer.arrivalCity || offer.arrivalAddress || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       (offer.cargoType || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       offer.id?.toString().includes(searchTerm);
-    
-    const matchesStatus = statusFilter === 'all' || (offer.tripStatus || offer.status) === statusFilter;
-    
+
+    const matchesStatus =
+      statusFilter === 'all' || (offer.tripStatus || offer.status) === statusFilter;
+
     return matchesSearch && matchesStatus;
   });
 
-  const handleViewOffer = async (offerId) => {
+  const handleViewOffer = async offerId => {
     try {
       setOrderDetailsDialog({ open: true, order: null, loading: true });
       const orderDetails = await ordersAPI.getById(offerId);
@@ -132,7 +143,7 @@ const FleetMyOffers = () => {
     }
   };
 
-  const handleAssignResources = (order) => {
+  const handleAssignResources = order => {
     setAssignmentDialog({ open: true, order });
   };
 
@@ -149,35 +160,44 @@ const FleetMyOffers = () => {
     loadFleetOffers();
   };
 
-  const renderResourceIcons = (offer) => {
+  const renderResourceIcons = offer => {
     const hasVehicle = offer.vehicleId || offer.vehicle || offer.assignedTruckId;
     const hasDriver = offer.driverId || offer.driver || offer.assignedDriverId;
     const hasTrailer = offer.trailerId || offer.trailer || offer.assignedTrailerId;
-    
+
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         {/* Truck Icon */}
-        <Tooltip title={hasVehicle ? `Araç: ${offer.vehicle?.plateNumber || offer.vehicleId || offer.assignedTruckId}` : 'Araç atanmamış'}>
-          <TruckIcon 
-            color={hasVehicle ? "primary" : "disabled"} 
-            sx={{ fontSize: 24 }} 
-          />
+        <Tooltip
+          title={
+            hasVehicle
+              ? `Araç: ${offer.vehicle?.plateNumber || offer.vehicleId || offer.assignedTruckId}`
+              : 'Araç atanmamış'
+          }
+        >
+          <TruckIcon color={hasVehicle ? 'primary' : 'disabled'} sx={{ fontSize: 24 }} />
         </Tooltip>
-        
+
         {/* Driver Icon */}
-        <Tooltip title={hasDriver ? `Şoför: ${offer.driver?.name || offer.driverId || offer.assignedDriverId}` : 'Şoför atanmamış'}>
-          <DriverIcon 
-            color={hasDriver ? "success" : "disabled"} 
-            sx={{ fontSize: 24 }} 
-          />
+        <Tooltip
+          title={
+            hasDriver
+              ? `Şoför: ${offer.driver?.name || offer.driverId || offer.assignedDriverId}`
+              : 'Şoför atanmamış'
+          }
+        >
+          <DriverIcon color={hasDriver ? 'success' : 'disabled'} sx={{ fontSize: 24 }} />
         </Tooltip>
-        
+
         {/* Trailer Icon */}
-        <Tooltip title={hasTrailer ? `Römork: ${offer.trailer?.plateNumber || offer.trailerId || offer.assignedTrailerId}` : 'Römork atanmamış'}>
-          <TrailerIcon 
-            color={hasTrailer ? "warning" : "disabled"} 
-            sx={{ fontSize: 24 }} 
-          />
+        <Tooltip
+          title={
+            hasTrailer
+              ? `Römork: ${offer.trailer?.plateNumber || offer.trailerId || offer.assignedTrailerId}`
+              : 'Römork atanmamış'
+          }
+        >
+          <TrailerIcon color={hasTrailer ? 'warning' : 'disabled'} sx={{ fontSize: 24 }} />
         </Tooltip>
       </Box>
     );
@@ -258,9 +278,9 @@ const FleetMyOffers = () => {
               size="small"
               label="Arama"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               InputProps={{
-                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
               }}
             />
           </Grid>
@@ -269,21 +289,16 @@ const FleetMyOffers = () => {
               <InputLabel shrink>Durum Filtresi</InputLabel>
               <Select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={e => setStatusFilter(e.target.value)}
                 label="Durum Filtresi"
                 notched
               >
                 <MenuItem value="all">Tümü</MenuItem>
-                {fleetStatusOptions.map((status) => (
+                {fleetStatusOptions.map(status => (
                   <MenuItem key={status.value} value={status.value}>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       {status.icon}
-                      <Chip 
-                        label={status.label} 
-                        color={status.color} 
-                        size="small" 
-                        sx={{ ml: 1 }}
-                      />
+                      <Chip label={status.label} color={status.color} size="small" sx={{ ml: 1 }} />
                     </Box>
                   </MenuItem>
                 ))}
@@ -293,7 +308,7 @@ const FleetMyOffers = () => {
           <Grid item xs={12} md={3}>
             <Box display="flex" justifyContent="flex-end">
               <Tooltip title="Filtreleri Temizle">
-                <IconButton 
+                <IconButton
                   onClick={() => {
                     setSearchTerm('');
                     setStatusFilter('all');
@@ -339,39 +354,56 @@ const FleetMyOffers = () => {
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                <TableCell><strong>Teklif No</strong></TableCell>
-                <TableCell><strong>Müşteri</strong></TableCell>
-                <TableCell><strong>Rota</strong></TableCell>
-                <TableCell><strong>Yük Bilgisi</strong></TableCell>
-                <TableCell><strong>Kaynak Durumu</strong></TableCell>
-                <TableCell><strong>Durum</strong></TableCell>
-                <TableCell><strong>Atanma Tarihi</strong></TableCell>
-                <TableCell><strong>Tahmini Teslimat</strong></TableCell>
-                <TableCell><strong>Fiyat</strong></TableCell>
-                <TableCell><strong>İşlemler</strong></TableCell>
+                <TableCell>
+                  <strong>Teklif No</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Müşteri</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Rota</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Yük Bilgisi</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Kaynak Durumu</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Durum</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Atanma Tarihi</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Tahmini Teslimat</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Fiyat</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>İşlemler</strong>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredOffers.map((offer) => (
+              {filteredOffers.map(offer => (
                 <TableRow key={offer.id} hover>
                   <TableCell>#{offer.id}</TableCell>
                   <TableCell>{offer.customerName || offer.customer?.name || 'N/A'}</TableCell>
                   <TableCell>
                     <Typography variant="body2">
-                      {offer.departureCity || offer.departureAddress || 'N/A'} → {offer.arrivalCity || offer.arrivalAddress || 'N/A'}
+                      {offer.departureCity || offer.departureAddress || 'N/A'} →{' '}
+                      {offer.arrivalCity || offer.arrivalAddress || 'N/A'}
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2">
-                      {offer.cargoType || 'N/A'}
-                    </Typography>
+                    <Typography variant="body2">{offer.cargoType || 'N/A'}</Typography>
                     <Typography variant="caption" color="text.secondary">
                       {offer.cargoWeightKg ? `${offer.cargoWeightKg} kg` : 'N/A'}
                     </Typography>
                   </TableCell>
-                  <TableCell>
-                    {renderResourceIcons(offer)}
-                  </TableCell>
+                  <TableCell>{renderResourceIcons(offer)}</TableCell>
                   <TableCell>
                     <Chip
                       icon={getStatusIcon(offer.tripStatus || offer.status)}
@@ -382,10 +414,14 @@ const FleetMyOffers = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    {offer.createdAt ? new Date(offer.createdAt).toLocaleDateString('tr-TR') : 'N/A'}
+                    {offer.createdAt
+                      ? new Date(offer.createdAt).toLocaleDateString('tr-TR')
+                      : 'N/A'}
                   </TableCell>
                   <TableCell>
-                    {offer.estimatedDeliveryDate ? new Date(offer.estimatedDeliveryDate).toLocaleDateString('tr-TR') : 'N/A'}
+                    {offer.estimatedDeliveryDate
+                      ? new Date(offer.estimatedDeliveryDate).toLocaleDateString('tr-TR')
+                      : 'N/A'}
                   </TableCell>
                   <TableCell>
                     <strong>{offer.price ? `₺${offer.price}` : 'N/A'}</strong>
@@ -393,10 +429,7 @@ const FleetMyOffers = () => {
                   <TableCell>
                     <Box sx={{ display: 'flex', gap: 1 }}>
                       <Tooltip title="Detay Görüntüle">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleViewOffer(offer.id)}
-                        >
+                        <IconButton size="small" onClick={() => handleViewOffer(offer.id)}>
                           <VisibilityIcon />
                         </IconButton>
                       </Tooltip>
@@ -431,10 +464,12 @@ const FleetMyOffers = () => {
         maxWidth="md"
         fullWidth
         PaperProps={{
-          sx: { minHeight: '60vh' }
+          sx: { minHeight: '60vh' },
         }}
       >
-        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <DialogTitle
+          sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+        >
           <Typography variant="h6" component="div">
             Sipariş Detayları
           </Typography>
@@ -454,39 +489,56 @@ const FleetMyOffers = () => {
                 <Grid item xs={12} md={6}>
                   <Card variant="outlined">
                     <CardContent>
-                      <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Typography
+                        variant="h6"
+                        gutterBottom
+                        sx={{ display: 'flex', alignItems: 'center' }}
+                      >
                         <BusinessIcon sx={{ mr: 1 }} />
                         Sipariş Bilgileri
                       </Typography>
                       <List dense>
                         <ListItem>
-                          <ListItemText 
-                            primary="Sipariş No" 
+                          <ListItemText
+                            primary="Sipariş No"
                             secondary={`#${orderDetailsDialog.order.id}`}
                           />
                         </ListItem>
                         <ListItem>
-                          <ListItemText 
-                            primary="Müşteri" 
-                            secondary={orderDetailsDialog.order.customerName || orderDetailsDialog.order.customer?.name || 'N/A'}
+                          <ListItemText
+                            primary="Müşteri"
+                            secondary={
+                              orderDetailsDialog.order.customerName ||
+                              orderDetailsDialog.order.customer?.name ||
+                              'N/A'
+                            }
                           />
                         </ListItem>
                         <ListItem>
-                          <ListItemText 
-                            primary="Durum" 
+                          <ListItemText
+                            primary="Durum"
                             secondary={
                               <Chip
-                                icon={getStatusIcon(orderDetailsDialog.order.tripStatus || orderDetailsDialog.order.status)}
-                                label={getStatusLabel(orderDetailsDialog.order.tripStatus || orderDetailsDialog.order.status)}
-                                color={getStatusColor(orderDetailsDialog.order.tripStatus || orderDetailsDialog.order.status)}
+                                icon={getStatusIcon(
+                                  orderDetailsDialog.order.tripStatus ||
+                                    orderDetailsDialog.order.status
+                                )}
+                                label={getStatusLabel(
+                                  orderDetailsDialog.order.tripStatus ||
+                                    orderDetailsDialog.order.status
+                                )}
+                                color={getStatusColor(
+                                  orderDetailsDialog.order.tripStatus ||
+                                    orderDetailsDialog.order.status
+                                )}
                                 size="small"
                               />
                             }
                           />
                         </ListItem>
                         <ListItem>
-                          <ListItemText 
-                            primary="Fiyat" 
+                          <ListItemText
+                            primary="Fiyat"
                             secondary={
                               <Typography variant="h6" color="success.main">
                                 ₺{orderDetailsDialog.order.price || 'N/A'}
@@ -498,37 +550,53 @@ const FleetMyOffers = () => {
                     </CardContent>
                   </Card>
                 </Grid>
-                
+
                 <Grid item xs={12} md={6}>
                   <Card variant="outlined">
                     <CardContent>
-                      <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Typography
+                        variant="h6"
+                        gutterBottom
+                        sx={{ display: 'flex', alignItems: 'center' }}
+                      >
                         <LocationIcon sx={{ mr: 1 }} />
                         Rota Bilgileri
                       </Typography>
                       <List dense>
                         <ListItem>
-                          <ListItemText 
-                            primary="Kalkış" 
-                            secondary={orderDetailsDialog.order.departureCity || orderDetailsDialog.order.departureAddress || 'N/A'}
+                          <ListItemText
+                            primary="Kalkış"
+                            secondary={
+                              orderDetailsDialog.order.departureCity ||
+                              orderDetailsDialog.order.departureAddress ||
+                              'N/A'
+                            }
                           />
                         </ListItem>
                         <ListItem>
-                          <ListItemText 
-                            primary="Varış" 
-                            secondary={orderDetailsDialog.order.arrivalCity || orderDetailsDialog.order.arrivalAddress || 'N/A'}
+                          <ListItemText
+                            primary="Varış"
+                            secondary={
+                              orderDetailsDialog.order.arrivalCity ||
+                              orderDetailsDialog.order.arrivalAddress ||
+                              'N/A'
+                            }
                           />
                         </ListItem>
                         <ListItem>
-                          <ListItemText 
-                            primary="Yük Türü" 
+                          <ListItemText
+                            primary="Yük Türü"
                             secondary={orderDetailsDialog.order.cargoType || 'N/A'}
                           />
                         </ListItem>
                         <ListItem>
-                          <ListItemText 
-                            primary="Yük Ağırlığı" 
-                            secondary={orderDetailsDialog.order.cargoWeightKg ? `${orderDetailsDialog.order.cargoWeightKg} kg` : 'N/A'}
+                          <ListItemText
+                            primary="Yük Ağırlığı"
+                            secondary={
+                              orderDetailsDialog.order.cargoWeightKg
+                                ? `${orderDetailsDialog.order.cargoWeightKg} kg`
+                                : 'N/A'
+                            }
                           />
                         </ListItem>
                       </List>
@@ -540,40 +608,77 @@ const FleetMyOffers = () => {
               {/* Assigned Resources */}
               <Card variant="outlined" sx={{ mb: 3 }}>
                 <CardContent>
-                  <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    sx={{ display: 'flex', alignItems: 'center' }}
+                  >
                     <AssignmentIcon sx={{ mr: 1 }} />
                     Atanan Kaynaklar
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={12} md={4}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          p: 2,
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          borderRadius: 1,
+                        }}
+                      >
                         <TruckIcon color="primary" sx={{ mr: 2 }} />
                         <Box>
                           <Typography variant="subtitle2">Araç</Typography>
                           <Typography variant="body2" color="text.secondary">
-                            {orderDetailsDialog.order.vehicle?.plateNumber || orderDetailsDialog.order.vehicleId || 'Atanmamış'}
+                            {orderDetailsDialog.order.vehicle?.plateNumber ||
+                              orderDetailsDialog.order.vehicleId ||
+                              'Atanmamış'}
                           </Typography>
                         </Box>
                       </Box>
                     </Grid>
                     <Grid item xs={12} md={4}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          p: 2,
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          borderRadius: 1,
+                        }}
+                      >
                         <DriverIcon color="success" sx={{ mr: 2 }} />
                         <Box>
                           <Typography variant="subtitle2">Şoför</Typography>
                           <Typography variant="body2" color="text.secondary">
-                            {orderDetailsDialog.order.driver?.name || orderDetailsDialog.order.driverId || 'Atanmamış'}
+                            {orderDetailsDialog.order.driver?.name ||
+                              orderDetailsDialog.order.driverId ||
+                              'Atanmamış'}
                           </Typography>
                         </Box>
                       </Box>
                     </Grid>
                     <Grid item xs={12} md={4}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          p: 2,
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          borderRadius: 1,
+                        }}
+                      >
                         <TrailerIcon color="warning" sx={{ mr: 2 }} />
                         <Box>
                           <Typography variant="subtitle2">Römork</Typography>
                           <Typography variant="body2" color="text.secondary">
-                            {orderDetailsDialog.order.trailer?.plateNumber || orderDetailsDialog.order.trailerId || 'Atanmamış'}
+                            {orderDetailsDialog.order.trailer?.plateNumber ||
+                              orderDetailsDialog.order.trailerId ||
+                              'Atanmamış'}
                           </Typography>
                         </Box>
                       </Box>
@@ -585,7 +690,11 @@ const FleetMyOffers = () => {
               {/* Additional Details */}
               <Card variant="outlined">
                 <CardContent>
-                  <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    sx={{ display: 'flex', alignItems: 'center' }}
+                  >
                     <CalendarIcon sx={{ mr: 1 }} />
                     Tarih Bilgileri
                   </Typography>
@@ -595,7 +704,9 @@ const FleetMyOffers = () => {
                         Oluşturulma Tarihi
                       </Typography>
                       <Typography variant="body1">
-                        {orderDetailsDialog.order.createdAt ? new Date(orderDetailsDialog.order.createdAt).toLocaleDateString('tr-TR') : 'N/A'}
+                        {orderDetailsDialog.order.createdAt
+                          ? new Date(orderDetailsDialog.order.createdAt).toLocaleDateString('tr-TR')
+                          : 'N/A'}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -603,7 +714,11 @@ const FleetMyOffers = () => {
                         Tahmini Teslimat
                       </Typography>
                       <Typography variant="body1">
-                        {orderDetailsDialog.order.estimatedDeliveryDate ? new Date(orderDetailsDialog.order.estimatedDeliveryDate).toLocaleDateString('tr-TR') : 'N/A'}
+                        {orderDetailsDialog.order.estimatedDeliveryDate
+                          ? new Date(
+                              orderDetailsDialog.order.estimatedDeliveryDate
+                            ).toLocaleDateString('tr-TR')
+                          : 'N/A'}
                       </Typography>
                     </Grid>
                   </Grid>
@@ -617,7 +732,7 @@ const FleetMyOffers = () => {
             Kapat
           </Button>
           {orderDetailsDialog.order && (
-            <Button 
+            <Button
               onClick={() => {
                 handleCloseOrderDetails();
                 handleAssignResources(orderDetailsDialog.order);
@@ -643,4 +758,4 @@ const FleetMyOffers = () => {
   );
 };
 
-export default FleetMyOffers; 
+export default FleetMyOffers;

@@ -10,7 +10,7 @@ import {
   Avatar,
   Divider,
   Alert,
-  CircularProgress
+  CircularProgress,
 } from '@mui/material';
 import { Person, Save, Edit } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
@@ -25,15 +25,15 @@ const OperatorProfile = () => {
     email: user?.email || '',
     phone: user?.phone || '',
     department: user?.department || 'Operasyon',
-    position: user?.position || 'Operatör'
+    position: user?.position || 'Operatör',
   });
   const [message, setMessage] = useState('');
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -151,11 +151,7 @@ const OperatorProfile = () => {
         <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
           {editing ? (
             <>
-              <Button
-                variant="outlined"
-                onClick={() => setEditing(false)}
-                disabled={loading}
-              >
+              <Button variant="outlined" onClick={() => setEditing(false)} disabled={loading}>
                 İptal
               </Button>
               <Button
@@ -168,11 +164,7 @@ const OperatorProfile = () => {
               </Button>
             </>
           ) : (
-            <Button
-              variant="contained"
-              onClick={() => setEditing(true)}
-              startIcon={<Edit />}
-            >
+            <Button variant="contained" onClick={() => setEditing(true)} startIcon={<Edit />}>
               Düzenle
             </Button>
           )}
@@ -182,4 +174,4 @@ const OperatorProfile = () => {
   );
 };
 
-export default OperatorProfile; 
+export default OperatorProfile;

@@ -9,7 +9,7 @@ import {
   Alert,
   InputAdornment,
   IconButton,
-  CircularProgress
+  CircularProgress,
 } from '@mui/material';
 import { Visibility, VisibilityOff, Login as LoginIcon } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -18,7 +18,7 @@ import { useAuth } from '../../contexts/AuthContext';
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     username: '',
-    password: ''
+    password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
@@ -30,11 +30,11 @@ const LoginPage = () => {
   useEffect(() => {
     if (isAuthenticated) {
       const from = location.state?.from?.pathname;
-      
+
       console.log('LoginPage - User object:', user);
       console.log('LoginPage - User role:', user?.role);
       console.log('LoginPage - User role type:', typeof user?.role);
-      
+
       // If there's a specific redirect path, use it
       if (from) {
         console.log('LoginPage - Redirecting to specific path:', from);
@@ -42,7 +42,7 @@ const LoginPage = () => {
       } else {
         // Otherwise, redirect based on user role
         let defaultPath = '/sales'; // fallback
-        
+
         if (user?.role) {
           console.log('LoginPage - Processing role:', user.role);
           switch (user.role) {
@@ -70,32 +70,32 @@ const LoginPage = () => {
         } else {
           console.log('LoginPage - No user role found, using default path:', defaultPath);
         }
-        
+
         console.log('LoginPage - Final redirect path:', defaultPath);
         navigate(defaultPath, { replace: true });
       }
     }
   }, [isAuthenticated, navigate, location, user]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
+
     // Clear error when user types
     if (formErrors[name]) {
       setFormErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     // Validate form
     const errors = {};
     if (!formData.username.trim()) {
@@ -104,7 +104,7 @@ const LoginPage = () => {
     if (!formData.password.trim()) {
       errors.password = 'Şifre zorunludur';
     }
-    
+
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
@@ -134,7 +134,7 @@ const LoginPage = () => {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          py: 4
+          py: 4,
         }}
       >
         <Paper
@@ -144,7 +144,7 @@ const LoginPage = () => {
             width: '100%',
             borderRadius: 2,
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white'
+            color: 'white',
           }}
         >
           <Box sx={{ textAlign: 'center', mb: 4 }}>
@@ -296,4 +296,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage; 
+export default LoginPage;

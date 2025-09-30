@@ -1,11 +1,11 @@
-import api from "./axios";
+import api from './axios';
 
 // Vehicle API functions
 export const vehicleAPI = {
   // Get all vehicles
   getAll: async () => {
     try {
-      const response = await api.get("/v1/vehicles");
+      const response = await api.get('/v1/vehicles');
       return response.data;
     } catch (error) {
       throw error;
@@ -13,7 +13,7 @@ export const vehicleAPI = {
   },
 
   // Get vehicle by ID
-  getById: async (id) => {
+  getById: async id => {
     try {
       const response = await api.get(`/v1/vehicles/${id}`);
       return response.data;
@@ -23,9 +23,9 @@ export const vehicleAPI = {
   },
 
   // Create new vehicle
-  create: async (vehicleData) => {
+  create: async vehicleData => {
     try {
-      const response = await api.post("/v1/vehicles", vehicleData);
+      const response = await api.post('/v1/vehicles', vehicleData);
       return response.data;
     } catch (error) {
       throw error;
@@ -43,7 +43,7 @@ export const vehicleAPI = {
   },
 
   // Delete vehicle
-  delete: async (id) => {
+  delete: async id => {
     try {
       const response = await api.delete(`/v1/vehicles/${id}`);
       return response.data;

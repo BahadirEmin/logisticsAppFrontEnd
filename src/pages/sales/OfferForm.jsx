@@ -19,7 +19,7 @@ import {
   Alert,
   Divider,
   CircularProgress,
-  IconButton
+  IconButton,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { ArrowForward, ArrowBack, Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
@@ -39,14 +39,14 @@ const cargoTypes = [
   'Proje Yükü',
   'Ağır Nakliye',
   'Ekspres Kargo',
-  'Parça Eşya'
+  'Parça Eşya',
 ];
 
 const currencies = [
   { value: 'TRY', label: 'TL (Türk Lirası)', symbol: '₺' },
   { value: 'EUR', label: 'EURO', symbol: '€' },
   { value: 'USD', label: 'DOLAR', symbol: '$' },
-  { value: 'GBP', label: 'STERLİN', symbol: '£' }
+  { value: 'GBP', label: 'STERLİN', symbol: '£' },
 ];
 
 const OfferForm = () => {
@@ -59,7 +59,7 @@ const OfferForm = () => {
   const [formData, setFormData] = useState({
     // Customer selection
     customerId: '',
-    
+
     // Step 1: Route and Cargo Info
     fromAddress: {
       country: 'Türkiye',
@@ -69,7 +69,7 @@ const OfferForm = () => {
       zipCode: '',
       contactPerson: '',
       phone: '',
-      email: ''
+      email: '',
     },
     toAddress: {
       country: 'Türkiye',
@@ -79,7 +79,7 @@ const OfferForm = () => {
       zipCode: '',
       contactPerson: '',
       phone: '',
-      email: ''
+      email: '',
     },
     // Cargo items array for multiple cargo support
     cargoItems: [
@@ -88,23 +88,23 @@ const OfferForm = () => {
         dimensions: {
           length: '',
           width: '',
-          height: ''
+          height: '',
         },
         cargoType: '',
         weight: '',
-        description: ''
-      }
+        description: '',
+      },
     ],
     transferable: false,
-    
+
     // Step 2: Additional Info (will be added)
     customerName: '',
     customerPhone: '',
     customerEmail: '',
     specialRequirements: '',
-    
+
     // Step 3: Pricing
-    quotePrice: ''
+    quotePrice: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -153,29 +153,33 @@ const OfferForm = () => {
   const loadCountries = async () => {
     try {
       const countriesData = await countriesAPI.getActive();
-      
+
       // Ülkeleri Türkçe isme göre alfabetik sıraya koy
       const sortedCountries = countriesData
-        .filter(country => country.isActive && country.countryNameTr && country.countryNameTr !== 'DİĞER')
-        .sort((a, b) => a.countryNameTr.localeCompare(b.countryNameTr, 'tr', { sensitivity: 'base' }));
-      
+        .filter(
+          country => country.isActive && country.countryNameTr && country.countryNameTr !== 'DİĞER'
+        )
+        .sort((a, b) =>
+          a.countryNameTr.localeCompare(b.countryNameTr, 'tr', { sensitivity: 'base' })
+        );
+
       // "DİĞER" seçeneğini en sona ekle (varsa)
       const otherCountry = countriesData.find(country => country.countryNameTr === 'DİĞER');
       if (otherCountry) {
         sortedCountries.push(otherCountry);
       }
-      
+
       setCountries(sortedCountries);
     } catch (error) {
       console.error('Error loading countries:', error);
     }
   };
 
-  const handleCustomerChange = (e) => {
+  const handleCustomerChange = e => {
     const customerId = e.target.value;
     setFormData(prev => ({
       ...prev,
-      customerId
+      customerId,
     }));
 
     // Auto-fill customer information if customer is selected
@@ -187,7 +191,7 @@ const OfferForm = () => {
           customerId,
           customerName: selectedCustomer.name,
           customerPhone: selectedCustomer.phoneNumber || '',
-          customerEmail: selectedCustomer.email || ''
+          customerEmail: selectedCustomer.email || '',
         }));
       }
     }
@@ -196,12 +200,10 @@ const OfferForm = () => {
     if (errors.customerId) {
       setErrors(prev => ({
         ...prev,
-        customerId: ''
+        customerId: '',
       }));
     }
   };
-
-
 
   // Add new cargo item
   const addCargoItem = () => {
@@ -214,30 +216,30 @@ const OfferForm = () => {
           dimensions: { length: '', width: '', height: '' },
           cargoType: '',
           weight: '',
-          description: ''
-        }
-      ]
+          description: '',
+        },
+      ],
     }));
   };
 
   // Remove cargo item
-  const removeCargoItem = (index) => {
+  const removeCargoItem = index => {
     if (formData.cargoItems.length > 1) {
       setFormData(prev => ({
         ...prev,
-        cargoItems: prev.cargoItems.filter((_, i) => i !== index)
+        cargoItems: prev.cargoItems.filter((_, i) => i !== index),
       }));
     }
   };
 
   const validateStep1 = () => {
     const newErrors = {};
-    
+
     // Validate customer selection
     if (!formData.customerId) {
       newErrors.customerId = 'Müşteri seçimi zorunludur';
     }
-    
+
     // Validate from address - Zorunlu alanlar: Ülke, Şehir, Posta kodu
     if (!formData.fromAddress.country.trim()) {
       newErrors['fromAddress.country'] = 'Kalkış ülkesi seçimi zorunludur';
@@ -248,7 +250,7 @@ const OfferForm = () => {
     if (!formData.fromAddress.zipCode.trim()) {
       newErrors['fromAddress.zipCode'] = 'Kalkış posta kodu zorunludur';
     }
-    
+
     // Validate to address - Zorunlu alanlar: Ülke, Şehir, Posta kodu
     if (!formData.toAddress.country.trim()) {
       newErrors['toAddress.country'] = 'Varış ülkesi seçimi zorunludur';
@@ -259,11 +261,12 @@ const OfferForm = () => {
     if (!formData.toAddress.zipCode.trim()) {
       newErrors['toAddress.zipCode'] = 'Varış posta kodu zorunludur';
     }
-    
+
     // Validate cargo items - Zorunlu alanlar: Ölçüler, Yük tipi, Ağırlık
     formData.cargoItems.forEach((item, index) => {
       if (!item.dimensions.length || !item.dimensions.width || !item.dimensions.height) {
-        newErrors[`cargoItems.${index}.dimensions`] = 'Tüm ölçü alanları zorunludur (uzunluk, genişlik, yükseklik)';
+        newErrors[`cargoItems.${index}.dimensions`] =
+          'Tüm ölçü alanları zorunludur (uzunluk, genişlik, yükseklik)';
       }
       if (!item.cargoType) {
         newErrors[`cargoItems.${index}.cargoType`] = 'Yük tipi seçimi zorunludur';
@@ -272,7 +275,7 @@ const OfferForm = () => {
         newErrors[`cargoItems.${index}.weight`] = 'Geçerli bir ağırlık giriniz';
       }
     });
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -281,27 +284,27 @@ const OfferForm = () => {
     if (activeStep === 0 && !validateStep1()) {
       return;
     }
-    
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+
+    setActiveStep(prevActiveStep => prevActiveStep + 1);
   };
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    setActiveStep(prevActiveStep => prevActiveStep - 1);
   };
 
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
-      
+
       // Calculate total weight from all cargo items
       const totalWeight = formData.cargoItems.reduce((sum, item) => {
         return sum + parseFloat(parseNumber(item.weight) || 0);
       }, 0);
-      
+
       // Prepare order data with cargo items
       const orderData = {
         customerId: parseInt(formData.customerId),
-        
+
         // Departure address details
         departureCountry: formData.fromAddress.country,
         departureCity: formData.fromAddress.city,
@@ -322,22 +325,22 @@ const OfferForm = () => {
           dimensions: {
             length: parseFloat(item.dimensions.length || 0),
             width: parseFloat(item.dimensions.width || 0),
-            height: parseFloat(item.dimensions.height || 0)
+            height: parseFloat(item.dimensions.height || 0),
           },
           cargoType: item.cargoType,
           weight: parseFloat(parseNumber(item.weight) || 0),
-          description: item.description
+          description: item.description,
         })),
         estimatedPrice: parseFloat(parseNumber(formData.estimatedPrice) || 0),
-        currency: formData.currency
+        currency: formData.currency,
       };
-      
+
       console.log('Order data being sent:', orderData);
-      
+
       // Create order
       const response = await ordersAPI.create(orderData);
       console.log('Order created successfully:', response);
-      
+
       // Success - redirect to offers list
       navigate('/sales/tekliflerim');
     } catch (error) {
@@ -353,11 +356,15 @@ const OfferForm = () => {
       <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
         Rota ve Yük Bilgileri
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 4, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
-        <strong>Bilgi:</strong> (*) işareti bulunan alanlar zorunludur. 
-        Ülke, şehir, posta kodu ve yük ölçüleri (uzunluk, genişlik, yükseklik) ile yük tipi ve ağırlığı zorunlu alanlardır.
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{ mb: 4, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}
+      >
+        <strong>Bilgi:</strong> (*) işareti bulunan alanlar zorunludur. Ülke, şehir, posta kodu ve
+        yük ölçüleri (uzunluk, genişlik, yükseklik) ile yük tipi ve ağırlığı zorunlu alanlardır.
       </Typography>
-      
+
       {/* Customer Selection */}
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
@@ -376,7 +383,13 @@ const OfferForm = () => {
         </Box>
         <Grid container spacing={2}>
           <Grid item xs={12} md={8}>
-            <FormControl fullWidth error={!!errors.customerId} size="small" variant="outlined" sx={{ minWidth: 200 }}>
+            <FormControl
+              fullWidth
+              error={!!errors.customerId}
+              size="small"
+              variant="outlined"
+              sx={{ minWidth: 200 }}
+            >
               <InputLabel shrink>Müşteri Seçin</InputLabel>
               <Select
                 name="customerId"
@@ -386,12 +399,10 @@ const OfferForm = () => {
                 disabled={loading}
                 notched
               >
-                {customers.map((customer) => (
+                {customers.map(customer => (
                   <MenuItem key={customer.id} value={customer.id}>
                     <Box>
-                      <Typography variant="body1">
-                        {customer.name}
-                      </Typography>
+                      <Typography variant="body1">{customer.name}</Typography>
                       {customer.taxNo && (
                         <Typography variant="caption" color="text.secondary">
                           Vergi No: {customer.taxNo}
@@ -408,7 +419,7 @@ const OfferForm = () => {
               )}
             </FormControl>
           </Grid>
-          
+
           {formData.customerId && (
             <Grid item xs={12} md={4}>
               <Box sx={{ p: 2, border: '1px solid #e0e0e0', borderRadius: 1, bgcolor: '#fafafa' }}>
@@ -445,9 +456,9 @@ const OfferForm = () => {
           )}
         </Grid>
       </Box>
-      
+
       <Divider sx={{ my: 4 }} />
-      
+
       {/* From Address */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h6" gutterBottom sx={{ mb: 2, color: '#1976d2' }}>
@@ -458,7 +469,12 @@ const OfferForm = () => {
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={4}>
-            <FormControl fullWidth error={!!errors['fromAddress.country']} size="small" sx={{ minWidth: 150 }}>
+            <FormControl
+              fullWidth
+              error={!!errors['fromAddress.country']}
+              size="small"
+              sx={{ minWidth: 150 }}
+            >
               <InputLabel shrink>Ülke</InputLabel>
               <Select
                 name="fromAddress.country"
@@ -466,7 +482,7 @@ const OfferForm = () => {
                 onChange={handleInputChange}
                 label="Ülke"
               >
-                {countries.map((country) => (
+                {countries.map(country => (
                   <MenuItem key={country.id} value={country.countryNameTr}>
                     {country.countryNameTr}
                   </MenuItem>
@@ -479,7 +495,7 @@ const OfferForm = () => {
               )}
             </FormControl>
           </Grid>
-          
+
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
@@ -495,7 +511,7 @@ const OfferForm = () => {
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
-          
+
           <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
@@ -508,7 +524,7 @@ const OfferForm = () => {
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
-          
+
           <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
@@ -524,7 +540,7 @@ const OfferForm = () => {
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
-          
+
           <Grid item xs={12}>
             <TextField
               fullWidth
@@ -539,7 +555,7 @@ const OfferForm = () => {
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
-          
+
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
@@ -552,7 +568,7 @@ const OfferForm = () => {
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
-          
+
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
@@ -565,7 +581,7 @@ const OfferForm = () => {
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
-          
+
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
@@ -581,9 +597,9 @@ const OfferForm = () => {
           </Grid>
         </Grid>
       </Box>
-      
+
       <Divider sx={{ my: 4 }} />
-      
+
       {/* To Address */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h6" gutterBottom sx={{ mb: 2, color: '#1976d2' }}>
@@ -594,7 +610,12 @@ const OfferForm = () => {
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={4}>
-            <FormControl fullWidth error={!!errors['toAddress.country']} size="small" sx={{ minWidth: 150 }}>
+            <FormControl
+              fullWidth
+              error={!!errors['toAddress.country']}
+              size="small"
+              sx={{ minWidth: 150 }}
+            >
               <InputLabel shrink>Ülke</InputLabel>
               <Select
                 name="toAddress.country"
@@ -602,7 +623,7 @@ const OfferForm = () => {
                 onChange={handleInputChange}
                 label="Ülke"
               >
-                {countries.map((country) => (
+                {countries.map(country => (
                   <MenuItem key={country.id} value={country.countryNameTr}>
                     {country.countryNameTr}
                   </MenuItem>
@@ -615,7 +636,7 @@ const OfferForm = () => {
               )}
             </FormControl>
           </Grid>
-          
+
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
@@ -631,7 +652,7 @@ const OfferForm = () => {
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
-          
+
           <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
@@ -644,7 +665,7 @@ const OfferForm = () => {
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
-          
+
           <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
@@ -660,7 +681,7 @@ const OfferForm = () => {
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
-          
+
           <Grid item xs={12}>
             <TextField
               fullWidth
@@ -675,7 +696,7 @@ const OfferForm = () => {
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
-          
+
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
@@ -688,7 +709,7 @@ const OfferForm = () => {
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
-          
+
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
@@ -701,7 +722,7 @@ const OfferForm = () => {
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
-          
+
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
@@ -717,38 +738,31 @@ const OfferForm = () => {
           </Grid>
         </Grid>
       </Box>
-      
+
       {/* Cargo Items */}
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6" gutterBottom sx={{ color: '#1976d2' }}>
             Yük Bilgileri *
           </Typography>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={addCargoItem}
-            startIcon={<AddIcon />}
-          >
+          <Button variant="outlined" size="small" onClick={addCargoItem} startIcon={<AddIcon />}>
             Yük Ekle
           </Button>
         </Box>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Ölçüler, yük tipi ve ağırlık zorunlu alanlardır.
         </Typography>
-        
+
         {formData.cargoItems.map((item, index) => (
           <Paper key={item.id} elevation={1} sx={{ p: 3, mb: 2, border: '1px solid #e0e0e0' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Box
+              sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}
+            >
               <Typography variant="subtitle1" color="primary">
                 Yük {index + 1}
               </Typography>
               {formData.cargoItems.length > 1 && (
-                <IconButton
-                  size="small"
-                  color="error"
-                  onClick={() => removeCargoItem(index)}
-                >
+                <IconButton size="small" color="error" onClick={() => removeCargoItem(index)}>
                   <DeleteIcon />
                 </IconButton>
               )}
@@ -767,10 +781,10 @@ const OfferForm = () => {
                   label="Uzunluk (cm)"
                   type="number"
                   value={item.dimensions.length}
-                  onChange={(e) => handleCargoItemChange(index, 'dimensions.length', e.target.value)}
+                  onChange={e => handleCargoItemChange(index, 'dimensions.length', e.target.value)}
                   required
                   error={!!errors[`cargoItems.${index}.dimensions`]}
-                  helperText={errors[`cargoItems.${index}.dimensions`] && "Uzunluk gerekli"}
+                  helperText={errors[`cargoItems.${index}.dimensions`] && 'Uzunluk gerekli'}
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
@@ -782,10 +796,10 @@ const OfferForm = () => {
                   label="Genişlik (cm)"
                   type="number"
                   value={item.dimensions.width}
-                  onChange={(e) => handleCargoItemChange(index, 'dimensions.width', e.target.value)}
+                  onChange={e => handleCargoItemChange(index, 'dimensions.width', e.target.value)}
                   required
                   error={!!errors[`cargoItems.${index}.dimensions`]}
-                  helperText={errors[`cargoItems.${index}.dimensions`] && "Genişlik gerekli"}
+                  helperText={errors[`cargoItems.${index}.dimensions`] && 'Genişlik gerekli'}
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
@@ -797,10 +811,10 @@ const OfferForm = () => {
                   label="Yükseklik (cm)"
                   type="number"
                   value={item.dimensions.height}
-                  onChange={(e) => handleCargoItemChange(index, 'dimensions.height', e.target.value)}
+                  onChange={e => handleCargoItemChange(index, 'dimensions.height', e.target.value)}
                   required
                   error={!!errors[`cargoItems.${index}.dimensions`]}
-                  helperText={errors[`cargoItems.${index}.dimensions`] && "Yükseklik gerekli"}
+                  helperText={errors[`cargoItems.${index}.dimensions`] && 'Yükseklik gerekli'}
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
@@ -812,15 +826,22 @@ const OfferForm = () => {
             </Typography>
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid item xs={12} sm={6} md={6}>
-                <FormControl fullWidth size="small" variant="outlined" error={!!errors[`cargoItems.${index}.cargoType`]} required sx={{ minWidth: 150 }}>
+                <FormControl
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  error={!!errors[`cargoItems.${index}.cargoType`]}
+                  required
+                  sx={{ minWidth: 150 }}
+                >
                   <InputLabel shrink>Yük Tipi</InputLabel>
                   <Select
                     value={item.cargoType}
-                    onChange={(e) => handleCargoItemChange(index, 'cargoType', e.target.value)}
+                    onChange={e => handleCargoItemChange(index, 'cargoType', e.target.value)}
                     label="Yük Tipi"
                     notched
                   >
-                    {cargoTypes.map((type) => (
+                    {cargoTypes.map(type => (
                       <MenuItem key={type} value={type}>
                         {type}
                       </MenuItem>
@@ -840,7 +861,7 @@ const OfferForm = () => {
                   size="small"
                   label="Ağırlık (kg)"
                   value={item.weight}
-                  onChange={(e) => handleCargoItemChange(index, 'weight', e.target.value)}
+                  onChange={e => handleCargoItemChange(index, 'weight', e.target.value)}
                   required
                   error={!!errors[`cargoItems.${index}.weight`]}
                   helperText={errors[`cargoItems.${index}.weight`]}
@@ -860,7 +881,7 @@ const OfferForm = () => {
                   multiline
                   rows={2}
                   value={item.description}
-                  onChange={(e) => handleCargoItemChange(index, 'description', e.target.value)}
+                  onChange={e => handleCargoItemChange(index, 'description', e.target.value)}
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
@@ -868,7 +889,7 @@ const OfferForm = () => {
           </Paper>
         ))}
       </Box>
-      
+
       {/* Transfer Option */}
       <Box sx={{ mb: 2 }}>
         <Typography variant="h6" gutterBottom sx={{ mb: 2, color: '#1976d2' }}>
@@ -897,7 +918,7 @@ const OfferForm = () => {
       <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
         Bilgileri Onayla
       </Typography>
-      
+
       <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom color="primary">
           Müşteri Bilgileri
@@ -908,126 +929,170 @@ const OfferForm = () => {
             return selectedCustomer ? (
               <>
                 <Grid item xs={6}>
-                  <Typography variant="body2" color="text.secondary">Müşteri Adı:</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Müşteri Adı:
+                  </Typography>
                   <Typography variant="body1">{selectedCustomer.name}</Typography>
                 </Grid>
                 {selectedCustomer.taxNo && (
                   <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">Vergi No:</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Vergi No:
+                    </Typography>
                     <Typography variant="body1">{selectedCustomer.taxNo}</Typography>
                   </Grid>
                 )}
                 {selectedCustomer.contactName && (
                   <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">İletişim Kişisi:</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      İletişim Kişisi:
+                    </Typography>
                     <Typography variant="body1">{selectedCustomer.contactName}</Typography>
                   </Grid>
                 )}
                 {selectedCustomer.phoneNumber && (
                   <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">Telefon:</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Telefon:
+                    </Typography>
                     <Typography variant="body1">{selectedCustomer.phoneNumber}</Typography>
                   </Grid>
                 )}
                 {selectedCustomer.address && (
                   <Grid item xs={12}>
-                    <Typography variant="body2" color="text.secondary">Adres:</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Adres:
+                    </Typography>
                     <Typography variant="body1">{selectedCustomer.address}</Typography>
                   </Grid>
                 )}
               </>
             ) : (
               <Grid item xs={12}>
-                <Typography variant="body1" color="text.secondary">Müşteri seçilmedi</Typography>
+                <Typography variant="body1" color="text.secondary">
+                  Müşteri seçilmedi
+                </Typography>
               </Grid>
             );
           })()}
         </Grid>
-        
+
         <Divider sx={{ my: 3 }} />
-        
+
         <Typography variant="h6" gutterBottom color="primary">
           Alış Adresi (Nereden)
         </Typography>
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">Ülke:</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Ülke:
+            </Typography>
             <Typography variant="body1">{formData.fromAddress.country}</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">Şehir:</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Şehir:
+            </Typography>
             <Typography variant="body1">{formData.fromAddress.city}</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">İlçe:</Typography>
+            <Typography variant="body2" color="text.secondary">
+              İlçe:
+            </Typography>
             <Typography variant="body1">{formData.fromAddress.district || '-'}</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">Posta Kodu:</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Posta Kodu:
+            </Typography>
             <Typography variant="body1">{formData.fromAddress.zipCode || '-'}</Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="body2" color="text.secondary">Açık Adres:</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Açık Adres:
+            </Typography>
             <Typography variant="body1">{formData.fromAddress.address}</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">İletişim Kişisi:</Typography>
+            <Typography variant="body2" color="text.secondary">
+              İletişim Kişisi:
+            </Typography>
             <Typography variant="body1">{formData.fromAddress.contactPerson}</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">Telefon:</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Telefon:
+            </Typography>
             <Typography variant="body1">{formData.fromAddress.phone}</Typography>
           </Grid>
           {formData.fromAddress.email && (
             <Grid item xs={12}>
-              <Typography variant="body2" color="text.secondary">E-posta:</Typography>
+              <Typography variant="body2" color="text.secondary">
+                E-posta:
+              </Typography>
               <Typography variant="body1">{formData.fromAddress.email}</Typography>
             </Grid>
           )}
         </Grid>
-        
+
         <Divider sx={{ my: 3 }} />
-        
+
         <Typography variant="h6" gutterBottom color="primary">
           Teslimat Adresi (Nereye)
         </Typography>
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">Ülke:</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Ülke:
+            </Typography>
             <Typography variant="body1">{formData.toAddress.country}</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">Şehir:</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Şehir:
+            </Typography>
             <Typography variant="body1">{formData.toAddress.city}</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">İlçe:</Typography>
+            <Typography variant="body2" color="text.secondary">
+              İlçe:
+            </Typography>
             <Typography variant="body1">{formData.toAddress.district || '-'}</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">Posta Kodu:</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Posta Kodu:
+            </Typography>
             <Typography variant="body1">{formData.toAddress.zipCode || '-'}</Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="body2" color="text.secondary">Açık Adres:</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Açık Adres:
+            </Typography>
             <Typography variant="body1">{formData.toAddress.address}</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">İletişim Kişisi:</Typography>
+            <Typography variant="body2" color="text.secondary">
+              İletişim Kişisi:
+            </Typography>
             <Typography variant="body1">{formData.toAddress.contactPerson}</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">Telefon:</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Telefon:
+            </Typography>
             <Typography variant="body1">{formData.toAddress.phone}</Typography>
           </Grid>
           {formData.toAddress.email && (
             <Grid item xs={12}>
-              <Typography variant="body2" color="text.secondary">E-posta:</Typography>
+              <Typography variant="body2" color="text.secondary">
+                E-posta:
+              </Typography>
               <Typography variant="body1">{formData.toAddress.email}</Typography>
             </Grid>
           )}
         </Grid>
-        
+
         <Typography variant="h6" gutterBottom color="primary">
           Yük Bilgileri
         </Typography>
@@ -1038,22 +1103,30 @@ const OfferForm = () => {
             </Typography>
             <Grid container spacing={2}>
               <Grid item xs={6}>
-                <Typography variant="body2" color="text.secondary">Ölçüler:</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Ölçüler:
+                </Typography>
                 <Typography variant="body1">
                   {item.dimensions.length} x {item.dimensions.width} x {item.dimensions.height} cm
                 </Typography>
               </Grid>
               <Grid item xs={6}>
-                <Typography variant="body2" color="text.secondary">Ağırlık:</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Ağırlık:
+                </Typography>
                 <Typography variant="body1">{item.weight} kg</Typography>
               </Grid>
               <Grid item xs={6}>
-                <Typography variant="body2" color="text.secondary">Yük Tipi:</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Yük Tipi:
+                </Typography>
                 <Typography variant="body1">{item.cargoType}</Typography>
               </Grid>
               {item.description && (
                 <Grid item xs={12}>
-                  <Typography variant="body2" color="text.secondary">Açıklama:</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Açıklama:
+                  </Typography>
                   <Typography variant="body1">{item.description}</Typography>
                 </Grid>
               )}
@@ -1062,20 +1135,26 @@ const OfferForm = () => {
         ))}
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">Toplam Ağırlık:</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Toplam Ağırlık:
+            </Typography>
             <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-              {formData.cargoItems.reduce((sum, item) => sum + parseFloat(parseNumber(item.weight) || 0), 0)} kg
+              {formData.cargoItems.reduce(
+                (sum, item) => sum + parseFloat(parseNumber(item.weight) || 0),
+                0
+              )}{' '}
+              kg
             </Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">Aktarma:</Typography>
-            <Typography variant="body1">
-              {formData.transferable ? 'Evet' : 'Hayır'}
+            <Typography variant="body2" color="text.secondary">
+              Aktarma:
             </Typography>
+            <Typography variant="body1">{formData.transferable ? 'Evet' : 'Hayır'}</Typography>
           </Grid>
         </Grid>
       </Paper>
-      
+
       <Alert severity="info" sx={{ mb: 3 }}>
         Bilgileri kontrol edin. Bir sonraki adımda teklif gönderilecektir.
       </Alert>
@@ -1087,12 +1166,12 @@ const OfferForm = () => {
       <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
         Teklif Fiyatı ve Gönder
       </Typography>
-      
+
       <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom color="primary">
           Fiyat Bilgileri *
         </Typography>
-        
+
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
             <TextField
@@ -1109,11 +1188,11 @@ const OfferForm = () => {
                   <Box sx={{ ml: 1 }}>
                     {currencies.find(c => c.value === formData.currency)?.symbol || '₺'}
                   </Box>
-                )
+                ),
               }}
             />
           </Grid>
-          
+
           <Grid item xs={12} md={6}>
             <FormControl fullWidth size="small" variant="outlined" sx={{ minWidth: 150 }}>
               <InputLabel shrink>Para Birimi</InputLabel>
@@ -1124,7 +1203,7 @@ const OfferForm = () => {
                 label="Para Birimi"
                 notched
               >
-                {currencies.map((currency) => (
+                {currencies.map(currency => (
                   <MenuItem key={currency.value} value={currency.value}>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <Typography variant="body1" sx={{ mr: 1 }}>
@@ -1139,24 +1218,25 @@ const OfferForm = () => {
           </Grid>
         </Grid>
       </Paper>
-      
+
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          <strong>Bilgi:</strong> Boş bıraktığınız alanları teklif gönderildikten sonra da doldurabilirsiniz. 
-          Fiyat bilgisini girmezseniz, operasyon ekibi daha sonra fiyat belirleyebilir.
+          <strong>Bilgi:</strong> Boş bıraktığınız alanları teklif gönderildikten sonra da
+          doldurabilirsiniz. Fiyat bilgisini girmezseniz, operasyon ekibi daha sonra fiyat
+          belirleyebilir.
         </Typography>
       </Alert>
-      
+
       <Alert severity="warning" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          <strong>Önemli:</strong> Teklif gönderildikten sonra durumunu sadece görüntüleyebilecek, değiştiremeyeceksiniz. 
-          Durum değişiklikleri operasyon ekibi tarafından yapılacaktır.
+          <strong>Önemli:</strong> Teklif gönderildikten sonra durumunu sadece görüntüleyebilecek,
+          değiştiremeyeceksiniz. Durum değişiklikleri operasyon ekibi tarafından yapılacaktır.
         </Typography>
       </Alert>
     </Box>
   );
 
-  const getStepContent = (step) => {
+  const getStepContent = step => {
     switch (step) {
       case 0:
         return renderStep1();
@@ -1175,28 +1255,22 @@ const OfferForm = () => {
         <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#1976d2', mb: 4 }}>
           Yeni Teklif Oluştur
         </Typography>
-        
+
         <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
-          {steps.map((label) => (
+          {steps.map(label => (
             <Step key={label}>
               <StepLabel>{label}</StepLabel>
             </Step>
           ))}
         </Stepper>
-        
-        <Box sx={{ mt: 4, mb: 4 }}>
-          {getStepContent(activeStep)}
-        </Box>
-        
+
+        <Box sx={{ mt: 4, mb: 4 }}>{getStepContent(activeStep)}</Box>
+
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Button
-            disabled={activeStep === 0}
-            onClick={handleBack}
-            startIcon={<ArrowBack />}
-          >
+          <Button disabled={activeStep === 0} onClick={handleBack} startIcon={<ArrowBack />}>
             Geri
           </Button>
-          
+
           <Box>
             {activeStep === steps.length - 1 ? (
               <Button
@@ -1208,11 +1282,7 @@ const OfferForm = () => {
                 {submitting ? 'Gönderiliyor...' : 'Teklifi Gönder'}
               </Button>
             ) : (
-              <Button
-                variant="contained"
-                onClick={handleNext}
-                endIcon={<ArrowForward />}
-              >
+              <Button variant="contained" onClick={handleNext} endIcon={<ArrowForward />}>
                 İleri
               </Button>
             )}

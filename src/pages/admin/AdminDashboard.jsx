@@ -19,17 +19,17 @@ const HomePage = () => {
 
       <Grid container spacing={3}>
         <Grid item xs={3}>
-          <Paper 
-            elevation={3} 
-            sx={{ 
-              p: 3, 
+          <Paper
+            elevation={3}
+            sx={{
+              p: 3,
               textAlign: 'center',
               cursor: 'pointer',
               transition: 'transform 0.2s',
               '&:hover': {
                 transform: 'translateY(-4px)',
-                boxShadow: 4
-              }
+                boxShadow: 4,
+              },
             }}
           >
             <LocalShippingIcon sx={{ fontSize: 50, color: '#1976d2', mb: 2 }} />
@@ -37,24 +37,24 @@ const HomePage = () => {
               Trucks Management
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              View, add, edit, and manage your fleet of trucks. Track maintenance, 
-              assign drivers, and monitor vehicle status.
+              View, add, edit, and manage your fleet of trucks. Track maintenance, assign drivers,
+              and monitor vehicle status.
             </Typography>
           </Paper>
         </Grid>
 
         <Grid item xs={3}>
-          <Paper 
-            elevation={3} 
-            sx={{ 
-              p: 3, 
+          <Paper
+            elevation={3}
+            sx={{
+              p: 3,
               textAlign: 'center',
               cursor: 'pointer',
               transition: 'transform 0.2s',
               '&:hover': {
                 transform: 'translateY(-4px)',
-                boxShadow: 4
-              }
+                boxShadow: 4,
+              },
             }}
           >
             <PersonIcon sx={{ fontSize: 50, color: '#1976d2', mb: 2 }} />
@@ -62,24 +62,24 @@ const HomePage = () => {
               Drivers Management
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Manage driver information, licenses, schedules, and assignments. 
-              Keep track of driver performance and availability.
+              Manage driver information, licenses, schedules, and assignments. Keep track of driver
+              performance and availability.
             </Typography>
           </Paper>
         </Grid>
 
         <Grid item xs={3}>
-          <Paper 
-            elevation={3} 
-            sx={{ 
-              p: 3, 
+          <Paper
+            elevation={3}
+            sx={{
+              p: 3,
               textAlign: 'center',
               cursor: 'pointer',
               transition: 'transform 0.2s',
               '&:hover': {
                 transform: 'translateY(-4px)',
-                boxShadow: 4
-              }
+                boxShadow: 4,
+              },
             }}
           >
             <GroupIcon sx={{ fontSize: 50, color: '#1976d2', mb: 2 }} />
@@ -87,24 +87,24 @@ const HomePage = () => {
               Personnels Management
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Manage all personnel information, roles, schedules, and assignments. 
-              Keep track of employee performance and availability.
+              Manage all personnel information, roles, schedules, and assignments. Keep track of
+              employee performance and availability.
             </Typography>
           </Paper>
         </Grid>
 
         <Grid item xs={3}>
-          <Paper 
-            elevation={3} 
-            sx={{ 
-              p: 3, 
+          <Paper
+            elevation={3}
+            sx={{
+              p: 3,
               textAlign: 'center',
               cursor: 'pointer',
               transition: 'transform 0.2s',
               '&:hover': {
                 transform: 'translateY(-4px)',
-                boxShadow: 4
-              }
+                boxShadow: 4,
+              },
             }}
           >
             <DirectionsCarIcon sx={{ fontSize: 50, color: '#1976d2', mb: 2 }} />
@@ -112,8 +112,8 @@ const HomePage = () => {
               Trailers Management
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              View, add, edit, and manage your fleet of trailers. Track maintenance, 
-              assign to trucks, and monitor trailer status.
+              View, add, edit, and manage your fleet of trailers. Track maintenance, assign to
+              trucks, and monitor trailer status.
             </Typography>
           </Paper>
         </Grid>
@@ -128,4 +128,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage; 
+export default HomePage;

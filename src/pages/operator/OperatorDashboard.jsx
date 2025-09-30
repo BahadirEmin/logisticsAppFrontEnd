@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Paper, Grid, Card, CardContent, CardActions, Button, CircularProgress } from '@mui/material';
-import { 
-  Timeline, 
-  CheckCircle, 
-  AccountCircle, 
+import {
+  Container,
+  Typography,
+  Box,
+  Paper,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  CircularProgress,
+} from '@mui/material';
+import {
+  Timeline,
+  CheckCircle,
+  AccountCircle,
   TrendingUp,
   LocalShipping,
   Person,
-  Assignment
+  Assignment,
 } from '@mui/icons-material';
 import { vehicleAPI } from '../../api/vehicles';
 import { driversAPI } from '../../api/drivers';
@@ -19,7 +30,7 @@ const OperatorDashboard = () => {
     activeTrips: 0,
     approvedOffers: 0,
     activeVehicles: 0,
-    activeDrivers: 0
+    activeDrivers: 0,
   });
 
   useEffect(() => {
@@ -29,23 +40,21 @@ const OperatorDashboard = () => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Paralel olarak tüm verileri çek
       const [vehicles, drivers, orders] = await Promise.all([
         vehicleAPI.getAll(),
         driversAPI.getAll(),
-        ordersAPI.getAll()
+        ordersAPI.getAll(),
       ]);
 
       // İstatistikleri hesapla
-      const activeTrips = orders.filter(o => 
-        o.tripStatus === 'YOLA_CIKTI' || o.tripStatus === 'GUMRUKTE'
+      const activeTrips = orders.filter(
+        o => o.tripStatus === 'YOLA_CIKTI' || o.tripStatus === 'GUMRUKTE'
       ).length;
-      
-      const approvedOffers = orders.filter(o => 
-        o.tripStatus === 'ONAYLANDI'
-      ).length;
-      
+
+      const approvedOffers = orders.filter(o => o.tripStatus === 'ONAYLANDI').length;
+
       const activeVehicles = vehicles.filter(v => v.isActive).length;
       const activeDrivers = drivers.filter(d => d.isActive).length;
 
@@ -53,7 +62,7 @@ const OperatorDashboard = () => {
         activeTrips,
         approvedOffers,
         activeVehicles,
-        activeDrivers
+        activeDrivers,
       });
     } catch (error) {
       console.error('Dashboard verileri yüklenirken hata:', error);
@@ -82,7 +91,11 @@ const OperatorDashboard = () => {
           <Grid item xs={12} sm={6} md={3}>
             <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
               <Timeline sx={{ fontSize: 40, color: '#1976d2', mb: 1 }} />
-              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+              <Typography
+                variant="h4"
+                component="div"
+                sx={{ fontWeight: 'bold', color: '#1976d2' }}
+              >
                 {dashboardData.activeTrips}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -93,7 +106,11 @@ const OperatorDashboard = () => {
           <Grid item xs={12} sm={6} md={3}>
             <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
               <CheckCircle sx={{ fontSize: 40, color: '#4caf50', mb: 1 }} />
-              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#4caf50' }}>
+              <Typography
+                variant="h4"
+                component="div"
+                sx={{ fontWeight: 'bold', color: '#4caf50' }}
+              >
                 {dashboardData.approvedOffers}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -104,7 +121,11 @@ const OperatorDashboard = () => {
           <Grid item xs={12} sm={6} md={3}>
             <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
               <LocalShipping sx={{ fontSize: 40, color: '#ff9800', mb: 1 }} />
-              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#ff9800' }}>
+              <Typography
+                variant="h4"
+                component="div"
+                sx={{ fontWeight: 'bold', color: '#ff9800' }}
+              >
                 {dashboardData.activeVehicles}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -115,7 +136,11 @@ const OperatorDashboard = () => {
           <Grid item xs={12} sm={6} md={3}>
             <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
               <Person sx={{ fontSize: 40, color: '#9c27b0', mb: 1 }} />
-              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#9c27b0' }}>
+              <Typography
+                variant="h4"
+                component="div"
+                sx={{ fontWeight: 'bold', color: '#9c27b0' }}
+              >
                 {dashboardData.activeDrivers}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -195,8 +220,8 @@ const OperatorDashboard = () => {
                 </Box>
               </Box>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Tüm aktif seferlerin durumunu, konumunu ve ilerlemesini gerçek zamanlı olarak izleyin.
-                Sürücü iletişimi ve rota optimizasyonu için gerekli araçları kullanın.
+                Tüm aktif seferlerin durumunu, konumunu ve ilerlemesini gerçek zamanlı olarak
+                izleyin. Sürücü iletişimi ve rota optimizasyonu için gerekli araçları kullanın.
               </Typography>
             </CardContent>
             <CardActions>
@@ -214,7 +239,16 @@ const OperatorDashboard = () => {
           Son Aktiviteler
         </Typography>
         <Paper elevation={2} sx={{ p: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              mb: 2,
+              p: 2,
+              bgcolor: '#f5f5f5',
+              borderRadius: 1,
+            }}
+          >
             <Assignment sx={{ mr: 2, color: '#1976d2' }} />
             <Box>
               <Typography variant="body1" fontWeight="medium">
@@ -225,7 +259,16 @@ const OperatorDashboard = () => {
               </Typography>
             </Box>
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              mb: 2,
+              p: 2,
+              bgcolor: '#f5f5f5',
+              borderRadius: 1,
+            }}
+          >
             <CheckCircle sx={{ mr: 2, color: '#4caf50' }} />
             <Box>
               <Typography variant="body1" fontWeight="medium">
@@ -236,7 +279,15 @@ const OperatorDashboard = () => {
               </Typography>
             </Box>
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              p: 2,
+              bgcolor: '#f5f5f5',
+              borderRadius: 1,
+            }}
+          >
             <TrendingUp sx={{ mr: 2, color: '#ff9800' }} />
             <Box>
               <Typography variant="body1" fontWeight="medium">
@@ -253,4 +304,4 @@ const OperatorDashboard = () => {
   );
 };
 
-export default OperatorDashboard; 
+export default OperatorDashboard;

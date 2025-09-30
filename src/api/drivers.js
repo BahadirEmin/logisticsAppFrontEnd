@@ -1,9 +1,9 @@
-import api from "./axios";
+import api from './axios';
 
 // Drivers API functions
 export const driversAPI = {
   // Get driver by ID
-  getById: async (id) => {
+  getById: async id => {
     try {
       const response = await api.get(`/v1/drivers/${id}`);
       return response.data;
@@ -15,7 +15,7 @@ export const driversAPI = {
   // Get all drivers
   getAll: async () => {
     try {
-      const response = await api.get("/v1/drivers");
+      const response = await api.get('/v1/drivers');
       return response.data;
     } catch (error) {
       throw error;
@@ -23,9 +23,9 @@ export const driversAPI = {
   },
 
   // Create new driver
-  create: async (driverData) => {
+  create: async driverData => {
     try {
-      const response = await api.post("/v1/drivers", driverData);
+      const response = await api.post('/v1/drivers', driverData);
       return response.data;
     } catch (error) {
       throw error;
@@ -43,7 +43,7 @@ export const driversAPI = {
   },
 
   // Delete driver
-  delete: async (id) => {
+  delete: async id => {
     try {
       const response = await api.delete(`/v1/drivers/${id}`);
       return response.data;
@@ -53,11 +53,9 @@ export const driversAPI = {
   },
 
   // Search drivers
-  search: async (licenseNo) => {
+  search: async licenseNo => {
     try {
-      const response = await api.get(
-        `/v1/drivers/search?licenseNo=${licenseNo}`
-      );
+      const response = await api.get(`/v1/drivers/search?licenseNo=${licenseNo}`);
       return response.data;
     } catch (error) {
       throw error;

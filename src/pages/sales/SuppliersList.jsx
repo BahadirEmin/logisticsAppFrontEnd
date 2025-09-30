@@ -29,7 +29,7 @@ import {
   InputAdornment,
   Grid,
   Card,
-  CardContent
+  CardContent,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -38,7 +38,7 @@ import {
   Search as SearchIcon,
   Business as BusinessIcon,
   CheckCircle as CheckCircleIcon,
-  Cancel as CancelIcon
+  Cancel as CancelIcon,
 } from '@mui/icons-material';
 import { supplierAPI } from '../../api/suppliers';
 
@@ -48,13 +48,13 @@ const SuppliersList = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterActive, setFilterActive] = useState('');
-  
+
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [supplierToDelete, setSupplierToDelete] = useState(null);
-  
+
   // Form state
   const [formData, setFormData] = useState({
     companyName: '',
@@ -69,7 +69,7 @@ const SuppliersList = () => {
     isActive: true,
     contractStartDate: '',
     contractEndDate: '',
-    notes: ''
+    notes: '',
   });
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
@@ -94,31 +94,33 @@ const SuppliersList = () => {
 
   // Filter suppliers
   const filteredSuppliers = suppliers.filter(supplier => {
-    const matchesSearch = supplier.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         supplier.taxNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         supplier.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         supplier.city?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesActive = filterActive === '' || 
-                         (filterActive === 'true' && supplier.isActive) ||
-                         (filterActive === 'false' && !supplier.isActive);
-    
+    const matchesSearch =
+      supplier.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      supplier.taxNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      supplier.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      supplier.city?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesActive =
+      filterActive === '' ||
+      (filterActive === 'true' && supplier.isActive) ||
+      (filterActive === 'false' && !supplier.isActive);
+
     return matchesSearch && matchesActive;
   });
 
   // Handle form input changes
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value, checked, type } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
-    
+
     // Clear error when user types
     if (formErrors[name]) {
       setFormErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
@@ -154,14 +156,14 @@ const SuppliersList = () => {
       isActive: true,
       contractStartDate: '',
       contractEndDate: '',
-      notes: ''
+      notes: '',
     });
     setFormErrors({});
     setDialogOpen(true);
   };
 
   // Open edit supplier dialog
-  const handleEditSupplier = (supplier) => {
+  const handleEditSupplier = supplier => {
     setEditingSupplier(supplier);
     setFormData({
       companyName: supplier.companyName,
@@ -176,7 +178,7 @@ const SuppliersList = () => {
       isActive: supplier.isActive !== undefined ? supplier.isActive : true,
       contractStartDate: supplier.contractStartDate ? supplier.contractStartDate.split('T')[0] : '',
       contractEndDate: supplier.contractEndDate ? supplier.contractEndDate.split('T')[0] : '',
-      notes: supplier.notes || ''
+      notes: supplier.notes || '',
     });
     setFormErrors({});
     setDialogOpen(true);
@@ -194,7 +196,7 @@ const SuppliersList = () => {
       setSaving(true);
       const supplierData = {
         ...formData,
-        isActive: Boolean(formData.isActive)
+        isActive: Boolean(formData.isActive),
       };
 
       if (editingSupplier) {
@@ -207,7 +209,10 @@ const SuppliersList = () => {
       await loadData(); // Reload data
     } catch (error) {
       console.error('Save supplier error:', error);
-      const backendMessage = error?.response?.data?.message || error?.response?.data?.error || 'Tedarikçi kaydedilirken hata oluştu';
+      const backendMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        'Tedarikçi kaydedilirken hata oluştu';
       setError(backendMessage);
     } finally {
       setSaving(false);
@@ -215,7 +220,7 @@ const SuppliersList = () => {
   };
 
   // Handle delete supplier
-  const handleDeleteSupplier = (supplier) => {
+  const handleDeleteSupplier = supplier => {
     setSupplierToDelete(supplier);
     setDeleteDialogOpen(true);
   };
@@ -243,7 +248,10 @@ const SuppliersList = () => {
       await loadData();
     } catch (error) {
       console.error('Inline delete error:', error);
-      const backendMessage = error?.response?.data?.message || error?.response?.data?.error || 'Tedarikçi silinirken hata oluştu';
+      const backendMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        'Tedarikçi silinirken hata oluştu';
       setError(backendMessage);
     } finally {
       setDeletingInline(false);
@@ -251,7 +259,7 @@ const SuppliersList = () => {
   };
 
   // Format date
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('tr-TR');
   };
@@ -307,7 +315,7 @@ const SuppliersList = () => {
                   size="small"
                   label="Ara"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={e => setSearchTerm(e.target.value)}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -322,7 +330,7 @@ const SuppliersList = () => {
                   <InputLabel shrink>Durum</InputLabel>
                   <Select
                     value={filterActive}
-                    onChange={(e) => setFilterActive(e.target.value)}
+                    onChange={e => setFilterActive(e.target.value)}
                     label="Durum"
                     notched
                   >
@@ -346,19 +354,37 @@ const SuppliersList = () => {
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                <TableCell><strong>Şirket Adı</strong></TableCell>
-                <TableCell><strong>Vergi No</strong></TableCell>
-                <TableCell><strong>E-posta</strong></TableCell>
-                <TableCell><strong>Telefon</strong></TableCell>
-                <TableCell><strong>Şehir</strong></TableCell>
-                <TableCell><strong>Sözleşme Durumu</strong></TableCell>
-                <TableCell><strong>Durum</strong></TableCell>
-                <TableCell><strong>Kayıt Tarihi</strong></TableCell>
-                <TableCell><strong>İşlemler</strong></TableCell>
+                <TableCell>
+                  <strong>Şirket Adı</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Vergi No</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>E-posta</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Telefon</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Şehir</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Sözleşme Durumu</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Durum</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Kayıt Tarihi</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>İşlemler</strong>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredSuppliers.map((supplier) => (
+              {filteredSuppliers.map(supplier => (
                 <TableRow key={supplier.id} hover>
                   <TableCell>
                     <Box>
@@ -378,10 +404,24 @@ const SuppliersList = () => {
                   <TableCell>{supplier.city || '-'}</TableCell>
                   <TableCell>
                     {supplier.contractStartDate && supplier.contractEndDate ? (
-                      <Chip 
-                        icon={isContractActive(supplier.contractStartDate, supplier.contractEndDate) ? <CheckCircleIcon /> : <CancelIcon />}
-                        label={isContractActive(supplier.contractStartDate, supplier.contractEndDate) ? 'Aktif' : 'Pasif'}
-                        color={isContractActive(supplier.contractStartDate, supplier.contractEndDate) ? 'success' : 'error'}
+                      <Chip
+                        icon={
+                          isContractActive(supplier.contractStartDate, supplier.contractEndDate) ? (
+                            <CheckCircleIcon />
+                          ) : (
+                            <CancelIcon />
+                          )
+                        }
+                        label={
+                          isContractActive(supplier.contractStartDate, supplier.contractEndDate)
+                            ? 'Aktif'
+                            : 'Pasif'
+                        }
+                        color={
+                          isContractActive(supplier.contractStartDate, supplier.contractEndDate)
+                            ? 'success'
+                            : 'error'
+                        }
                         size="small"
                       />
                     ) : (
@@ -389,7 +429,7 @@ const SuppliersList = () => {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Chip 
+                    <Chip
                       icon={<BusinessIcon />}
                       label={supplier.isActive ? 'Aktif' : 'Pasif'}
                       color={supplier.isActive ? 'success' : 'error'}
@@ -423,9 +463,7 @@ const SuppliersList = () => {
 
         {/* Add/Edit Supplier Dialog */}
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-          <DialogTitle>
-            {editingSupplier ? 'Tedarikçi Düzenle' : 'Yeni Tedarikçi Ekle'}
-          </DialogTitle>
+          <DialogTitle>{editingSupplier ? 'Tedarikçi Düzenle' : 'Yeni Tedarikçi Ekle'}</DialogTitle>
           <DialogContent>
             <Grid container spacing={3} sx={{ mt: 1 }}>
               <Grid item xs={12} md={6}>
@@ -581,9 +619,17 @@ const SuppliersList = () => {
                 {deletingInline ? 'Siliniyor...' : 'Sil'}
               </Button>
             )}
-            <Button onClick={() => setDialogOpen(false)} disabled={saving || deletingInline}>İptal</Button>
+            <Button onClick={() => setDialogOpen(false)} disabled={saving || deletingInline}>
+              İptal
+            </Button>
             <Button onClick={handleSubmit} variant="contained" disabled={saving || deletingInline}>
-              {saving ? (editingSupplier ? 'Güncelleniyor...' : 'Kaydediliyor...') : (editingSupplier ? 'Güncelle' : 'Kaydet')}
+              {saving
+                ? editingSupplier
+                  ? 'Güncelleniyor...'
+                  : 'Kaydediliyor...'
+                : editingSupplier
+                  ? 'Güncelle'
+                  : 'Kaydet'}
             </Button>
           </DialogActions>
         </Dialog>
@@ -593,8 +639,8 @@ const SuppliersList = () => {
           <DialogTitle>Tedarikçi Sil</DialogTitle>
           <DialogContent>
             <Typography>
-              "{supplierToDelete?.companyName}" tedarikçisini silmek istediğinizden emin misiniz?
-              Bu işlem geri alınamaz.
+              "{supplierToDelete?.companyName}" tedarikçisini silmek istediğinizden emin misiniz? Bu
+              işlem geri alınamaz.
             </Typography>
           </DialogContent>
           <DialogActions>

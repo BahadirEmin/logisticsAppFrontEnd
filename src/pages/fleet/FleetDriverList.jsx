@@ -30,7 +30,7 @@ import {
   Select,
   MenuItem,
   FormHelperText,
-  Snackbar
+  Snackbar,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -42,7 +42,7 @@ import {
   Person as PersonIcon,
   DirectionsCar as CarIcon,
   Phone as PhoneIcon,
-  Email as EmailIcon
+  Email as EmailIcon,
 } from '@mui/icons-material';
 import { driversAPI } from '../../api/drivers';
 import { useAuth } from '../../contexts/AuthContext';
@@ -69,13 +69,22 @@ const DriverList = () => {
     residencePermitExpiry: '',
     phoneNumber: '',
     email: '',
-    isActive: true
+    isActive: true,
   });
 
   // License class options
   const licenseClassOptions = [
-    'CDL-A', 'CDL-B', 'CDL-C', 'CDL-D', 'CDL-E', 'CDL-F',
-    'Class A', 'Class B', 'Class C', 'Class D', 'Class E'
+    'CDL-A',
+    'CDL-B',
+    'CDL-C',
+    'CDL-D',
+    'CDL-E',
+    'CDL-F',
+    'Class A',
+    'Class B',
+    'Class C',
+    'Class D',
+    'Class E',
   ];
 
   useEffect(() => {
@@ -108,10 +117,12 @@ const DriverList = () => {
         licenseClass: driver.licenseClass || '',
         passportExpiry: driver.passportExpiry ? driver.passportExpiry.split('T')[0] : '',
         visaExpiry: driver.visaExpiry ? driver.visaExpiry.split('T')[0] : '',
-        residencePermitExpiry: driver.residencePermitExpiry ? driver.residencePermitExpiry.split('T')[0] : '',
+        residencePermitExpiry: driver.residencePermitExpiry
+          ? driver.residencePermitExpiry.split('T')[0]
+          : '',
         phoneNumber: driver.phoneNumber || '',
         email: driver.email || '',
-        isActive: driver.isActive !== undefined ? driver.isActive : true
+        isActive: driver.isActive !== undefined ? driver.isActive : true,
       });
     } else {
       setEditingDriver(null);
@@ -125,7 +136,7 @@ const DriverList = () => {
         residencePermitExpiry: '',
         phoneNumber: '',
         email: '',
-        isActive: true
+        isActive: true,
       });
     }
     setOpenDialog(true);
@@ -144,21 +155,32 @@ const DriverList = () => {
       residencePermitExpiry: '',
       phoneNumber: '',
       email: '',
-      isActive: true
+      isActive: true,
     });
   };
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleSubmit = async () => {
     // Form validation
-    if (!formData.firstName || !formData.lastName || !formData.licenseNo || !formData.licenseClass || !formData.phoneNumber || !formData.email) {
-      setSnackbar({ open: true, message: 'Lütfen tüm zorunlu alanları doldurun!', severity: 'error' });
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.licenseNo ||
+      !formData.licenseClass ||
+      !formData.phoneNumber ||
+      !formData.email
+    ) {
+      setSnackbar({
+        open: true,
+        message: 'Lütfen tüm zorunlu alanları doldurun!',
+        severity: 'error',
+      });
       return;
     }
 
@@ -174,7 +196,7 @@ const DriverList = () => {
 
     try {
       console.log('Submitting driver data:', formData);
-      
+
       if (editingDriver) {
         const result = await driversAPI.update(editingDriver.id, formData);
         console.log('Driver updated successfully:', result);
@@ -195,7 +217,7 @@ const DriverList = () => {
     }
   };
 
-  const handleDelete = async (driverId) => {
+  const handleDelete = async driverId => {
     if (window.confirm('Bu sürücüyü silmek istediğinizden emin misiniz?')) {
       try {
         await driversAPI.delete(driverId);
@@ -219,7 +241,7 @@ const DriverList = () => {
         licenseClass: 'CDL-A',
         phoneNumber: '5551234567',
         email: 'test@example.com',
-        isActive: true
+        isActive: true,
       };
       console.log('Test data:', testData);
       const result = await driversAPI.create(testData);
@@ -233,44 +255,52 @@ const DriverList = () => {
   };
 
   const filteredDrivers = drivers.filter(driver => {
-    const matchesSearch = 
+    const matchesSearch =
       (driver.firstName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (driver.lastName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (driver.licenseNo || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (driver.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (driver.phoneNumber || '').includes(searchTerm);
-    
+
     const matchesStatus = statusFilter === 'all' || driver.isActive === (statusFilter === 'active');
-    
+
     return matchesSearch && matchesStatus;
   });
 
-  const getExpiryStatus = (expiryDate) => {
+  const getExpiryStatus = expiryDate => {
     if (!expiryDate) return 'unknown';
     const today = new Date();
     const expiry = new Date(expiryDate);
     const daysUntilExpiry = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-    
+
     if (daysUntilExpiry < 0) return 'expired';
     if (daysUntilExpiry <= 30) return 'warning';
     return 'valid';
   };
 
-  const getExpiryColor = (status) => {
+  const getExpiryColor = status => {
     switch (status) {
-      case 'expired': return 'error';
-      case 'warning': return 'warning';
-      case 'valid': return 'success';
-      default: return 'default';
+      case 'expired':
+        return 'error';
+      case 'warning':
+        return 'warning';
+      case 'valid':
+        return 'success';
+      default:
+        return 'default';
     }
   };
 
-  const getExpiryLabel = (status) => {
+  const getExpiryLabel = status => {
     switch (status) {
-      case 'expired': return 'Süresi Dolmuş';
-      case 'warning': return 'Yakında Dolacak';
-      case 'valid': return 'Geçerli';
-      default: return 'Bilinmiyor';
+      case 'expired':
+        return 'Süresi Dolmuş';
+      case 'warning':
+        return 'Yakında Dolacak';
+      case 'valid':
+        return 'Geçerli';
+      default:
+        return 'Bilinmiyor';
     }
   };
 
@@ -360,9 +390,9 @@ const DriverList = () => {
               size="small"
               label="Sürücü Ara..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               InputProps={{
-                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
               }}
             />
           </Grid>
@@ -371,7 +401,7 @@ const DriverList = () => {
               <InputLabel shrink>Durum Filtresi</InputLabel>
               <Select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={e => setStatusFilter(e.target.value)}
                 label="Durum Filtresi"
                 notched
               >
@@ -392,19 +422,14 @@ const DriverList = () => {
             </Button>
           </Grid>
           <Grid item xs={12} md={1}>
-            <Button
-              variant="outlined"
-              onClick={testAPICall}
-              fullWidth
-              size="small"
-            >
+            <Button variant="outlined" onClick={testAPICall} fullWidth size="small">
               Test API
             </Button>
           </Grid>
           <Grid item xs={12} md={2}>
             <Box display="flex" justifyContent="flex-end">
               <Tooltip title="Filtreleri Temizle">
-                <IconButton 
+                <IconButton
                   onClick={() => {
                     setSearchTerm('');
                     setStatusFilter('all');
@@ -424,19 +449,37 @@ const DriverList = () => {
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                <TableCell><strong>Ad Soyad</strong></TableCell>
-                <TableCell><strong>Lisans No</strong></TableCell>
-                <TableCell><strong>Lisans Sınıfı</strong></TableCell>
-                <TableCell><strong>İletişim</strong></TableCell>
-                <TableCell><strong>Pasaport</strong></TableCell>
-                <TableCell><strong>Vize</strong></TableCell>
-                <TableCell><strong>İkamet</strong></TableCell>
-                <TableCell><strong>Durum</strong></TableCell>
-                <TableCell><strong>İşlemler</strong></TableCell>
+                <TableCell>
+                  <strong>Ad Soyad</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Lisans No</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Lisans Sınıfı</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>İletişim</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Pasaport</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Vize</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>İkamet</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Durum</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>İşlemler</strong>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredDrivers.map((driver) => (
+              {filteredDrivers.map(driver => (
                 <TableRow key={driver.id} hover>
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -454,15 +497,13 @@ const DriverList = () => {
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <CarIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                      <Typography variant="body2">
-                        {driver.licenseNo}
-                      </Typography>
+                      <Typography variant="body2">{driver.licenseNo}</Typography>
                     </Box>
                   </TableCell>
                   <TableCell>
-                    <Chip 
-                      label={driver.licenseClass} 
-                      size="small" 
+                    <Chip
+                      label={driver.licenseClass}
+                      size="small"
                       variant="outlined"
                       color="primary"
                     />
@@ -471,15 +512,11 @@ const DriverList = () => {
                     <Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
                         <PhoneIcon sx={{ mr: 0.5, fontSize: 'small', color: 'text.secondary' }} />
-                        <Typography variant="caption">
-                          {driver.phoneNumber}
-                        </Typography>
+                        <Typography variant="caption">{driver.phoneNumber}</Typography>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <EmailIcon sx={{ mr: 0.5, fontSize: 'small', color: 'text.secondary' }} />
-                        <Typography variant="caption">
-                          {driver.email}
-                        </Typography>
+                        <Typography variant="caption">{driver.email}</Typography>
                       </Box>
                     </Box>
                   </TableCell>
@@ -518,10 +555,7 @@ const DriverList = () => {
                   <TableCell>
                     <Box sx={{ display: 'flex', gap: 1 }}>
                       <Tooltip title="Düzenle">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleOpenDialog(driver)}
-                        >
+                        <IconButton size="small" onClick={() => handleOpenDialog(driver)}>
                           <EditIcon />
                         </IconButton>
                       </Tooltip>
@@ -551,9 +585,7 @@ const DriverList = () => {
 
       {/* Add/Edit Driver Dialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
-        <DialogTitle>
-          {editingDriver ? 'Sürücü Düzenle' : 'Yeni Sürücü Ekle'}
-        </DialogTitle>
+        <DialogTitle>{editingDriver ? 'Sürücü Düzenle' : 'Yeni Sürücü Ekle'}</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} sm={6}>
@@ -561,7 +593,7 @@ const DriverList = () => {
                 fullWidth
                 label="Ad"
                 value={formData.firstName}
-                onChange={(e) => handleInputChange('firstName', e.target.value)}
+                onChange={e => handleInputChange('firstName', e.target.value)}
                 required
               />
             </Grid>
@@ -570,7 +602,7 @@ const DriverList = () => {
                 fullWidth
                 label="Soyad"
                 value={formData.lastName}
-                onChange={(e) => handleInputChange('lastName', e.target.value)}
+                onChange={e => handleInputChange('lastName', e.target.value)}
                 required
               />
             </Grid>
@@ -579,7 +611,7 @@ const DriverList = () => {
                 fullWidth
                 label="Lisans Numarası"
                 value={formData.licenseNo}
-                onChange={(e) => handleInputChange('licenseNo', e.target.value)}
+                onChange={e => handleInputChange('licenseNo', e.target.value)}
                 required
               />
             </Grid>
@@ -588,7 +620,7 @@ const DriverList = () => {
                 <InputLabel shrink>Lisans Sınıfı *</InputLabel>
                 <Select
                   value={formData.licenseClass}
-                  onChange={(e) => handleInputChange('licenseClass', e.target.value)}
+                  onChange={e => handleInputChange('licenseClass', e.target.value)}
                   label="Lisans Sınıfı *"
                   error={!formData.licenseClass}
                   notched
@@ -596,7 +628,7 @@ const DriverList = () => {
                   <MenuItem value="">
                     <em>Lisans sınıfı seçin</em>
                   </MenuItem>
-                  {licenseClassOptions.map((option) => (
+                  {licenseClassOptions.map(option => (
                     <MenuItem key={option} value={option}>
                       {option}
                     </MenuItem>
@@ -613,7 +645,7 @@ const DriverList = () => {
                 label="Pasaport Bitiş Tarihi"
                 type="date"
                 value={formData.passportExpiry}
-                onChange={(e) => handleInputChange('passportExpiry', e.target.value)}
+                onChange={e => handleInputChange('passportExpiry', e.target.value)}
                 InputLabelProps={{ shrink: true }}
               />
             </Grid>
@@ -623,7 +655,7 @@ const DriverList = () => {
                 label="Vize Bitiş Tarihi"
                 type="date"
                 value={formData.visaExpiry}
-                onChange={(e) => handleInputChange('visaExpiry', e.target.value)}
+                onChange={e => handleInputChange('visaExpiry', e.target.value)}
                 InputLabelProps={{ shrink: true }}
               />
             </Grid>
@@ -633,7 +665,7 @@ const DriverList = () => {
                 label="İkamet İzni Bitiş Tarihi"
                 type="date"
                 value={formData.residencePermitExpiry}
-                onChange={(e) => handleInputChange('residencePermitExpiry', e.target.value)}
+                onChange={e => handleInputChange('residencePermitExpiry', e.target.value)}
                 InputLabelProps={{ shrink: true }}
               />
             </Grid>
@@ -642,7 +674,7 @@ const DriverList = () => {
                 fullWidth
                 label="Telefon Numarası"
                 value={formData.phoneNumber}
-                onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                onChange={e => handleInputChange('phoneNumber', e.target.value)}
                 required
               />
             </Grid>
@@ -652,7 +684,7 @@ const DriverList = () => {
                 label="E-posta"
                 type="email"
                 value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
+                onChange={e => handleInputChange('email', e.target.value)}
                 required
               />
             </Grid>
@@ -662,7 +694,7 @@ const DriverList = () => {
                   <InputLabel shrink>Durum</InputLabel>
                   <Select
                     value={formData.isActive}
-                    onChange={(e) => handleInputChange('isActive', e.target.value)}
+                    onChange={e => handleInputChange('isActive', e.target.value)}
                     label="Durum"
                     notched
                   >
@@ -688,8 +720,8 @@ const DriverList = () => {
         autoHideDuration={6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
       >
-        <Alert 
-          onClose={() => setSnackbar({ ...snackbar, open: false })} 
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.severity}
         >
           {snackbar.message}

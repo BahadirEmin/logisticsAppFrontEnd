@@ -1,15 +1,15 @@
 // JWT Token management utilities
-export const TOKEN_KEY = "logistics_jwt_token";
-export const USER_KEY = "logistics_user_data";
+export const TOKEN_KEY = 'logistics_jwt_token';
+export const USER_KEY = 'logistics_user_data';
 
 // Normalize role from backend to frontend format
-export const normalizeRole = (role) => {
+export const normalizeRole = role => {
   if (!role) return role;
   return role.toLowerCase();
 };
 
 // Store JWT token in localStorage
-export const setToken = (token) => {
+export const setToken = token => {
   localStorage.setItem(TOKEN_KEY, token);
 };
 
@@ -24,7 +24,7 @@ export const removeToken = () => {
 };
 
 // Store user data in localStorage
-export const setUser = (user) => {
+export const setUser = user => {
   // Normalize role before storing
   const normalizedUser = user
     ? {
@@ -59,27 +59,27 @@ export const clearAuth = () => {
 };
 
 // Decode JWT token (basic implementation)
-export const decodeToken = (token) => {
+export const decodeToken = token => {
   try {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const jsonPayload = decodeURIComponent(
       atob(base64)
-        .split("")
+        .split('')
         .map(function (c) {
-          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         })
-        .join("")
+        .join('')
     );
     return JSON.parse(jsonPayload);
   } catch (error) {
-    console.error("Token decode error:", error);
+    console.error('Token decode error:', error);
     return null;
   }
 };
 
 // Check if token is expired
-export const isTokenExpired = (token) => {
+export const isTokenExpired = token => {
   if (!token) return true;
 
   const decoded = decodeToken(token);

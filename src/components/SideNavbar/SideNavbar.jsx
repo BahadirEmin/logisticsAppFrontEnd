@@ -1,15 +1,15 @@
 import React from 'react';
-import { 
-  Box, 
-  Drawer, 
-  List, 
-  ListItem, 
-  ListItemButton, 
-  ListItemIcon, 
-  ListItemText, 
+import {
+  Box,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
   Typography,
   Divider,
-  Button
+  Button,
 } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
@@ -35,7 +35,7 @@ const SideNavbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  
+
   const userRole = user?.role;
 
   const handleLogout = async () => {
@@ -66,7 +66,11 @@ const SideNavbar = () => {
           { text: 'Dashboard', icon: <HomeIcon />, path: '/operator' },
           { text: 'Hesabım', icon: <AccountCircleIcon />, path: '/operator/hesabim' },
           { text: 'Tekliflerim', icon: <ListAltIcon />, path: '/operator/tekliflerim' },
-          { text: 'Onaylanan Teklifler', icon: <CheckCircleIcon />, path: '/operator/onaylanan-teklifler' },
+          {
+            text: 'Onaylanan Teklifler',
+            icon: <CheckCircleIcon />,
+            path: '/operator/onaylanan-teklifler',
+          },
           { text: 'Sefer Takip Ekranı', icon: <TimelineIcon />, path: '/operator/sefer-takip' },
         ];
       case 'sales':
@@ -111,12 +115,18 @@ const SideNavbar = () => {
           {user?.name || user?.username}
         </Typography>
         <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
-          {userRole === 'admin' ? 'Admin' : userRole === 'operator' || userRole === 'operation' ? 'Operasyoncu' : userRole === 'fleet' ? 'Filocu' : 'Satışçı'}
+          {userRole === 'admin'
+            ? 'Admin'
+            : userRole === 'operator' || userRole === 'operation'
+              ? 'Operasyoncu'
+              : userRole === 'fleet'
+                ? 'Filocu'
+                : 'Satışçı'}
         </Typography>
       </Box>
       <Divider className="divider" />
       <List sx={{ pt: 2, flexGrow: 1 }}>
-        {menuItems.map((item) => {
+        {menuItems.map(item => {
           const isSelected = location.pathname === item.path;
           return (
             <ListItem key={item.text} disablePadding>
@@ -131,11 +141,9 @@ const SideNavbar = () => {
                   mb: 1,
                 }}
               >
-                <ListItemIcon className="nav-icon">
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText 
-                  primary={item.text} 
+                <ListItemIcon className="nav-icon">{item.icon}</ListItemIcon>
+                <ListItemText
+                  primary={item.text}
                   className={`nav-text ${isSelected ? 'selected' : ''}`}
                 />
               </ListItemButton>
@@ -143,7 +151,7 @@ const SideNavbar = () => {
           );
         })}
       </List>
-      
+
       {/* Logout button at bottom */}
       <Box sx={{ p: 2 }}>
         <Button
@@ -167,4 +175,4 @@ const SideNavbar = () => {
   );
 };
 
-export default SideNavbar; 
+export default SideNavbar;

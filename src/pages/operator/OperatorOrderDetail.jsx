@@ -11,7 +11,7 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader
+  CardHeader,
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon,
@@ -19,7 +19,7 @@ import {
   LocationOn as LocationIcon,
   Person as PersonIcon,
   LocalShipping as CargoIcon,
-  Schedule as ScheduleIcon
+  Schedule as ScheduleIcon,
 } from '@mui/icons-material';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
@@ -40,15 +40,15 @@ const OperatorOrderDetail = () => {
     if (location.state?.from) {
       return location.state.from;
     }
-    
+
     // URL path'e göre varsayılan geri dönüş yolu belirle
     const currentPath = location.pathname;
-    
+
     // Eğer onaylanan tekliflerden geldiyse
     if (currentPath.includes('onaylanan-teklifler')) {
       return '/operator/onaylanan-teklifler';
     }
-    
+
     // Varsayılan olarak tekliflerim sayfasına dön
     return '/operator/tekliflerim';
   };
@@ -63,7 +63,7 @@ const OperatorOrderDetail = () => {
     { value: 'YOLA_CIKTI', label: 'Yola Çıktı', color: 'info' },
     { value: 'GUMRUKTE', label: 'Gümrükte', color: 'warning' },
     { value: 'TAMAMLANDI', label: 'Tamamlandı', color: 'success' },
-    { value: 'IPTAL_EDILDI', label: 'İptal Edildi', color: 'error' }
+    { value: 'IPTAL_EDILDI', label: 'İptal Edildi', color: 'error' },
   ];
 
   useEffect(() => {
@@ -84,17 +84,17 @@ const OperatorOrderDetail = () => {
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     const statusOption = tripStatusOptions.find(option => option.value === status);
     return statusOption ? statusOption.color : 'default';
   };
 
-  const getStatusLabel = (status) => {
+  const getStatusLabel = status => {
     const statusOption = tripStatusOptions.find(option => option.value === status);
     return statusOption ? statusOption.label : status;
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     if (!dateString) return 'Belirtilmemiş';
     return new Date(dateString).toLocaleDateString('tr-TR');
   };
@@ -123,11 +123,7 @@ const OperatorOrderDetail = () => {
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
         </Alert>
-        <Button
-          variant="outlined"
-          startIcon={<ArrowBackIcon />}
-          onClick={handleBack}
-        >
+        <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={handleBack}>
           Geri Dön
         </Button>
       </Container>
@@ -140,11 +136,7 @@ const OperatorOrderDetail = () => {
         <Alert severity="warning" sx={{ mb: 2 }}>
           Sipariş bulunamadı.
         </Alert>
-        <Button
-          variant="outlined"
-          startIcon={<ArrowBackIcon />}
-          onClick={handleBack}
-        >
+        <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={handleBack}>
           Geri Dön
         </Button>
       </Container>
@@ -155,11 +147,7 @@ const OperatorOrderDetail = () => {
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Box display="flex" alignItems="center" gap={2}>
-          <Button
-            variant="outlined"
-            startIcon={<ArrowBackIcon />}
-            onClick={handleBack}
-          >
+          <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={handleBack}>
             Geri Dön
           </Button>
           <Typography variant="h4" component="h1">
@@ -175,12 +163,7 @@ const OperatorOrderDetail = () => {
           )}
         </Box>
         {order.tripStatus === 'TEKLIF_ASAMASI' && (
-          <Button
-            variant="contained"
-            startIcon={<EditIcon />}
-            onClick={handleEdit}
-            color="primary"
-          >
+          <Button variant="contained" startIcon={<EditIcon />} onClick={handleEdit} color="primary">
             Düzenle
           </Button>
         )}
@@ -189,17 +172,24 @@ const OperatorOrderDetail = () => {
       <Grid container spacing={3}>
         {/* Status Card */}
         <Grid item xs={12}>
-          <Card sx={{ 
-            height: '100%',
-            background: `linear-gradient(135deg, ${
-              order.tripStatus === 'TEKLIF_ASAMASI' ? '#f5f5f5, #e0e0e0' :
-              order.tripStatus === 'ONAYLANDI' ? '#e8f5e8, #c8e6c9' :
-              order.tripStatus === 'YOLA_CIKTI' ? '#e3f2fd, #bbdefb' :
-              order.tripStatus === 'GUMRUKTE' ? '#fff3e0, #ffcc02' :
-              order.tripStatus === 'TAMAMLANDI' ? '#e8f5e8, #4caf50' :
-              '#ffebee, #f44336'
-            })`
-          }}>
+          <Card
+            sx={{
+              height: '100%',
+              background: `linear-gradient(135deg, ${
+                order.tripStatus === 'TEKLIF_ASAMASI'
+                  ? '#f5f5f5, #e0e0e0'
+                  : order.tripStatus === 'ONAYLANDI'
+                    ? '#e8f5e8, #c8e6c9'
+                    : order.tripStatus === 'YOLA_CIKTI'
+                      ? '#e3f2fd, #bbdefb'
+                      : order.tripStatus === 'GUMRUKTE'
+                        ? '#fff3e0, #ffcc02'
+                        : order.tripStatus === 'TAMAMLANDI'
+                          ? '#e8f5e8, #4caf50'
+                          : '#ffebee, #f44336'
+              })`,
+            }}
+          >
             <CardHeader
               title="Sipariş Durumu ve Özet"
               avatar={<PersonIcon color="primary" />}
@@ -222,14 +212,28 @@ const OperatorOrderDetail = () => {
                 <Typography variant="h5" color="primary" sx={{ fontWeight: 'bold', mb: 3 }}>
                   {getStatusLabel(order.tripStatus)}
                 </Typography>
-                
+
                 {/* Güzergah */}
                 <Typography variant="h6" sx={{ mb: 2 }}>
-                  <strong>{order.departureCity}, {order.departureCountry}</strong> → <strong>{order.arrivalCity}, {order.arrivalCountry}</strong>
+                  <strong>
+                    {order.departureCity}, {order.departureCountry}
+                  </strong>{' '}
+                  →{' '}
+                  <strong>
+                    {order.arrivalCity}, {order.arrivalCountry}
+                  </strong>
                 </Typography>
-                
+
                 {/* Özet Bilgiler */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, flexWrap: 'wrap', mb: 2 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: 4,
+                    flexWrap: 'wrap',
+                    mb: 2,
+                  }}
+                >
                   <Typography variant="body1">
                     <strong>Yük:</strong> {order.cargoType}
                   </Typography>
@@ -240,9 +244,17 @@ const OperatorOrderDetail = () => {
                     <strong>Oluşturulma:</strong> {formatDate(order.createdAt)}
                   </Typography>
                 </Box>
-                
+
                 {/* Tarih Bilgileri */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, flexWrap: 'wrap', mb: 2 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: 4,
+                    flexWrap: 'wrap',
+                    mb: 2,
+                  }}
+                >
                   {order.loadingDate && (
                     <Typography variant="body2" color="warning.main" sx={{ fontWeight: 'medium' }}>
                       <strong>Yükleme:</strong> {formatDate(order.loadingDate)}
@@ -262,10 +274,10 @@ const OperatorOrderDetail = () => {
 
                 {/* Teklif Ücreti - En altta */}
                 <Typography variant="body1" sx={{ textAlign: 'center', mt: 2, fontWeight: 'bold' }}>
-                  Teklif Ücreti: {(order.estimatedPrice || order.price || order.quotePrice) 
+                  Teklif Ücreti:{' '}
+                  {order.estimatedPrice || order.price || order.quotePrice
                     ? `${order.estimatedPrice || order.price || order.quotePrice} ${order.currency || 'TRY'}`
-                    : 'Belirtilmemiş'
-                  }
+                    : 'Belirtilmemiş'}
                 </Typography>
               </Box>
             </CardContent>
@@ -350,11 +362,7 @@ const OperatorOrderDetail = () => {
         {/* Cargo and Date Information Row */}
         <Grid item xs={12} md={6}>
           <Card sx={{ height: '100%', minHeight: 280 }}>
-            <CardHeader
-              title="Yük Bilgileri"
-              avatar={<CargoIcon color="info" />}
-              sx={{ pb: 1 }}
-            />
+            <CardHeader title="Yük Bilgileri" avatar={<CargoIcon color="info" />} sx={{ pb: 1 }} />
             <CardContent sx={{ pt: 0 }}>
               <Typography variant="h6" gutterBottom color="info.main">
                 {order.cargoType}
@@ -372,10 +380,10 @@ const OperatorOrderDetail = () => {
                 <strong>Yükseklik:</strong> {order.cargoHeight} m
               </Typography>
               <Typography variant="body2" sx={{ mt: 2 }}>
-                <strong>Transfer Edilebilir:</strong> 
-                <Chip 
-                  label={order.canTransfer ? 'Evet' : 'Hayır'} 
-                  color={order.canTransfer ? 'success' : 'error'} 
+                <strong>Transfer Edilebilir:</strong>
+                <Chip
+                  label={order.canTransfer ? 'Evet' : 'Hayır'}
+                  color={order.canTransfer ? 'success' : 'error'}
                   size="small"
                   sx={{ ml: 1 }}
                 />
@@ -393,25 +401,25 @@ const OperatorOrderDetail = () => {
             />
             <CardContent sx={{ pt: 0 }}>
               <Typography variant="body2" sx={{ mb: 1, mt: 2 }}>
-                <strong>Yükleme Tarihi:</strong> 
+                <strong>Yükleme Tarihi:</strong>
                 <Box component="span" sx={{ ml: 1, color: 'warning.main' }}>
                   {formatDate(order.loadingDate)}
                 </Box>
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>Son Teslim Tarihi:</strong> 
+                <strong>Son Teslim Tarihi:</strong>
                 <Box component="span" sx={{ ml: 1, color: 'error.main' }}>
                   {formatDate(order.deadlineDate)}
                 </Box>
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>Tahmini Varış Tarihi:</strong> 
+                <strong>Tahmini Varış Tarihi:</strong>
                 <Box component="span" sx={{ ml: 1, color: 'info.main' }}>
                   {formatDate(order.estimatedArrivalDate)}
                 </Box>
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>Oluşturulma Tarihi:</strong> 
+                <strong>Oluşturulma Tarihi:</strong>
                 <Box component="span" sx={{ ml: 1, color: 'text.secondary' }}>
                   {formatDate(order.createdAt)}
                 </Box>
@@ -423,8 +431,8 @@ const OperatorOrderDetail = () => {
         {/* Personnel Assignment Information */}
         <Grid item xs={12} md={6}>
           <Card sx={{ height: '100%', minHeight: 240 }}>
-            <CardHeader 
-              title="Personel Atamaları" 
+            <CardHeader
+              title="Personel Atamaları"
               avatar={<PersonIcon color="primary" />}
               sx={{ pb: 1 }}
             />
@@ -436,28 +444,28 @@ const OperatorOrderDetail = () => {
                 <strong>Satış Personeli ID:</strong> {order.salesPersonId}
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>Operasyon Personeli:</strong> 
-                <Chip 
-                  label={order.operationPersonId || 'Atanmamış'} 
-                  color={order.operationPersonId ? 'success' : 'default'} 
+                <strong>Operasyon Personeli:</strong>
+                <Chip
+                  label={order.operationPersonId || 'Atanmamış'}
+                  color={order.operationPersonId ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
                 />
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>Filo Personeli:</strong> 
-                <Chip 
-                  label={order.fleetPersonId || 'Atanmamış'} 
-                  color={order.fleetPersonId ? 'success' : 'default'} 
+                <strong>Filo Personeli:</strong>
+                <Chip
+                  label={order.fleetPersonId || 'Atanmamış'}
+                  color={order.fleetPersonId ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
                 />
               </Typography>
               <Typography variant="body2">
-                <strong>Gümrük Personeli:</strong> 
-                <Chip 
-                  label={order.customsPersonId || 'Atanmamış'} 
-                  color={order.customsPersonId ? 'success' : 'default'} 
+                <strong>Gümrük Personeli:</strong>
+                <Chip
+                  label={order.customsPersonId || 'Atanmamış'}
+                  color={order.customsPersonId ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
                 />
@@ -469,26 +477,26 @@ const OperatorOrderDetail = () => {
         {/* Vehicle Assignment Information */}
         <Grid item xs={12} md={6}>
           <Card sx={{ height: '100%', minHeight: 240 }}>
-            <CardHeader 
-              title="Araç Atamaları" 
+            <CardHeader
+              title="Araç Atamaları"
               avatar={<CargoIcon color="secondary" />}
               sx={{ pb: 1 }}
             />
             <CardContent sx={{ pt: 0 }}>
               <Typography variant="body2" sx={{ mb: 1, mt: 1 }}>
-                <strong>Atanan Tır:</strong> 
-                <Chip 
-                  label={order.assignedTruckId || 'Atanmamış'} 
-                  color={order.assignedTruckId ? 'success' : 'default'} 
+                <strong>Atanan Tır:</strong>
+                <Chip
+                  label={order.assignedTruckId || 'Atanmamış'}
+                  color={order.assignedTruckId ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
                 />
               </Typography>
               <Typography variant="body2" sx={{ mb: 2 }}>
-                <strong>Atanan Romork:</strong> 
-                <Chip 
-                  label={order.assignedTrailerId || 'Atanmamış'} 
-                  color={order.assignedTrailerId ? 'success' : 'default'} 
+                <strong>Atanan Romork:</strong>
+                <Chip
+                  label={order.assignedTrailerId || 'Atanmamış'}
+                  color={order.assignedTrailerId ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
                 />

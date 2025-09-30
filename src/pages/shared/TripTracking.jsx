@@ -19,16 +19,16 @@ import {
   TableRow,
   Alert,
   CircularProgress,
-  LinearProgress
+  LinearProgress,
 } from '@mui/material';
-import { 
-  Search, 
-  LocalShipping, 
-  LocationOn, 
-  Schedule, 
+import {
+  Search,
+  LocalShipping,
+  LocationOn,
+  Schedule,
   CheckCircle,
   Warning,
-  DirectionsCar
+  DirectionsCar,
 } from '@mui/icons-material';
 
 const TripTracking = () => {
@@ -59,7 +59,7 @@ const TripTracking = () => {
           currentLocation: 'Eskişehir, Türkiye',
           cargoType: 'Genel Kargo',
           weight: '1500 kg',
-          customer: 'ABC Şirketi'
+          customer: 'ABC Şirketi',
         },
         {
           id: 2,
@@ -75,7 +75,7 @@ const TripTracking = () => {
           currentLocation: 'Bursa, Türkiye',
           cargoType: 'Soğuk Zincir',
           weight: '800 kg',
-          customer: 'XYZ Lojistik'
+          customer: 'XYZ Lojistik',
         },
         {
           id: 3,
@@ -91,8 +91,8 @@ const TripTracking = () => {
           currentLocation: 'Afyon, Türkiye',
           cargoType: 'Tehlikeli Madde',
           weight: '2000 kg',
-          customer: 'DEF Ticaret'
-        }
+          customer: 'DEF Ticaret',
+        },
       ];
       setTrips(mockTrips);
     } catch (error) {
@@ -102,12 +102,12 @@ const TripTracking = () => {
     }
   };
 
-  const getStatusChip = (status) => {
+  const getStatusChip = status => {
     const statusConfig = {
       in_progress: { label: 'Yolda', color: 'primary', icon: <LocalShipping /> },
       completed: { label: 'Tamamlandı', color: 'success', icon: <CheckCircle /> },
       delayed: { label: 'Gecikmeli', color: 'warning', icon: <Warning /> },
-      pending: { label: 'Beklemede', color: 'default', icon: <Schedule /> }
+      pending: { label: 'Beklemede', color: 'default', icon: <Schedule /> },
     };
 
     const config = statusConfig[status] || statusConfig.pending;
@@ -122,20 +122,25 @@ const TripTracking = () => {
     );
   };
 
-  const getProgressColor = (status) => {
+  const getProgressColor = status => {
     switch (status) {
-      case 'completed': return 'success';
-      case 'delayed': return 'warning';
-      case 'in_progress': return 'primary';
-      default: return 'default';
+      case 'completed':
+        return 'success';
+      case 'delayed':
+        return 'warning';
+      case 'in_progress':
+        return 'primary';
+      default:
+        return 'default';
     }
   };
 
-  const filteredTrips = trips.filter(trip => 
-    trip.tripNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    trip.driverName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    trip.vehiclePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    trip.customer.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredTrips = trips.filter(
+    trip =>
+      trip.tripNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      trip.driverName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      trip.vehiclePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      trip.customer.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -212,7 +217,7 @@ const TripTracking = () => {
           fullWidth
           placeholder="Sefer no, sürücü adı, plaka ara..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -226,11 +231,18 @@ const TripTracking = () => {
 
       {/* Trips Grid */}
       <Grid container spacing={3}>
-        {filteredTrips.map((trip) => (
+        {filteredTrips.map(trip => (
           <Grid item xs={12} md={6} lg={4} key={trip.id}>
             <Card elevation={2} sx={{ height: '100%' }}>
               <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    mb: 2,
+                  }}
+                >
                   <Typography variant="h6" component="h2" gutterBottom>
                     {trip.tripNumber}
                   </Typography>
@@ -273,9 +285,9 @@ const TripTracking = () => {
                   <Typography variant="body2" gutterBottom>
                     <strong>İlerleme:</strong>
                   </Typography>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={trip.progress} 
+                  <LinearProgress
+                    variant="determinate"
+                    value={trip.progress}
                     color={getProgressColor(trip.status)}
                     sx={{ height: 8, borderRadius: 4 }}
                   />
@@ -284,7 +296,9 @@ const TripTracking = () => {
                   </Typography>
                 </Box>
 
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box
+                  sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                >
                   <Box>
                     <Typography variant="caption" display="block" color="text.secondary">
                       Başlangıç: {new Date(trip.startDate).toLocaleDateString('tr-TR')}
@@ -293,11 +307,7 @@ const TripTracking = () => {
                       Tahmini: {new Date(trip.estimatedArrival).toLocaleDateString('tr-TR')}
                     </Typography>
                   </Box>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    startIcon={<LocationOn />}
-                  >
+                  <Button size="small" variant="outlined" startIcon={<LocationOn />}>
                     Takip Et
                   </Button>
                 </Box>
@@ -316,4 +326,4 @@ const TripTracking = () => {
   );
 };
 
-export default TripTracking; 
+export default TripTracking;

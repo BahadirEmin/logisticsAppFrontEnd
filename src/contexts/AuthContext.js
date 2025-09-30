@@ -1,23 +1,21 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { authAPI } from "../api/auth";
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { authAPI } from '../api/auth';
 import {
   setToken,
   getToken,
-  removeToken,
   setUser,
   getUser,
-  removeUser,
   isAuthenticated,
   clearAuth,
   normalizeRole,
-} from "../utils/auth";
+} from '../utils/auth';
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
@@ -53,7 +51,7 @@ export const AuthProvider = ({ children }) => {
           }
         }
       } catch (error) {
-        console.error("Auth initialization error:", error);
+        console.error('Auth initialization error:', error);
         clearAuth();
       } finally {
         setLoading(false);
@@ -77,11 +75,11 @@ export const AuthProvider = ({ children }) => {
             ...response.user,
             role: normalizeRole(response.user.role),
           }
-        : { username, role: "sales" };
+        : { username, role: 'sales' };
 
-      console.log("Login response:", response);
-      console.log("Original role:", response.user?.role);
-      console.log("Normalized role:", normalizedUser.role);
+      console.log('Login response:', response);
+      console.log('Original role:', response.user?.role);
+      console.log('Normalized role:', normalizedUser.role);
 
       // Store token and user data
       setToken(response.token);
@@ -90,8 +88,8 @@ export const AuthProvider = ({ children }) => {
 
       return response;
     } catch (error) {
-      console.error("Login error:", error);
-      setError(error.response?.data?.message || "Giriş başarısız");
+      console.error('Login error:', error);
+      setError(error.response?.data?.message || 'Giriş başarısız');
       throw error;
     } finally {
       setLoading(false);
@@ -103,7 +101,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await authAPI.logout();
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error('Logout error:', error);
     } finally {
       // Always clear local storage
       clearAuth();
@@ -113,7 +111,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Update user data
-  const updateUser = (userData) => {
+  const updateUser = userData => {
     const normalizedUser = userData
       ? {
           ...userData,
