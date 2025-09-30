@@ -258,7 +258,7 @@ const OfferList = () => {
                 notched
               >
                 <MenuItem value="all">
-                  <Chip label="Tümü" color="primary" size="small" />
+                  <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
                 </MenuItem>
                 {STATUS_OPTIONS.map(status => (
                   <MenuItem

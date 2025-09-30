@@ -273,7 +273,7 @@ const OfferList = () => {
                   label="Durum"
                 >
                   <MenuItem value="all">
-                    <Chip label="Tümü" size="small" variant="outlined" />
+                    <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
                   </MenuItem>
                   {STATUS_OPTIONS.map(status => (
                     <MenuItem key={status.value} value={status.value}>

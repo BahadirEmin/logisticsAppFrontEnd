@@ -364,7 +364,7 @@ const FleetVehicleList = () => {
                   notched
                 >
                   <MenuItem value="all">
-                    <Chip label="Tümü" size="small" variant="outlined" />
+                    <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
                   </MenuItem>
                   <MenuItem value="true">
                     <Chip label="Aktif" size="small" color="success" />

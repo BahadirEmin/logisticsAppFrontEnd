@@ -272,7 +272,7 @@ const OperatorMyOffers = () => {
                 notched
               >
                 <MenuItem value="all">
-                  <Chip label="Tümü" color="primary" size="small" />
+                  <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
                 </MenuItem>
                 {OPERATOR_STATUS_OPTIONS.map(status => (
                   <MenuItem key={status.value} value={status.value}>

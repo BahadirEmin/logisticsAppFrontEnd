@@ -333,7 +333,7 @@ const CustomerList = () => {
                     notched
                   >
                     <MenuItem value="all">
-                      <Chip label="Tümü" color="primary" size="small" />
+                      <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
                     </MenuItem>
                     {riskStatuses.map(status => (
                       <MenuItem key={status.id} value={status.id}>
@@ -360,13 +360,13 @@ const CustomerList = () => {
                     notched
                   >
                     <MenuItem value="all">
-                      <Chip label="Tümü" color="primary" size="small" />
+                      <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
                     </MenuItem>
                     <MenuItem value="true">
                       <Chip icon={<WarningIcon />} label="Kara Listede" color="error" size="small" />
                     </MenuItem>
                     <MenuItem value="false">
-                      <Chip label="Kara Listede Değil" color="success" size="small" />
+                      <Chip label="Güvenli" color="success" size="small" />
                     </MenuItem>
                   </Select>
                 </FormControl>
