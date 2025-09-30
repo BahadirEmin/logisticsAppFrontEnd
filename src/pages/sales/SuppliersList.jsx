@@ -47,7 +47,7 @@ const SuppliersList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterActive, setFilterActive] = useState('');
+  const [filterActive, setFilterActive] = useState('all');
 
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -101,7 +101,7 @@ const SuppliersList = () => {
       supplier.city?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesActive =
-      filterActive === '' ||
+      filterActive === 'all' ||
       (filterActive === 'true' && supplier.isActive) ||
       (filterActive === 'false' && !supplier.isActive);
 
@@ -334,16 +334,17 @@ const SuppliersList = () => {
                     label="Durum"
                     notched
                   >
-                    <MenuItem value="">Tümü</MenuItem>
-                    <MenuItem value="true">Aktif</MenuItem>
-                    <MenuItem value="false">Pasif</MenuItem>
+                    <MenuItem value="all">
+                      <Chip label="Tümü" color="primary" size="small" />
+                    </MenuItem>
+                    <MenuItem value="true">
+                      <Chip icon={<CheckCircleIcon />} label="Aktif" color="success" size="small" />
+                    </MenuItem>
+                    <MenuItem value="false">
+                      <Chip icon={<CancelIcon />} label="Pasif" color="error" size="small" />
+                    </MenuItem>
                   </Select>
                 </FormControl>
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  {filteredSuppliers.length} tedarikçi bulundu
-                </Typography>
               </Grid>
             </Grid>
           </CardContent>

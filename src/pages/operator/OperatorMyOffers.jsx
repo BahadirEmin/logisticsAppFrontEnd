@@ -271,10 +271,17 @@ const OperatorMyOffers = () => {
                 label="Durum Filtresi"
                 notched
               >
-                <MenuItem value="all">Tümü</MenuItem>
+                <MenuItem value="all">
+                  <Chip label="Tümü" color="primary" size="small" />
+                </MenuItem>
                 {OPERATOR_STATUS_OPTIONS.map(status => (
                   <MenuItem key={status.value} value={status.value}>
-                    <Chip label={status.label} color={status.color} size="small" />
+                    <Chip 
+                      icon={status.icon}
+                      label={status.label} 
+                      color={status.color} 
+                      size="small" 
+                    />
                   </MenuItem>
                 ))}
               </Select>

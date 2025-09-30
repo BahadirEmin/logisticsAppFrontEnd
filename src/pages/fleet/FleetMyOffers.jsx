@@ -384,7 +384,6 @@ const FleetMyOffers = () => {
                       label={getStatusLabel(offer.tripStatus || offer.status)}
                       color={getStatusColor(offer.tripStatus || offer.status)}
                       size="small"
-                      variant="outlined"
                     />
                   </TableCell>
                   <TableCell>

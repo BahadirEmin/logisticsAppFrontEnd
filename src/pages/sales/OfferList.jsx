@@ -258,7 +258,7 @@ const OfferList = () => {
                 notched
               >
                 <MenuItem value="all">
-                  <Chip label="Tümü" size="small" variant="outlined" />
+                  <Chip label="Tümü" color="primary" size="small" />
                 </MenuItem>
                 {STATUS_OPTIONS.map(status => (
                   <MenuItem
@@ -267,10 +267,10 @@ const OfferList = () => {
                     sx={{ justifyContent: 'flex-start' }}
                   >
                     <Chip 
+                      icon={status.icon}
                       label={status.label} 
                       color={status.color} 
                       size="small" 
-                      icon={status.icon}
                     />
                   </MenuItem>
                 ))}

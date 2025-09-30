@@ -238,12 +238,19 @@ const ApprovedOffers = () => {
           </Grid>
           <Grid item xs={12} md={6}>
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              <Chip
+                label="Tümü"
+                onClick={() => setFilterStatus('all')}
+                color={filterStatus === 'all' ? 'primary' : 'default'}
+                variant={filterStatus === 'all' ? 'filled' : 'outlined'}
+              />
               {STATUS_OPTIONS.map(status => (
                 <Chip
                   key={status.value}
+                  icon={status.icon}
                   label={status.label}
                   onClick={() => setFilterStatus(status.value)}
-                  color={filterStatus === status.value ? 'primary' : 'default'}
+                  color={filterStatus === status.value ? status.color : 'default'}
                   variant={filterStatus === status.value ? 'filled' : 'outlined'}
                 />
               ))}
@@ -317,7 +324,6 @@ const ApprovedOffers = () => {
                       label={getStatusLabel(offer.tripStatus || offer.status)}
                       color={getStatusColor(offer.tripStatus || offer.status)}
                       size="small"
-                      variant="outlined"
                     />
                   </TableCell>
                   <TableCell>

@@ -351,6 +351,7 @@ const OfferList = () => {
                     </TableCell>
                     <TableCell>
                       <Chip
+                        icon={getStatusIcon(offer.status || offer.tripStatus)}
                         label={getStatusLabel(offer.status || offer.tripStatus)}
                         color={getStatusColor(offer.status || offer.tripStatus)}
                         size="small"
