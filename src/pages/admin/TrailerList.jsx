@@ -323,7 +323,7 @@ const TrailerList = () => {
               <TextField
                 fullWidth
                 size="small"
-                label="Römork Ara"
+                label="Ara"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 InputProps={{

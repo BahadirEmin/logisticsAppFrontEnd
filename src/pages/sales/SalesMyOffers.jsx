@@ -265,7 +265,7 @@ const SalesMyOffers = () => {
             <TextField
               fullWidth
               size="small"
-              label="Arama"
+              label="Ara"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               InputProps={{

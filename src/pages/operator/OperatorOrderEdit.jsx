@@ -28,6 +28,7 @@ import {
 import { useParams, useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
 import { useAuth } from '../../contexts/AuthContext';
+import { STATUS_OPTIONS } from '../../constants/statusConstants';
 
 const OperatorOrderEdit = () => {
   const [order, setOrder] = useState(null);
@@ -37,15 +38,6 @@ const OperatorOrderEdit = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-
-  const tripStatusOptions = [
-    { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması' },
-    { value: 'ONAYLANDI', label: 'Onaylandı' },
-    { value: 'YOLA_CIKTI', label: 'Yola Çıktı' },
-    { value: 'GUMRUKTE', label: 'Gümrükte' },
-    { value: 'TAMAMLANDI', label: 'Tamamlandı' },
-    { value: 'IPTAL_EDILDI', label: 'İptal Edildi' },
-  ];
 
   useEffect(() => {
     loadOrder();
@@ -173,7 +165,7 @@ const OperatorOrderEdit = () => {
                     label="Durum"
                     notched
                   >
-                    {tripStatusOptions.map(status => (
+                    {STATUS_OPTIONS.map(status => (
                       <MenuItem key={status.value} value={status.value}>
                         {status.label}
                       </MenuItem>

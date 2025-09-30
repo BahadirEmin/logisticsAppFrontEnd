@@ -38,26 +38,17 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
+import { STATUS_OPTIONS, getStatusColor, getStatusLabel, getStatusIcon } from '../../constants/statusConstants';
 
 const OfferList = () => {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [approvalDialog, setApprovalDialog] = useState({ open: false, offer: null });
   const [approving, setApproving] = useState(false);
   const navigate = useNavigate();
-
-  // Trip status options
-  const tripStatusOptions = [
-    { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması', color: 'warning' },
-    { value: 'ONAYLANAN_TEKLIF', label: 'Onaylanan Teklif', color: 'success' },
-    { value: 'YOLA_CIKTI', label: 'Yola Çıktı', color: 'info' },
-    { value: 'TESLIM_EDILDI', label: 'Teslim Edildi', color: 'success' },
-    { value: 'REDDEDILDI', label: 'Reddedildi', color: 'error' },
-    { value: 'IPTAL_EDILDI', label: 'İptal Edildi', color: 'error' },
-  ];
 
   useEffect(() => {
     loadOffers();
@@ -77,16 +68,6 @@ const OfferList = () => {
     }
   };
 
-  const getStatusColor = status => {
-    const statusOption = tripStatusOptions.find(option => option.value === status);
-    return statusOption ? statusOption.color : 'default';
-  };
-
-  const getStatusLabel = status => {
-    const statusOption = tripStatusOptions.find(option => option.value === status);
-    return statusOption ? statusOption.label : status;
-  };
-
   const filteredOffers = offers.filter(offer => {
     const matchesSearch =
       offer.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -95,7 +76,7 @@ const OfferList = () => {
       offer.cargoType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       offer.id?.toString().includes(searchTerm);
 
-    const matchesStatus = !statusFilter || offer.tripStatus === statusFilter;
+    const matchesStatus = statusFilter === 'all' || !statusFilter || offer.tripStatus === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
@@ -259,7 +240,7 @@ const OfferList = () => {
             <TextField
               fullWidth
               size="small"
-              label="Ara..."
+              label="Ara"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               InputProps={{
@@ -276,14 +257,21 @@ const OfferList = () => {
                 label="Durum Filtresi"
                 notched
               >
-                <MenuItem value="">Tümü</MenuItem>
-                {tripStatusOptions.map(status => (
+                <MenuItem value="all">
+                  <Chip label="Tümü" size="small" variant="outlined" />
+                </MenuItem>
+                {STATUS_OPTIONS.map(status => (
                   <MenuItem
                     key={status.value}
                     value={status.value}
                     sx={{ justifyContent: 'flex-start' }}
                   >
-                    <Chip label={status.label} color={status.color} size="small" />
+                    <Chip 
+                      label={status.label} 
+                      color={status.color} 
+                      size="small" 
+                      icon={status.icon}
+                    />
                   </MenuItem>
                 ))}
               </Select>
@@ -383,7 +371,7 @@ const OfferList = () => {
                         label={getStatusLabel(offer.tripStatus)}
                         color={getStatusColor(offer.tripStatus)}
                         size="small"
-                        variant="outlined"
+                        icon={getStatusIcon(offer.tripStatus)}
                       />
                     </TableCell>
                     <TableCell>

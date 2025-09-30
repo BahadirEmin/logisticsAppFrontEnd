@@ -45,7 +45,7 @@ const TrailerList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterActive, setFilterActive] = useState('');
+  const [filterActive, setFilterActive] = useState('all');
 
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -102,7 +102,7 @@ const TrailerList = () => {
       trailer.vin?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesActive =
-      filterActive === '' ||
+      filterActive === 'all' || filterActive === '' ||
       (filterActive === 'true' && trailer.isActive) ||
       (filterActive === 'false' && !trailer.isActive);
 
@@ -326,7 +326,7 @@ const TrailerList = () => {
               <TextField
                 fullWidth
                 size="small"
-                label="Römork Ara"
+                label="Ara"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 InputProps={{
@@ -347,9 +347,15 @@ const TrailerList = () => {
                   label="Durum"
                   notched
                 >
-                  <MenuItem value="">Tümü</MenuItem>
-                  <MenuItem value="true">Aktif</MenuItem>
-                  <MenuItem value="false">Pasif</MenuItem>
+                  <MenuItem value="all">
+                    <Chip label="Tümü" size="small" variant="outlined" />
+                  </MenuItem>
+                  <MenuItem value="true">
+                    <Chip label="Aktif" size="small" color="success" />
+                  </MenuItem>
+                  <MenuItem value="false">
+                    <Chip label="Pasif" size="small" color="error" />
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -460,7 +466,7 @@ const TrailerList = () => {
               Römork bulunamadı
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {searchTerm || filterActive !== ''
+              {searchTerm || filterActive !== 'all'
                 ? 'Arama kriterlerinizi değiştirmeyi deneyin.'
                 : 'Henüz römork eklenmemiş.'}
             </Typography>

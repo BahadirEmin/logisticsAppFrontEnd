@@ -31,36 +31,16 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
 import FleetResourceAssignment from '../../components/FleetResourceAssignment';
+import { STATUS_OPTIONS, getStatusColor, getStatusLabel, getStatusIcon } from '../../constants/statusConstants';
 
 const OfferList = () => {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [assignmentDialog, setAssignmentDialog] = useState({ open: false, order: null });
   const navigate = useNavigate();
-
-  // Fleet status options - using same standard as Sales and Operation
-  const fleetStatusOptions = [
-    { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması', color: 'warning' },
-    { value: 'ONAYLANAN_TEKLIF', label: 'Onaylanan Teklif', color: 'success' },
-    { value: 'YOLA_CIKTI', label: 'Yola Çıktı', color: 'info' },
-    { value: 'TESLIM_EDILDI', label: 'Teslim Edildi', color: 'success' },
-    { value: 'REDDEDILDI', label: 'Reddedildi', color: 'error' },
-    { value: 'IPTAL_EDILDI', label: 'İptal Edildi', color: 'error' },
-  ];
-
-  // Status helper functions
-  const getStatusColor = status => {
-    const statusOption = fleetStatusOptions.find(option => option.value === status);
-    return statusOption ? statusOption.color : 'default';
-  };
-
-  const getStatusLabel = status => {
-    const statusOption = fleetStatusOptions.find(option => option.value === status);
-    return statusOption ? statusOption.label : status;
-  };
 
   const fetchOffers = useCallback(async () => {
     try {
@@ -168,7 +148,7 @@ const OfferList = () => {
       (offer.departureAddress && offer.departureAddress.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (offer.arrivalAddress && offer.arrivalAddress.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const matchesStatus = !statusFilter || 
+    const matchesStatus = statusFilter === 'all' || !statusFilter || 
       (offer.status === statusFilter || offer.tripStatus === statusFilter);
 
     return matchesSearch && matchesStatus;
@@ -292,10 +272,18 @@ const OfferList = () => {
                   notched
                   label="Durum"
                 >
-                  <MenuItem value="">Tümü</MenuItem>
-                  {fleetStatusOptions.map(status => (
+                  <MenuItem value="all">
+                    <Chip label="Tümü" size="small" variant="outlined" />
+                  </MenuItem>
+                  {STATUS_OPTIONS.map(status => (
                     <MenuItem key={status.value} value={status.value}>
-                      {status.label}
+                      <Chip
+                        label={status.label}
+                        color={status.color}
+                        size="small"
+                        icon={status.icon}
+                        sx={{ minWidth: 100 }}
+                      />
                     </MenuItem>
                   ))}
                 </Select>

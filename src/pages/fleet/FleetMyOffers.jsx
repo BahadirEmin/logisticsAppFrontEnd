@@ -50,6 +50,7 @@ import {
 import { ordersAPI } from '../../api/orders';
 import { useAuth } from '../../contexts/AuthContext';
 import FleetResourceAssignment from '../../components/FleetResourceAssignment';
+import { STATUS_OPTIONS, getStatusColor, getStatusLabel, getStatusIcon } from '../../constants/statusConstants';
 
 const FleetMyOffers = () => {
   const [offers, setOffers] = useState([]);
@@ -64,16 +65,6 @@ const FleetMyOffers = () => {
     loading: false,
   });
   const { user } = useAuth();
-
-  // Fleet-specific status options - using same standard as Sales and Operation
-  const fleetStatusOptions = [
-    { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması', color: 'warning', icon: <Schedule /> },
-    { value: 'ONAYLANAN_TEKLIF', label: 'Onaylanan Teklif', color: 'success', icon: <CheckCircle /> },
-    { value: 'YOLA_CIKTI', label: 'Yola Çıktı', color: 'info', icon: <LocalShipping /> },
-    { value: 'TESLIM_EDILDI', label: 'Teslim Edildi', color: 'success', icon: <CheckCircle /> },
-    { value: 'REDDEDILDI', label: 'Reddedildi', color: 'error', icon: <Schedule /> },
-    { value: 'IPTAL_EDILDI', label: 'İptal Edildi', color: 'error', icon: <Schedule /> },
-  ];
 
   const loadFleetOffers = useCallback(async () => {
     try {
@@ -100,21 +91,6 @@ const FleetMyOffers = () => {
   useEffect(() => {
     loadFleetOffers();
   }, [loadFleetOffers]);
-
-  const getStatusIcon = status => {
-    const statusOption = fleetStatusOptions.find(option => option.value === status);
-    return statusOption ? statusOption.icon : <Schedule />;
-  };
-
-  const getStatusLabel = status => {
-    const statusOption = fleetStatusOptions.find(option => option.value === status);
-    return statusOption ? statusOption.label : status;
-  };
-
-  const getStatusColor = status => {
-    const statusOption = fleetStatusOptions.find(option => option.value === status);
-    return statusOption ? statusOption.color : 'default';
-  };
 
   const filteredOffers = offers.filter(offer => {
     const matchesSearch =
@@ -310,7 +286,7 @@ const FleetMyOffers = () => {
             <TextField
               fullWidth
               size="small"
-              label="Arama"
+              label="Ara"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               InputProps={{
@@ -327,13 +303,17 @@ const FleetMyOffers = () => {
                 label="Durum Filtresi"
                 notched
               >
-                <MenuItem value="all">Tümü</MenuItem>
-                {fleetStatusOptions.map(status => (
+                <MenuItem value="all">
+                  <Chip label="Tümü" size="small" variant="outlined" />
+                </MenuItem>
+                {STATUS_OPTIONS.map(status => (
                   <MenuItem key={status.value} value={status.value}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {status.icon}
-                      <Typography sx={{ ml: 1 }}>{status.label}</Typography>
-                    </Box>
+                    <Chip
+                      label={status.label}
+                      size="small"
+                      color={status.color}
+                      icon={status.icon}
+                    />
                   </MenuItem>
                 ))}
               </Select>
