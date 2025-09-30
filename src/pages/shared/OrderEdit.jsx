@@ -27,6 +27,7 @@ import {
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
+import { useAuth } from '../../contexts/AuthContext';
 
 const OrderEdit = () => {
   const [order, setOrder] = useState(null);
@@ -35,6 +36,7 @@ const OrderEdit = () => {
   const [error, setError] = useState(null);
   const { orderId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const tripStatusOptions = [
     { value: 'TEKLIF_ASAMASI', label: 'Teklif Aşaması' },
@@ -133,6 +135,25 @@ const OrderEdit = () => {
     );
   }
 
+  // Check if sales user is trying to edit an order that's not in draft stage
+  if (user?.role === 'sales' && order.tripStatus !== 'TEKLIF_ASAMASI') {
+    return (
+      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          <strong>Yetkisiz Erişim:</strong> Onaylanmış siparişleri sadece görüntüleyebilirsiniz. 
+          Durum değişiklikleri operasyon ekibi tarafından yapılmaktadır.
+        </Alert>
+        <Button
+          variant="outlined"
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate(`/sales/teklifler/${orderId}`)}
+        >
+          Sipariş Detayına Dön
+        </Button>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -163,20 +184,35 @@ const OrderEdit = () => {
             <Card>
               <CardHeader title="Sipariş Durumu" />
               <CardContent>
-                <FormControl fullWidth>
-                  <InputLabel>Durum</InputLabel>
-                  <Select
-                    value={order.tripStatus}
-                    onChange={(e) => handleInputChange('tripStatus', e.target.value)}
+                {user?.role === 'sales' ? (
+                  // Sales personnel can only view status, not change it
+                  <TextField
+                    fullWidth
                     label="Durum"
-                  >
-                    {tripStatusOptions.map((status) => (
-                      <MenuItem key={status.value} value={status.value}>
-                        {status.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                    value={tripStatusOptions.find(status => status.value === order.tripStatus)?.label || order.tripStatus}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    disabled
+                    helperText="Durum değişiklikleri operasyon ekibi tarafından yapılmaktadır"
+                  />
+                ) : (
+                  // Other roles can change status
+                  <FormControl fullWidth>
+                    <InputLabel>Durum</InputLabel>
+                    <Select
+                      value={order.tripStatus}
+                      onChange={(e) => handleInputChange('tripStatus', e.target.value)}
+                      label="Durum"
+                    >
+                      {tripStatusOptions.map((status) => (
+                        <MenuItem key={status.value} value={status.value}>
+                          {status.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
               </CardContent>
             </Card>
           </Grid>

@@ -479,6 +479,7 @@ const OfferForm = () => {
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Şehir"
               name="fromAddress.city"
@@ -493,6 +494,7 @@ const OfferForm = () => {
           <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="İlçe"
               name="fromAddress.district"
@@ -504,6 +506,7 @@ const OfferForm = () => {
           <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Posta Kodu"
               name="fromAddress.zipCode"
@@ -518,6 +521,7 @@ const OfferForm = () => {
           <Grid item xs={12}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Açık Adres"
               name="fromAddress.address"
@@ -531,6 +535,7 @@ const OfferForm = () => {
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="İletişim Kişisi"
               name="fromAddress.contactPerson"
@@ -542,6 +547,7 @@ const OfferForm = () => {
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Telefon"
               name="fromAddress.phone"
@@ -553,6 +559,7 @@ const OfferForm = () => {
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="E-posta"
               name="fromAddress.email"
@@ -598,6 +605,7 @@ const OfferForm = () => {
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Şehir"
               name="toAddress.city"
@@ -612,6 +620,7 @@ const OfferForm = () => {
           <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="İlçe"
               name="toAddress.district"
@@ -623,6 +632,7 @@ const OfferForm = () => {
           <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Posta Kodu"
               name="toAddress.zipCode"
@@ -637,6 +647,7 @@ const OfferForm = () => {
           <Grid item xs={12}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Açık Adres"
               name="toAddress.address"
@@ -650,6 +661,7 @@ const OfferForm = () => {
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="İletişim Kişisi"
               name="toAddress.contactPerson"
@@ -661,6 +673,7 @@ const OfferForm = () => {
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Telefon"
               name="toAddress.phone"
@@ -672,6 +685,7 @@ const OfferForm = () => {
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="E-posta"
               name="toAddress.email"
@@ -724,6 +738,7 @@ const OfferForm = () => {
               <Grid item xs={12} sm={4} md={4}>
                 <TextField
                   fullWidth
+                  variant="outlined"
                   size="small"
                   label="Uzunluk (cm)"
                   type="number"
@@ -737,6 +752,7 @@ const OfferForm = () => {
               <Grid item xs={12} sm={4} md={4}>
                 <TextField
                   fullWidth
+                  variant="outlined"
                   size="small"
                   label="Genişlik (cm)"
                   type="number"
@@ -750,6 +766,7 @@ const OfferForm = () => {
               <Grid item xs={12} sm={4} md={4}>
                 <TextField
                   fullWidth
+                  variant="outlined"
                   size="small"
                   label="Yükseklik (cm)"
                   type="number"
@@ -791,6 +808,7 @@ const OfferForm = () => {
               <Grid item xs={12} sm={6} md={6}>
                 <TextField
                   fullWidth
+                  variant="outlined"
                   size="small"
                   label="Ağırlık (kg)"
                   value={item.weight}
@@ -807,6 +825,7 @@ const OfferForm = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
+                  variant="outlined"
                   size="small"
                   label="Yük Açıklaması"
                   multiline
@@ -1049,6 +1068,7 @@ const OfferForm = () => {
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Teklif Fiyatı"
               value={formData.estimatedPrice}
