@@ -376,14 +376,15 @@ const OfferForm = () => {
         </Box>
         <Grid container spacing={2}>
           <Grid item xs={12} md={8}>
-            <FormControl fullWidth error={!!errors.customerId} size="small" sx={{ minWidth: 200 }}>
-              <InputLabel>Müşteri Seçin</InputLabel>
+            <FormControl fullWidth error={!!errors.customerId} size="small" variant="outlined" sx={{ minWidth: 200 }}>
+              <InputLabel shrink>Müşteri Seçin</InputLabel>
               <Select
                 name="customerId"
                 value={formData.customerId}
                 onChange={handleCustomerChange}
                 label="Müşteri Seçin"
                 disabled={loading}
+                notched
               >
                 {customers.map((customer) => (
                   <MenuItem key={customer.id} value={customer.id}>
@@ -455,7 +456,7 @@ const OfferForm = () => {
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={4}>
             <FormControl fullWidth error={!!errors['fromAddress.country']} size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Ülke</InputLabel>
+              <InputLabel shrink>Ülke</InputLabel>
               <Select
                 name="fromAddress.country"
                 value={formData.fromAddress.country}
@@ -479,6 +480,7 @@ const OfferForm = () => {
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Şehir"
               name="fromAddress.city"
@@ -487,23 +489,27 @@ const OfferForm = () => {
               required
               error={!!errors['fromAddress.city']}
               helperText={errors['fromAddress.city']}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
           <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="İlçe"
               name="fromAddress.district"
               value={formData.fromAddress.district}
               onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
           <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Posta Kodu"
               name="fromAddress.zipCode"
@@ -512,12 +518,14 @@ const OfferForm = () => {
               required
               error={!!errors['fromAddress.zipCode']}
               helperText={errors['fromAddress.zipCode']}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
           <Grid item xs={12}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Açık Adres"
               name="fromAddress.address"
@@ -525,40 +533,47 @@ const OfferForm = () => {
               onChange={handleInputChange}
               multiline
               rows={2}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="İletişim Kişisi"
               name="fromAddress.contactPerson"
               value={formData.fromAddress.contactPerson}
               onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Telefon"
               name="fromAddress.phone"
               value={formData.fromAddress.phone}
               onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="E-posta"
               name="fromAddress.email"
               type="email"
               value={formData.fromAddress.email}
               onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
         </Grid>
@@ -574,7 +589,7 @@ const OfferForm = () => {
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={4}>
             <FormControl fullWidth error={!!errors['toAddress.country']} size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Ülke</InputLabel>
+              <InputLabel shrink>Ülke</InputLabel>
               <Select
                 name="toAddress.country"
                 value={formData.toAddress.country}
@@ -598,6 +613,7 @@ const OfferForm = () => {
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Şehir"
               name="toAddress.city"
@@ -606,23 +622,27 @@ const OfferForm = () => {
               required
               error={!!errors['toAddress.city']}
               helperText={errors['toAddress.city']}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
           <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="İlçe"
               name="toAddress.district"
               value={formData.toAddress.district}
               onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
           <Grid item xs={12} sm={6} md={2}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Posta Kodu"
               name="toAddress.zipCode"
@@ -631,12 +651,14 @@ const OfferForm = () => {
               required
               error={!!errors['toAddress.zipCode']}
               helperText={errors['toAddress.zipCode']}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
           <Grid item xs={12}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Açık Adres"
               name="toAddress.address"
@@ -644,40 +666,47 @@ const OfferForm = () => {
               onChange={handleInputChange}
               multiline
               rows={2}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="İletişim Kişisi"
               name="toAddress.contactPerson"
               value={formData.toAddress.contactPerson}
               onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Telefon"
               name="toAddress.phone"
               value={formData.toAddress.phone}
               onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="E-posta"
               name="toAddress.email"
               type="email"
               value={formData.toAddress.email}
               onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
         </Grid>
@@ -724,6 +753,7 @@ const OfferForm = () => {
               <Grid item xs={12} sm={4} md={4}>
                 <TextField
                   fullWidth
+                  variant="outlined"
                   size="small"
                   label="Uzunluk (cm)"
                   type="number"
@@ -732,11 +762,13 @@ const OfferForm = () => {
                   required
                   error={!!errors[`cargoItems.${index}.dimensions`]}
                   helperText={errors[`cargoItems.${index}.dimensions`] && "Uzunluk gerekli"}
+                  InputLabelProps={{ shrink: true }}
                 />
               </Grid>
               <Grid item xs={12} sm={4} md={4}>
                 <TextField
                   fullWidth
+                  variant="outlined"
                   size="small"
                   label="Genişlik (cm)"
                   type="number"
@@ -745,11 +777,13 @@ const OfferForm = () => {
                   required
                   error={!!errors[`cargoItems.${index}.dimensions`]}
                   helperText={errors[`cargoItems.${index}.dimensions`] && "Genişlik gerekli"}
+                  InputLabelProps={{ shrink: true }}
                 />
               </Grid>
               <Grid item xs={12} sm={4} md={4}>
                 <TextField
                   fullWidth
+                  variant="outlined"
                   size="small"
                   label="Yükseklik (cm)"
                   type="number"
@@ -758,6 +792,7 @@ const OfferForm = () => {
                   required
                   error={!!errors[`cargoItems.${index}.dimensions`]}
                   helperText={errors[`cargoItems.${index}.dimensions`] && "Yükseklik gerekli"}
+                  InputLabelProps={{ shrink: true }}
                 />
               </Grid>
             </Grid>
@@ -768,12 +803,13 @@ const OfferForm = () => {
             </Typography>
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid item xs={12} sm={6} md={6}>
-                <FormControl fullWidth size="small" error={!!errors[`cargoItems.${index}.cargoType`]} required sx={{ minWidth: 150 }}>
-                  <InputLabel>Yük Tipi *</InputLabel>
+                <FormControl fullWidth size="small" variant="outlined" error={!!errors[`cargoItems.${index}.cargoType`]} required sx={{ minWidth: 150 }}>
+                  <InputLabel shrink>Yük Tipi</InputLabel>
                   <Select
                     value={item.cargoType}
                     onChange={(e) => handleCargoItemChange(index, 'cargoType', e.target.value)}
-                    label="Yük Tipi *"
+                    label="Yük Tipi"
+                    notched
                   >
                     {cargoTypes.map((type) => (
                       <MenuItem key={type} value={type}>
@@ -791,6 +827,7 @@ const OfferForm = () => {
               <Grid item xs={12} sm={6} md={6}>
                 <TextField
                   fullWidth
+                  variant="outlined"
                   size="small"
                   label="Ağırlık (kg)"
                   value={item.weight}
@@ -798,6 +835,7 @@ const OfferForm = () => {
                   required
                   error={!!errors[`cargoItems.${index}.weight`]}
                   helperText={errors[`cargoItems.${index}.weight`]}
+                  InputLabelProps={{ shrink: true }}
                 />
               </Grid>
             </Grid>
@@ -807,12 +845,14 @@ const OfferForm = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
+                  variant="outlined"
                   size="small"
                   label="Yük Açıklaması"
                   multiline
                   rows={2}
                   value={item.description}
                   onChange={(e) => handleCargoItemChange(index, 'description', e.target.value)}
+                  InputLabelProps={{ shrink: true }}
                 />
               </Grid>
             </Grid>
@@ -1049,11 +1089,13 @@ const OfferForm = () => {
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
+              variant="outlined"
               size="small"
               label="Teklif Fiyatı"
               value={formData.estimatedPrice}
               onChange={handleInputChange}
               name="estimatedPrice"
+              InputLabelProps={{ shrink: true }}
               InputProps={{
                 endAdornment: (
                   <Box sx={{ ml: 1 }}>
@@ -1065,13 +1107,14 @@ const OfferForm = () => {
           </Grid>
           
           <Grid item xs={12} md={6}>
-            <FormControl fullWidth size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Para Birimi</InputLabel>
+            <FormControl fullWidth size="small" variant="outlined" sx={{ minWidth: 150 }}>
+              <InputLabel shrink>Para Birimi</InputLabel>
               <Select
                 name="currency"
                 value={formData.currency}
                 onChange={handleInputChange}
                 label="Para Birimi"
+                notched
               >
                 {currencies.map((currency) => (
                   <MenuItem key={currency.value} value={currency.value}>

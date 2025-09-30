@@ -197,6 +197,14 @@ const OfferList = () => {
         Tekliflerim
       </Typography>
 
+      {/* Info Alert about order status management */}
+      <Alert severity="info" sx={{ mb: 2 }}>
+        <Typography variant="body2">
+          <strong>Bilgi:</strong> Onayladığınız siparişlerin durumunu sadece görüntüleyebilir, değiştiremezsiniz. 
+          Sipariş durumu değişiklikleri operasyon ekibi tarafından yönetilmektedir.
+        </Typography>
+      </Alert>
+
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
@@ -443,19 +451,6 @@ const OfferList = () => {
                                 onClick={() => handleDeleteOffer(offer.id)}
                               >
                                 <DeleteIcon />
-                              </IconButton>
-                            </Tooltip>
-                          </>
-                        )}
-                        {offer.tripStatus === 'ONAYLANAN_TEKLIF' && (
-                          <>
-                            <Tooltip title="Düzenle">
-                              <IconButton
-                                size="small"
-                                color="warning"
-                                onClick={() => handleEditOffer(offer.id)}
-                              >
-                                <EditIcon />
                               </IconButton>
                             </Tooltip>
                           </>
