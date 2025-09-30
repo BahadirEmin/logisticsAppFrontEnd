@@ -227,12 +227,13 @@ const OfferList = () => {
             />
           </Grid>
           <Grid item xs={12} md={3}>
-            <FormControl fullWidth size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Durum Filtresi</InputLabel>
+            <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+              <InputLabel shrink>Durum Filtresi</InputLabel>
               <Select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 label="Durum Filtresi"
+                notched
               >
                 <MenuItem value="">Tümü</MenuItem>
                 {tripStatusOptions.map((status) => (

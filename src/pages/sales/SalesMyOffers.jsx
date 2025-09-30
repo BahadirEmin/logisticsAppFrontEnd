@@ -185,7 +185,7 @@ const SalesMyOffers = () => {
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h4" component="h1">
+        <Typography variant="h4" component="h1" sx={{ color: '#1976d2' }}>
           Tekliflerim
         </Typography>
         <Button
@@ -197,6 +197,50 @@ const SalesMyOffers = () => {
           Yeni Teklif
         </Button>
       </Box>
+
+      {/* Stats Cards */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 2, textAlign: 'center' }}>
+            <Typography color="textSecondary" gutterBottom>
+              Toplam Teklif
+            </Typography>
+            <Typography variant="h4" component="div" color="primary.main">
+              {offers.length}
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 2, textAlign: 'center' }}>
+            <Typography color="textSecondary" gutterBottom>
+              Onaylanan
+            </Typography>
+            <Typography variant="h4" component="div" color="success.main">
+              {offers.filter(o => o.tripStatus === 'ONAYLANAN_TEKLIF').length}
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 2, textAlign: 'center' }}>
+            <Typography color="textSecondary" gutterBottom>
+              Bekleyen
+            </Typography>
+            <Typography variant="h4" component="div" color="warning.main">
+              {offers.filter(o => o.tripStatus === 'TEKLIF_ASAMASI').length}
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 2, textAlign: 'center' }}>
+            <Typography color="textSecondary" gutterBottom>
+              Reddedilen
+            </Typography>
+            <Typography variant="h4" component="div" color="error.main">
+              {offers.filter(o => o.tripStatus === 'REDDEDILDI').length}
+            </Typography>
+          </Paper>
+        </Grid>
+      </Grid>
 
       {/* Info Alert about order status management */}
       <Alert severity="info" sx={{ mb: 2 }}>
@@ -212,6 +256,7 @@ const SalesMyOffers = () => {
         </Alert>
       )}
 
+      {/* Filters */}
       <Paper sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} md={3}>
@@ -227,12 +272,13 @@ const SalesMyOffers = () => {
             />
           </Grid>
           <Grid item xs={12} md={3}>
-            <FormControl fullWidth size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Durum Filtresi</InputLabel>
+            <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+              <InputLabel shrink>Durum Filtresi</InputLabel>
               <Select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 label="Durum Filtresi"
+                notched
               >
                 <MenuItem value="">Tümü</MenuItem>
                 {tripStatusOptions.map((status) => (

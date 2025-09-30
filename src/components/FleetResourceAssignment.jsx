@@ -166,18 +166,16 @@ const FleetResourceAssignment = ({
           <Grid container spacing={3}>
             {/* Vehicle Selection */}
             <Grid item xs={12} md={4}>
-              <FormControl fullWidth>
-                <InputLabel id="vehicle-select-label">
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <VehicleIcon fontSize="small" />
-                    Araç Seçin
-                  </Box>
+              <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+                <InputLabel id="vehicle-select-label" shrink>
+                  Araç Seçin
                 </InputLabel>
                 <Select
                   labelId="vehicle-select-label"
                   value={selectedVehicle}
                   onChange={(e) => setSelectedVehicle(e.target.value)}
                   label="Araç Seçin"
+                  notched
                 >
                   <MenuItem value="">
                     <em>Araç seçmeyin</em>
@@ -200,18 +198,16 @@ const FleetResourceAssignment = ({
 
             {/* Driver Selection */}
             <Grid item xs={12} md={4}>
-              <FormControl fullWidth>
-                <InputLabel id="driver-select-label">
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <DriverIcon fontSize="small" />
-                    Şoför Seçin
-                  </Box>
+              <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+                <InputLabel id="driver-select-label" shrink>
+                  Şoför Seçin
                 </InputLabel>
                 <Select
                   labelId="driver-select-label"
                   value={selectedDriver}
                   onChange={(e) => setSelectedDriver(e.target.value)}
                   label="Şoför Seçin"
+                  notched
                 >
                   <MenuItem value="">
                     <em>Şoför seçmeyin</em>
@@ -234,18 +230,16 @@ const FleetResourceAssignment = ({
 
             {/* Trailer Selection */}
             <Grid item xs={12} md={4}>
-              <FormControl fullWidth>
-                <InputLabel id="trailer-select-label">
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <TrailerIcon fontSize="small" />
-                    Römork Seçin
-                  </Box>
+              <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+                <InputLabel id="trailer-select-label" shrink>
+                  Römork Seçin
                 </InputLabel>
                 <Select
                   labelId="trailer-select-label"
                   value={selectedTrailer}
                   onChange={(e) => setSelectedTrailer(e.target.value)}
                   label="Römork Seçin"
+                  notched
                 >
                   <MenuItem value="">
                     <em>Römork seçmeyin</em>

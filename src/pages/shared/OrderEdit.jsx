@@ -198,12 +198,13 @@ const OrderEdit = () => {
                   />
                 ) : (
                   // Other roles can change status
-                  <FormControl fullWidth>
-                    <InputLabel>Durum</InputLabel>
+                  <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+                    <InputLabel shrink>Durum</InputLabel>
                     <Select
                       value={order.tripStatus}
                       onChange={(e) => handleInputChange('tripStatus', e.target.value)}
                       label="Durum"
+                      notched
                     >
                       {tripStatusOptions.map((status) => (
                         <MenuItem key={status.value} value={status.value}>

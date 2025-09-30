@@ -367,12 +367,13 @@ const DriverList = () => {
             />
           </Grid>
           <Grid item xs={12} md={3}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Durum Filtresi</InputLabel>
+            <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+              <InputLabel shrink>Durum Filtresi</InputLabel>
               <Select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 label="Durum Filtresi"
+                notched
               >
                 <MenuItem value="all">Tümü</MenuItem>
                 <MenuItem value="active">Aktif</MenuItem>
@@ -583,13 +584,14 @@ const DriverList = () => {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth required>
-                <InputLabel>Lisans Sınıfı *</InputLabel>
+              <FormControl fullWidth required size="small" sx={{ minWidth: 200 }}>
+                <InputLabel shrink>Lisans Sınıfı *</InputLabel>
                 <Select
                   value={formData.licenseClass}
                   onChange={(e) => handleInputChange('licenseClass', e.target.value)}
                   label="Lisans Sınıfı *"
                   error={!formData.licenseClass}
+                  notched
                 >
                   <MenuItem value="">
                     <em>Lisans sınıfı seçin</em>
@@ -656,12 +658,13 @@ const DriverList = () => {
             </Grid>
             {editingDriver && (
               <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>Durum</InputLabel>
+                <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+                  <InputLabel shrink>Durum</InputLabel>
                   <Select
                     value={formData.isActive}
                     onChange={(e) => handleInputChange('isActive', e.target.value)}
                     label="Durum"
+                    notched
                   >
                     <MenuItem value={true}>Aktif</MenuItem>
                     <MenuItem value={false}>Pasif</MenuItem>

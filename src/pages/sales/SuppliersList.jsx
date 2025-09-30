@@ -318,12 +318,13 @@ const SuppliersList = () => {
                 />
               </Grid>
               <Grid item xs={12} md={3}>
-                <FormControl fullWidth>
-                  <InputLabel>Durum</InputLabel>
+                <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+                  <InputLabel shrink>Durum</InputLabel>
                   <Select
                     value={filterActive}
                     onChange={(e) => setFilterActive(e.target.value)}
                     label="Durum"
+                    notched
                   >
                     <MenuItem value="">Tümü</MenuItem>
                     <MenuItem value="true">Aktif</MenuItem>

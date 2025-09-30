@@ -316,12 +316,13 @@ const CustomerList = () => {
                 />
               </Grid>
               <Grid item xs={12} md={3}>
-                <FormControl fullWidth>
-                  <InputLabel>Risk Durumu</InputLabel>
+                <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+                  <InputLabel shrink>Risk Durumu</InputLabel>
                   <Select
                     value={filterRiskStatus}
                     onChange={(e) => setFilterRiskStatus(e.target.value)}
                     label="Risk Durumu"
+                    notched
                   >
                     <MenuItem value="">Tümü</MenuItem>
                     {riskStatuses.map((status) => (
@@ -340,12 +341,13 @@ const CustomerList = () => {
                 </FormControl>
               </Grid>
               <Grid item xs={12} md={3}>
-                <FormControl fullWidth>
-                  <InputLabel>Kara Liste Durumu</InputLabel>
+                <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+                  <InputLabel shrink>Kara Liste Durumu</InputLabel>
                   <Select
                     value={filterBlacklisted}
                     onChange={(e) => setFilterBlacklisted(e.target.value)}
                     label="Kara Liste Durumu"
+                    notched
                   >
                     <MenuItem value="">Tümü</MenuItem>
                     <MenuItem value="true">Kara Listede</MenuItem>
@@ -512,13 +514,14 @@ const CustomerList = () => {
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <FormControl fullWidth error={!!formErrors.riskStatusId}>
-                  <InputLabel>Risk Durumu *</InputLabel>
+                <FormControl fullWidth error={!!formErrors.riskStatusId} size="small" sx={{ minWidth: 200 }}>
+                  <InputLabel shrink>Risk Durumu *</InputLabel>
                   <Select
                     name="riskStatusId"
                     value={formData.riskStatusId}
                     onChange={handleInputChange}
                     label="Risk Durumu *"
+                    notched
                   >
                     {console.log('Risk statuses in form:', riskStatuses)}
                     {riskStatuses.length > 0 ? (

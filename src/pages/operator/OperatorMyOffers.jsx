@@ -295,12 +295,13 @@ const OperatorMyOffers = () => {
             />
           </Grid>
           <Grid item xs={12} md={3}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Durum Filtresi</InputLabel>
+            <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+              <InputLabel shrink>Durum Filtresi</InputLabel>
               <Select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 label="Durum Filtresi"
+                notched
               >
                 <MenuItem value="all">Tümü</MenuItem>
                 {operatorStatusOptions.map((status) => (
@@ -471,12 +472,13 @@ const OperatorMyOffers = () => {
               <Grid container spacing={2}>
                 {/* Status */}
                 <Grid item xs={12}>
-                  <FormControl fullWidth>
-                    <InputLabel>Durum</InputLabel>
+                  <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+                    <InputLabel shrink>Durum</InputLabel>
                     <Select
                       value={editDialog.offer.tripStatus || editDialog.offer.status || ''}
                       onChange={(e) => handleEditInputChange('tripStatus', e.target.value)}
                       label="Durum"
+                      notched
                     >
                       {operatorStatusOptions.map((status) => (
                         <MenuItem key={status.value} value={status.value}>

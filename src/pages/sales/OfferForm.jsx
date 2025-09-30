@@ -353,16 +353,16 @@ const OfferForm = () => {
       <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
         Rota ve Yük Bilgileri
       </Typography>
-      {/* <Typography variant="body2" color="text.secondary" sx={{ mb: 4, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
-        <strong>Önemli:</strong> Ülke, şehir, posta kodu ve yük ölçüleri (uzunluk, genişlik, yükseklik) ile yük tipi ve ağırlığı zorunlu alanlardir. 
-        Bu bilgiler diğer satışçıların benzer işler için fiyat referansı görebilmesi açısından gereklidir.
-      </Typography> */}
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 4, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+        <strong>Bilgi:</strong> (*) işareti bulunan alanlar zorunludur. 
+        Ülke, şehir, posta kodu ve yük ölçüleri (uzunluk, genişlik, yükseklik) ile yük tipi ve ağırlığı zorunlu alanlardır.
+      </Typography>
       
       {/* Customer Selection */}
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
           <Typography variant="h6" sx={{ color: '#1976d2' }}>
-            Müşteri Seçimi
+            Müşteri Seçimi *
           </Typography>
           <Button
             variant="outlined"
@@ -451,7 +451,10 @@ const OfferForm = () => {
       {/* From Address */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h6" gutterBottom sx={{ mb: 2, color: '#1976d2' }}>
-          Nereden (Alış Adresi) - Ülke, Şehir, Posta Kodu Zorunlu
+          Nereden (Alış Adresi) *
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Ülke, şehir ve posta kodu zorunlu alanlardır.
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={4}>
@@ -584,7 +587,10 @@ const OfferForm = () => {
       {/* To Address */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h6" gutterBottom sx={{ mb: 2, color: '#1976d2' }}>
-          Nereye (Teslimat Adresi) - Ülke, Şehir, Posta Kodu Zorunlu
+          Nereye (Teslimat Adresi) *
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Ülke, şehir ve posta kodu zorunlu alanlardır.
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={4}>
@@ -716,7 +722,7 @@ const OfferForm = () => {
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6" gutterBottom sx={{ color: '#1976d2' }}>
-            Yük Bilgileri - Ölçüler, Tip ve Ağırlık Zorunlu
+            Yük Bilgileri *
           </Typography>
           <Button
             variant="outlined"
@@ -727,6 +733,9 @@ const OfferForm = () => {
             Yük Ekle
           </Button>
         </Box>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Ölçüler, yük tipi ve ağırlık zorunlu alanlardır.
+        </Typography>
         
         {formData.cargoItems.map((item, index) => (
           <Paper key={item.id} elevation={1} sx={{ p: 3, mb: 2, border: '1px solid #e0e0e0' }}>
@@ -1077,12 +1086,11 @@ const OfferForm = () => {
     <Box>
       <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
         Teklif Fiyatı ve Gönder
-        Teklif Fiyatı ve Gönder
       </Typography>
       
       <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom color="primary">
-          Fiyat Bilgileri
+          Fiyat Bilgileri *
         </Typography>
         
         <Grid container spacing={3}>
