@@ -535,20 +535,22 @@ const VehicleList = () => {
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleEditVehicle(vehicle)}
-                      color="primary"
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleDeleteVehicle(vehicle)}
-                      color="error"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
+                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleEditVehicle(vehicle)}
+                        color="primary"
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleDeleteVehicle(vehicle)}
+                        color="error"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))}

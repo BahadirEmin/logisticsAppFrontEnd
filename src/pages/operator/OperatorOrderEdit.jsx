@@ -28,6 +28,7 @@ import {
 import { useParams, useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
 import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'react-toastify';
 import { STATUS_OPTIONS } from '../../constants/statusConstants';
 
 const OperatorOrderEdit = () => {
@@ -70,10 +71,29 @@ const OperatorOrderEdit = () => {
       setSaving(true);
       setError(null);
       await ordersAPI.update(orderId, order);
+      
+      toast.success('Sipariş başarıyla güncellendi!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
+      
       navigate(`/operator/teklifler/${orderId}`);
     } catch (err) {
       console.error('Sipariş güncellenirken hata:', err);
       setError('Sipariş güncellenirken bir hata oluştu.');
+      
+      toast.error('Sipariş güncellenirken bir hata oluştu.', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } finally {
       setSaving(false);
     }
