@@ -513,8 +513,8 @@ const OrderDetail = () => {
               <Typography variant="body2">
                 <strong>Gümrük Personeli:</strong>
                 <Chip
-                  label={order.customsPersonId || 'Atanmamış'}
-                  color={order.customsPersonId ? 'success' : 'default'}
+                  label={order.customsPersonName || order.customsPerson?.username || 'Atanmamış'}
+                  color={order.customsPersonName || order.customsPerson?.username ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
                 />

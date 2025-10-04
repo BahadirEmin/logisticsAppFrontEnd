@@ -435,14 +435,16 @@ const OfferList = () => {
                 <TableCell>Nereye</TableCell>
                 <TableCell>Yük Bilgileri</TableCell>
                 <TableCell>Durum</TableCell>
-                <TableCell>Tarih</TableCell>
+                <TableCell>Kalkış Tarihi</TableCell>
+                <TableCell>Tahmini Teslimat</TableCell>
+                <TableCell>Teklif Fiyatı</TableCell>
                 <TableCell align="center">İşlemler</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredOffers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} align="center">
+                  <TableCell colSpan={10} align="center">
                     <Typography variant="body2" color="textSecondary">
                       {searchTerm || statusFilter
                         ? 'Arama kriterlerinize uygun teklif bulunamadı.'
@@ -499,10 +501,39 @@ const OfferList = () => {
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2">
-                        {new Date(offer.createdAt).toLocaleDateString('tr-TR')}
+                        {offer.departureDate 
+                          ? new Date(offer.departureDate).toLocaleDateString('tr-TR')
+                          : 'Belirtilmemiş'}
                       </Typography>
                       <Typography variant="caption" color="textSecondary">
-                        {new Date(offer.createdAt).toLocaleTimeString('tr-TR')}
+                        {offer.departureDate 
+                          ? new Date(offer.departureDate).toLocaleTimeString('tr-TR', { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })
+                          : 'Saat yok'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2">
+                        {offer.estimatedDeliveryDate || offer.arrivalDate
+                          ? new Date(offer.estimatedDeliveryDate || offer.arrivalDate).toLocaleDateString('tr-TR')
+                          : 'Belirtilmemiş'}
+                      </Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        {offer.estimatedDeliveryDate || offer.arrivalDate
+                          ? new Date(offer.estimatedDeliveryDate || offer.arrivalDate).toLocaleTimeString('tr-TR', { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })
+                          : 'Saat yok'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" fontWeight="bold" color="primary">
+                        {offer.quotePrice || offer.price 
+                          ? `₺${(offer.quotePrice || offer.price).toLocaleString('tr-TR')}` 
+                          : 'Belirtilmemiş'}
                       </Typography>
                     </TableCell>
                     <TableCell align="center">

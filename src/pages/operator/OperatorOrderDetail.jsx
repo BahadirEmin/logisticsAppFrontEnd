@@ -296,14 +296,14 @@ const OperatorOrderDetail = () => {
               <Typography variant="h6" gutterBottom color="primary">
                 {order.departureCity}, {order.departureCountry}
               </Typography>
-              <Typography variant="body2" color="textSecondary" paragraph sx={{ minHeight: 40 }}>
-                {order.departureAddress}
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 0.5 }}>
+              <Typography variant="body2" sx={{ mb: 1 }}>
                 <strong>İlçe:</strong> {order.departureDistrict || 'Belirtilmemiş'}
               </Typography>
-              <Typography variant="body2" sx={{ mb: 2 }}>
+              <Typography variant="body2" sx={{ mb: 1 }}>
                 <strong>Posta Kodu:</strong> {order.departurePostalCode || 'Belirtilmemiş'}
+              </Typography>
+              <Typography variant="body2" color="textSecondary" paragraph sx={{ minHeight: 40 }}>
+                <strong>Adres:</strong> {order.departureAddress || 'Belirtilmemiş'}
               </Typography>
               <Divider sx={{ my: 2 }} />
               <Typography variant="subtitle2" gutterBottom color="primary">
@@ -333,14 +333,14 @@ const OperatorOrderDetail = () => {
               <Typography variant="h6" gutterBottom color="secondary">
                 {order.arrivalCity}, {order.arrivalCountry}
               </Typography>
-              <Typography variant="body2" color="textSecondary" paragraph sx={{ minHeight: 40 }}>
-                {order.arrivalAddress}
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 0.5 }}>
+              <Typography variant="body2" sx={{ mb: 1 }}>
                 <strong>İlçe:</strong> {order.arrivalDistrict || 'Belirtilmemiş'}
               </Typography>
-              <Typography variant="body2" sx={{ mb: 2 }}>
+              <Typography variant="body2" sx={{ mb: 1 }}>
                 <strong>Posta Kodu:</strong> {order.arrivalPostalCode || 'Belirtilmemiş'}
+              </Typography>
+              <Typography variant="body2" color="textSecondary" paragraph sx={{ minHeight: 40 }}>
+                <strong>Adres:</strong> {order.arrivalAddress || 'Belirtilmemiş'}
               </Typography>
               <Divider sx={{ my: 2 }} />
               <Typography variant="subtitle2" gutterBottom color="secondary">
@@ -438,16 +438,28 @@ const OperatorOrderDetail = () => {
             />
             <CardContent sx={{ pt: 0 }}>
               <Typography variant="body2" sx={{ mb: 1, mt: 1 }}>
-                <strong>Müşteri ID:</strong> {order.customerId}
+                <strong>Müşteri:</strong>
+                <Chip
+                  label={order.customerName || 'Belirtilmemiş'}
+                  color={order.customerName ? 'success' : 'default'}
+                  size="small"
+                  sx={{ ml: 1 }}
+                />
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>Satış Personeli ID:</strong> {order.salesPersonId}
+                <strong>Satış Personeli:</strong>
+                <Chip
+                  label={order.salesPersonName || 'Belirtilmemiş'}
+                  color={order.salesPersonName ? 'success' : 'default'}
+                  size="small"
+                  sx={{ ml: 1 }}
+                />
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
                 <strong>Operasyon Personeli:</strong>
                 <Chip
-                  label={order.operationPersonId || 'Atanmamış'}
-                  color={order.operationPersonId ? 'success' : 'default'}
+                  label={order.operationPersonName || 'Atanmamış'}
+                  color={order.operationPersonName ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
                 />
@@ -455,8 +467,8 @@ const OperatorOrderDetail = () => {
               <Typography variant="body2" sx={{ mb: 1 }}>
                 <strong>Filo Personeli:</strong>
                 <Chip
-                  label={order.fleetPersonId || 'Atanmamış'}
-                  color={order.fleetPersonId ? 'success' : 'default'}
+                  label={order.fleetPersonName || 'Atanmamış'}
+                  color={order.fleetPersonName ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
                 />
@@ -464,8 +476,8 @@ const OperatorOrderDetail = () => {
               <Typography variant="body2">
                 <strong>Gümrük Personeli:</strong>
                 <Chip
-                  label={order.customsPersonId || 'Atanmamış'}
-                  color={order.customsPersonId ? 'success' : 'default'}
+                  label={order.customsPersonName || 'Atanmamış'}
+                  color={order.customsPersonName ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
                 />
@@ -484,19 +496,28 @@ const OperatorOrderDetail = () => {
             />
             <CardContent sx={{ pt: 0 }}>
               <Typography variant="body2" sx={{ mb: 1, mt: 1 }}>
+                <strong>Atanan Soför:</strong>
+                <Chip
+                  label={order.assignedDriverName || order.driverName || 'Atanmamış'}
+                  color={order.assignedDriverName || order.driverName ? 'success' : 'default'}
+                  size="small"
+                  sx={{ ml: 1 }}
+                />
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
                 <strong>Atanan Tır:</strong>
                 <Chip
-                  label={order.assignedTruckId || 'Atanmamış'}
-                  color={order.assignedTruckId ? 'success' : 'default'}
+                  label={order.assignedTruckName || order.assignedTruckPlateNo || order.truckPlateNo || 'Atanmamış'}
+                  color={order.assignedTruckName || order.assignedTruckPlateNo || order.truckPlateNo ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
                 />
               </Typography>
               <Typography variant="body2" sx={{ mb: 2 }}>
-                <strong>Atanan Romork:</strong>
+                <strong>Atanan Römork:</strong>
                 <Chip
-                  label={order.assignedTrailerId || 'Atanmamış'}
-                  color={order.assignedTrailerId ? 'success' : 'default'}
+                  label={order.assignedTrailerName || order.assignedTrailerNo || order.trailerPlateNo || 'Atanmamış'}
+                  color={order.assignedTrailerName || order.assignedTrailerNo || order.trailerPlateNo ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
                 />

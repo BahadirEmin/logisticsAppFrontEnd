@@ -399,7 +399,7 @@ const ApprovedOffers = () => {
                   <strong>Durum</strong>
                 </TableCell>
                 <TableCell>
-                  <strong>Onay Tarihi</strong>
+                  <strong>Kalkış Tarihi</strong>
                 </TableCell>
                 <TableCell>
                   <strong>Tahmini Teslimat</strong>
@@ -442,9 +442,11 @@ const ApprovedOffers = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    {offer.createdAt
-                      ? new Date(offer.createdAt).toLocaleDateString('tr-TR')
-                      : 'N/A'}
+                    {offer.departureDate
+                      ? new Date(offer.departureDate).toLocaleDateString('tr-TR')
+                      : offer.createdAt
+                        ? new Date(offer.createdAt).toLocaleDateString('tr-TR')
+                        : 'N/A'}
                   </TableCell>
                   <TableCell>
                     {offer.estimatedDeliveryDate
