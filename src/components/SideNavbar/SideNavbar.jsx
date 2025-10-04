@@ -65,10 +65,9 @@ const SideNavbar = () => {
         return [
           { text: 'Dashboard', icon: <HomeIcon />, path: '/operator' },
           { text: 'Hesabım', icon: <AccountCircleIcon />, path: '/operator/hesabim' },
-          { text: 'Tekliflerim', icon: <ListAltIcon />, path: '/operator/tekliflerim' },
           {
-            text: 'Onaylanan Teklifler',
-            icon: <CheckCircleIcon />,
+            text: 'Teklifler',
+            icon: <AssignmentIcon />,
             path: '/operator/onaylanan-teklifler',
           },
           { text: 'Sefer Takip Ekranı', icon: <TimelineIcon />, path: '/operator/sefer-takip' },

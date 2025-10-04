@@ -49,8 +49,8 @@ const OperatorOrderDetail = () => {
       return '/operator/onaylanan-teklifler';
     }
 
-    // Varsayılan olarak tekliflerim sayfasına dön
-    return '/operator/tekliflerim';
+    // Varsayılan olarak teklifler sayfasına dön
+    return '/operator/onaylanan-teklifler';
   };
 
   const handleBack = () => {

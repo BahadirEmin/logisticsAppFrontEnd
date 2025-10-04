@@ -102,7 +102,7 @@ const OperatorOrderEdit = () => {
         <Button
           variant="outlined"
           startIcon={<ArrowBackIcon />}
-          onClick={() => navigate('/operator/tekliflerim')}
+          onClick={() => navigate('/operator/onaylanan-teklifler')}
         >
           Geri Dön
         </Button>
@@ -119,7 +119,7 @@ const OperatorOrderEdit = () => {
         <Button
           variant="outlined"
           startIcon={<ArrowBackIcon />}
-          onClick={() => navigate('/operator/tekliflerim')}
+          onClick={() => navigate('/operator/onaylanan-teklifler')}
         >
           Geri Dön
         </Button>

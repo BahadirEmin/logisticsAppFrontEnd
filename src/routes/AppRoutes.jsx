@@ -7,7 +7,6 @@ import OperatorDashboard from '../pages/operator/OperatorDashboard';
 import OperatorProfile from '../pages/operator/OperatorProfile';
 import ApprovedOffers from '../pages/operator/ApprovedOffers';
 import TripTracking from '../pages/shared/TripTracking';
-import OperatorMyOffers from '../pages/operator/OperatorMyOffers';
 import FleetMyOffers from '../pages/fleet/FleetMyOffers';
 import SalesDashboard from '../pages/sales/SalesDashboard';
 import OfferForm from '../pages/sales/OfferForm';
@@ -124,16 +123,6 @@ const AppRoutes = () => {
             <ProtectedRoute allowedRoles={['operator', 'operation']}>
               <MainLayout>
                 <TripTracking />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/operator/tekliflerim"
-          element={
-            <ProtectedRoute allowedRoles={['operator', 'operation']}>
-              <MainLayout>
-                <OperatorMyOffers />
               </MainLayout>
             </ProtectedRoute>
           }

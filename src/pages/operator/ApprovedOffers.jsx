@@ -24,6 +24,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  FormControlLabel,
+  Switch,
 } from '@mui/material';
 import {
   Search,
@@ -47,6 +49,7 @@ const ApprovedOffers = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [showMyOffersOnly, setShowMyOffersOnly] = useState(false);
   const [error, setError] = useState(null);
   const [assigningOrderId, setAssigningOrderId] = useState(null);
   const { user } = useAuth();
@@ -91,7 +94,15 @@ const ApprovedOffers = () => {
     const matchesStatus =
       filterStatus === 'all' || (offer.tripStatus || offer.status) === filterStatus;
 
-    return matchesSearch && matchesStatus;
+    // Check if offer belongs to current user
+    const matchesOwnership = !showMyOffersOnly || 
+      offer.operationPersonId === user?.id || 
+      offer.fleetPersonId === user?.id ||
+      offer.createdBy === user?.id ||
+      offer.salesPersonId === user?.id ||
+      offer.userId === user?.id;
+
+    return matchesSearch && matchesStatus && matchesOwnership;
   });
 
   if (loading) {
@@ -166,109 +177,131 @@ const ApprovedOffers = () => {
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#1976d2', mb: 4 }}>
-        Onaylanan Teklifler
+        Teklifler
       </Typography>
 
-      {/* Stats Cards */}
+      {/* Statistics Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Toplam Onaylanan
-              </Typography>
-              <Typography variant="h4" component="div">
-                {offers.length}
-              </Typography>
-            </CardContent>
-          </Card>
+          <Paper sx={{ p: 2, textAlign: 'center' }}>
+                        <Typography color="textSecondary" gutterBottom>
+              Toplam Teklif
+            </Typography>
+            <Typography variant="h4" component="div" color="primary.main">
+              {offers.length}
+            </Typography>
+          </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Yolda Olan
-              </Typography>
-              <Typography variant="h4" component="div" color="warning.main">
-                {offers.filter(o => (o.tripStatus || o.status) === 'in_transit').length}
-              </Typography>
-            </CardContent>
-          </Card>
+          <Paper sx={{ p: 2, textAlign: 'center' }}>
+            <Typography color="textSecondary" gutterBottom>
+              Yolda Olan
+            </Typography>
+            <Typography variant="h4" component="div" color="warning.main">
+              {offers.filter(o => (o.tripStatus || o.status) === 'in_transit').length}
+            </Typography>
+          </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Teslim Edilen
-              </Typography>
-              <Typography variant="h4" component="div" color="success.main">
-                {offers.filter(o => (o.tripStatus || o.status) === 'delivered').length}
-              </Typography>
-            </CardContent>
-          </Card>
+          <Paper sx={{ p: 2, textAlign: 'center' }}>
+            <Typography color="textSecondary" gutterBottom>
+              Teslim Edilen
+            </Typography>
+            <Typography variant="h4" component="div" color="success.main">
+              {offers.filter(o => (o.tripStatus || o.status) === 'delivered').length}
+            </Typography>
+          </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Toplam Değer
-              </Typography>
-              <Typography variant="h4" component="div" color="primary.main">
-                ₺{offers.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0).toLocaleString()}
-              </Typography>
-            </CardContent>
-          </Card>
+          <Paper sx={{ p: 2, textAlign: 'center' }}>
+            <Typography color="textSecondary" gutterBottom>
+              Toplam Değer
+            </Typography>
+            <Typography variant="h4" component="div" color="primary.main">
+              ₺{offers.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0).toLocaleString()}
+            </Typography>
+          </Paper>
         </Grid>
       </Grid>
 
-      {/* Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                size="small"
-                label="Ara"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
-                <InputLabel shrink>Durum Filtresi</InputLabel>
-                <Select
-                  value={filterStatus}
-                  onChange={e => setFilterStatus(e.target.value)}
-                  label="Durum Filtresi"
-                  notched
-                >
-                  <MenuItem value="all">
-                    <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
+      {/* Filters and Actions */}
+      <Paper sx={{ p: 2, mb: 2 }}>
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            <TextField
+              size="small"
+              label="Ara"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              sx={{ width: 300 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <FormControl size="small" sx={{ width: 200 }}>
+              <InputLabel shrink>Durum Filtresi</InputLabel>
+              <Select
+                value={filterStatus}
+                onChange={e => setFilterStatus(e.target.value)}
+                label="Durum Filtresi"
+                notched
+              >
+                <MenuItem value="all">
+                  <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
+                </MenuItem>
+                {STATUS_OPTIONS.map(status => (
+                  <MenuItem key={status.value} value={status.value}>
+                    <Chip 
+                      icon={status.icon}
+                      label={status.label} 
+                      color={status.color} 
+                      size="small" 
+                    />
                   </MenuItem>
-                  {STATUS_OPTIONS.map(status => (
-                    <MenuItem key={status.value} value={status.value}>
-                      <Chip 
-                        icon={status.icon}
-                        label={status.label} 
-                        color={status.color} 
-                        size="small" 
-                      />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+          
+          <Box 
+            sx={{ 
+              backgroundColor: showMyOffersOnly ? 'primary.100' : 'grey.100',
+              borderRadius: 2,
+              px: 2,
+              py: 0.5,
+              transition: 'all 0.3s ease-in-out',
+              border: showMyOffersOnly ? '1px solid primary.300' : '1px solid grey.300',
+              '&:hover': {
+                backgroundColor: showMyOffersOnly ? 'primary.200' : 'grey.200',
+                transform: 'translateY(-1px)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              }
+            }}
+          >
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showMyOffersOnly}
+                  onChange={(e) => setShowMyOffersOnly(e.target.checked)}
+                  color="primary"
+                />
+              }
+              label="Tekliflerim"
+              sx={{ margin: 0 }}
+            />
+          </Box>
+        </Box>
+      </Paper>
 
       {/* Offers Table */}
       <Paper elevation={2}>
