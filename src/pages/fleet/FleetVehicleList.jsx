@@ -288,9 +288,27 @@ const FleetVehicleList = () => {
       setDeleteDialogOpen(false);
       setVehicleToDelete(null);
       loadData();
+      
+      toast.success('Araç başarıyla silindi!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } catch (error) {
       setError('Araç silinirken hata oluştu');
       console.error('Delete vehicle error:', error);
+      
+      toast.error('Araç silinirken hata oluştu', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     }
   };
 
@@ -303,6 +321,15 @@ const FleetVehicleList = () => {
       setDialogOpen(false);
       setEditingVehicle(null);
       await loadData();
+      
+      toast.success('Araç başarıyla silindi!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } catch (error) {
       console.error('Inline delete error:', error);
       const backendMessage =
@@ -310,6 +337,15 @@ const FleetVehicleList = () => {
         error?.response?.data?.error ||
         'Araç silinirken hata oluştu';
       setError(backendMessage);
+      
+      toast.error(backendMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } finally {
       setDeletingInline(false);
     }
@@ -495,20 +531,22 @@ const FleetVehicleList = () => {
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleEditVehicle(vehicle)}
-                      color="primary"
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleDeleteVehicle(vehicle)}
-                      color="error"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
+                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleEditVehicle(vehicle)}
+                        color="primary"
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleDeleteVehicle(vehicle)}
+                        color="error"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))}
