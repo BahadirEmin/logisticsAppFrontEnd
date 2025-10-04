@@ -352,7 +352,7 @@ const VehicleList = () => {
               <TextField
                 fullWidth
                 size="small"
-                label="Araç Ara"
+                label="Ara"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 InputProps={{

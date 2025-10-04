@@ -97,11 +97,12 @@ const DriverList = () => {
       setError(null);
       const data = await driversAPI.getAll();
       console.log('Drivers loaded successfully:', data);
-      setDrivers(data);
+      setDrivers(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Drivers yüklenirken hata:', err);
       console.error('Error details:', err.response?.data);
       setError('Sürücüler yüklenirken bir hata oluştu.');
+      setDrivers([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -231,29 +232,6 @@ const DriverList = () => {
   };
 
   // Test function to debug API calls
-  const testAPICall = async () => {
-    try {
-      console.log('Testing API call...');
-      const testData = {
-        firstName: 'Test',
-        lastName: 'Driver',
-        licenseNo: 'TEST123',
-        licenseClass: 'CDL-A',
-        phoneNumber: '5551234567',
-        email: 'test@example.com',
-        isActive: true,
-      };
-      console.log('Test data:', testData);
-      const result = await driversAPI.create(testData);
-      console.log('Test API result:', result);
-      setSnackbar({ open: true, message: 'Test API call successful!', severity: 'success' });
-      loadDrivers();
-    } catch (err) {
-      console.error('Test API call failed:', err);
-      setSnackbar({ open: true, message: `Test failed: ${err.message}`, severity: 'error' });
-    }
-  };
-
   const filteredDrivers = drivers.filter(driver => {
     const matchesSearch =
       (driver.firstName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -388,7 +366,7 @@ const DriverList = () => {
             <TextField
               fullWidth
               size="small"
-              label="Sürücü Ara..."
+              label="Ara"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               InputProps={{
@@ -405,13 +383,19 @@ const DriverList = () => {
                 label="Durum Filtresi"
                 notched
               >
-                <MenuItem value="all">Tümü</MenuItem>
-                <MenuItem value="active">Aktif</MenuItem>
-                <MenuItem value="inactive">Pasif</MenuItem>
+                <MenuItem value="all">
+                  <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
+                </MenuItem>
+                <MenuItem value="active">
+                  <Chip label="Aktif" size="small" color="success" />
+                </MenuItem>
+                <MenuItem value="inactive">
+                  <Chip label="Pasif" size="small" color="error" />
+                </MenuItem>
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={2}>
+          <Grid item xs={12} md={5}>
             <Button
               variant="contained"
               startIcon={<AddIcon />}
@@ -420,25 +404,6 @@ const DriverList = () => {
             >
               Yeni Sürücü
             </Button>
-          </Grid>
-          <Grid item xs={12} md={1}>
-            <Button variant="outlined" onClick={testAPICall} fullWidth size="small">
-              Test API
-            </Button>
-          </Grid>
-          <Grid item xs={12} md={2}>
-            <Box display="flex" justifyContent="flex-end">
-              <Tooltip title="Filtreleri Temizle">
-                <IconButton
-                  onClick={() => {
-                    setSearchTerm('');
-                    setStatusFilter('all');
-                  }}
-                >
-                  <FilterListIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
           </Grid>
         </Grid>
       </Paper>

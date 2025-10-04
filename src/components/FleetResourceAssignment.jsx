@@ -59,17 +59,30 @@ const FleetResourceAssignment = ({ open, onClose, orderId, orderInfo, onSuccess 
 
     try {
       const [vehiclesData, driversData, trailersData] = await Promise.all([
-        vehicleAPI.getAll(),
-        driversAPI.getAll(),
-        trailerAPI.getAll(),
+        vehicleAPI.getAll().catch(err => {
+          console.warn('Vehicles API failed:', err);
+          return [];
+        }),
+        driversAPI.getAll().catch(err => {
+          console.warn('Drivers API failed:', err);
+          return [];
+        }),
+        trailerAPI.getAll().catch(err => {
+          console.warn('Trailers API failed:', err);
+          return [];
+        }),
       ]);
 
-      setVehicles(vehiclesData || []);
-      setDrivers(driversData || []);
-      setTrailers(trailersData || []);
+      setVehicles(Array.isArray(vehiclesData) ? vehiclesData : []);
+      setDrivers(Array.isArray(driversData) ? driversData : []);
+      setTrailers(Array.isArray(trailersData) ? trailersData : []);
     } catch (err) {
       console.error('Error loading resources:', err);
       setError('Kaynaklar yüklenirken bir hata oluştu.');
+      // Set empty arrays as fallback
+      setVehicles([]);
+      setDrivers([]);
+      setTrailers([]);
     } finally {
       setLoading(false);
     }

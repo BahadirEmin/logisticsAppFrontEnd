@@ -48,8 +48,8 @@ const CustomerList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterRiskStatus, setFilterRiskStatus] = useState('');
-  const [filterBlacklisted, setFilterBlacklisted] = useState('');
+  const [filterRiskStatus, setFilterRiskStatus] = useState('all');
+  const [filterBlacklisted, setFilterBlacklisted] = useState('all');
 
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -104,10 +104,10 @@ const CustomerList = () => {
       customer.contactName?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesRiskStatus =
-      !filterRiskStatus || customer.riskStatusId === parseInt(filterRiskStatus);
+      filterRiskStatus === 'all' || customer.riskStatusId === parseInt(filterRiskStatus);
 
     const matchesBlacklisted =
-      filterBlacklisted === '' ||
+      filterBlacklisted === 'all' ||
       (filterBlacklisted === 'true' && customer.isBlacklisted) ||
       (filterBlacklisted === 'false' && !customer.isBlacklisted);
 
@@ -332,7 +332,9 @@ const CustomerList = () => {
                     label="Risk Durumu"
                     notched
                   >
-                    <MenuItem value="">Tümü</MenuItem>
+                    <MenuItem value="all">
+                      <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
+                    </MenuItem>
                     {riskStatuses.map(status => (
                       <MenuItem key={status.id} value={status.id}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -357,16 +359,17 @@ const CustomerList = () => {
                     label="Kara Liste Durumu"
                     notched
                   >
-                    <MenuItem value="">Tümü</MenuItem>
-                    <MenuItem value="true">Kara Listede</MenuItem>
-                    <MenuItem value="false">Kara Listede Değil</MenuItem>
+                    <MenuItem value="all">
+                      <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
+                    </MenuItem>
+                    <MenuItem value="true">
+                      <Chip icon={<WarningIcon />} label="Kara Listede" color="error" size="small" />
+                    </MenuItem>
+                    <MenuItem value="false">
+                      <Chip label="Güvenli" color="success" size="small" />
+                    </MenuItem>
                   </Select>
                 </FormControl>
-              </Grid>
-              <Grid item xs={12} md={2}>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  {filteredCustomers.length} müşteri bulundu
-                </Typography>
               </Grid>
             </Grid>
           </CardContent>
@@ -439,12 +442,19 @@ const CustomerList = () => {
                   </TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                      {customer.isBlacklisted && (
+                      {customer.isBlacklisted ? (
                         <Chip
                           icon={<WarningIcon />}
                           label="Kara Liste"
                           color="error"
                           size="small"
+                        />
+                      ) : (
+                        <Chip
+                          label="Güvenli"
+                          color="success"
+                          size="small"
+                          variant="outlined"
                         />
                       )}
                       {customer.isInLawsuit && (

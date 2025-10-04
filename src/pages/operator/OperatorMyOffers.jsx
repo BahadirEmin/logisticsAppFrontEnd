@@ -30,14 +30,16 @@ import {
 import {
   Search as SearchIcon,
   Visibility as VisibilityIcon,
-  CheckCircle as CheckCircleIcon,
-  Schedule as ScheduleIcon,
-  LocalShipping as LocalShippingIcon,
-  Assignment as AssignmentIcon,
   Download as DownloadIcon,
   Person as PersonIcon,
   Edit as EditIcon,
 } from '@mui/icons-material';
+import { 
+  OPERATOR_STATUS_OPTIONS, 
+  getStatusColor, 
+  getStatusLabel, 
+  getStatusIcon 
+} from '../../constants/statusConstants';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
 import { useAuth } from '../../contexts/AuthContext';
@@ -53,17 +55,6 @@ const OperatorMyOffers = () => {
   const [saving, setSaving] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
-
-  // Operator-specific status options
-  const operatorStatusOptions = [
-    { value: 'BEKLEMEDE', label: 'Beklemede', color: 'default', icon: <ScheduleIcon /> },
-    { value: 'ISLEME_ALINDI', label: 'İşleme Alındı', color: 'info', icon: <AssignmentIcon /> },
-    { value: 'ONAYLANDI', label: 'Onaylandı', color: 'success', icon: <CheckCircleIcon /> },
-    { value: 'YOLA_CIKTI', label: 'Yola Çıktı', color: 'primary', icon: <LocalShippingIcon /> },
-    { value: 'GUMRUKTE', label: 'Gümrükte', color: 'warning', icon: <ScheduleIcon /> },
-    { value: 'TAMAMLANDI', label: 'Tamamlandı', color: 'success', icon: <CheckCircleIcon /> },
-    { value: 'IPTAL_EDILDI', label: 'İptal Edildi', color: 'error', icon: <ScheduleIcon /> },
-  ];
 
   // Priority options
   const priorityOptions = [
@@ -104,20 +95,7 @@ const OperatorMyOffers = () => {
     }
   };
 
-  const getStatusColor = status => {
-    const statusOption = operatorStatusOptions.find(option => option.value === status);
-    return statusOption ? statusOption.color : 'default';
-  };
 
-  const getStatusLabel = status => {
-    const statusOption = operatorStatusOptions.find(option => option.value === status);
-    return statusOption ? statusOption.label : status;
-  };
-
-  const getStatusIcon = status => {
-    const statusOption = operatorStatusOptions.find(option => option.value === status);
-    return statusOption ? statusOption.icon : <ScheduleIcon />;
-  };
 
   const getPriorityColor = priority => {
     const priorityOption = priorityOptions.find(option => option.value === priority);
@@ -237,7 +215,7 @@ const OperatorMyOffers = () => {
               {offers.filter(o => (o.tripStatus || o.status) === 'pending').length}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Beklemede
+              {getStatusLabel('pending')}
             </Typography>
           </Paper>
         </Grid>
@@ -276,7 +254,7 @@ const OperatorMyOffers = () => {
             <TextField
               fullWidth
               size="small"
-              label="Arama"
+              label="Ara"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               InputProps={{
@@ -293,10 +271,17 @@ const OperatorMyOffers = () => {
                 label="Durum Filtresi"
                 notched
               >
-                <MenuItem value="all">Tümü</MenuItem>
-                {operatorStatusOptions.map(status => (
+                <MenuItem value="all">
+                  <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
+                </MenuItem>
+                {OPERATOR_STATUS_OPTIONS.map(status => (
                   <MenuItem key={status.value} value={status.value}>
-                    <Chip label={status.label} color={status.color} size="small" />
+                    <Chip 
+                      icon={status.icon}
+                      label={status.label} 
+                      color={status.color} 
+                      size="small" 
+                    />
                   </MenuItem>
                 ))}
               </Select>
@@ -373,7 +358,6 @@ const OperatorMyOffers = () => {
                       label={getStatusLabel(offer.tripStatus || offer.status)}
                       color={getStatusColor(offer.tripStatus || offer.status)}
                       size="small"
-                      variant="outlined"
                     />
                   </TableCell>
                   <TableCell>
@@ -463,7 +447,7 @@ const OperatorMyOffers = () => {
                       label="Durum"
                       notched
                     >
-                      {operatorStatusOptions.map(status => (
+                      {OPERATOR_STATUS_OPTIONS.map(status => (
                         <MenuItem key={status.value} value={status.value}>
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             {status.icon}

@@ -204,6 +204,24 @@ export const ordersAPI = {
     }
   },
 
+  // Get all orders for fleet management
+  getOrdersForFleet: async () => {
+    try {
+      const response = await api.get('/v1/orders/fleet');
+      return response;
+    } catch (error) {
+      console.error('Get orders for fleet error:', error);
+      // Fallback to regular orders endpoint
+      try {
+        const fallbackResponse = await api.get('/v1/orders');
+        return { data: fallbackResponse.data || [] };
+      } catch (fallbackError) {
+        console.error('Fallback orders API also failed:', fallbackError);
+        return { data: [] };
+      }
+    }
+  },
+
   // Download driver information document
   downloadDriverInformationDocument: async orderId => {
     try {

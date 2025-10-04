@@ -46,7 +46,7 @@ const FleetVehicleList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterActive, setFilterActive] = useState('');
+  const [filterActive, setFilterActive] = useState('all');
 
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -90,10 +90,13 @@ const FleetVehicleList = () => {
   const loadData = async () => {
     try {
       setLoading(true);
+      setError(null);
       const vehiclesData = await vehicleAPI.getAll();
-      setVehicles(vehiclesData);
+      setVehicles(Array.isArray(vehiclesData) ? vehiclesData : []);
     } catch (error) {
+      console.error('Error loading vehicles:', error);
       setError('Araç listesi yüklenirken hata oluştu');
+      setVehicles([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -108,7 +111,7 @@ const FleetVehicleList = () => {
       vehicle.vin?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesActive =
-      filterActive === '' ||
+      filterActive === 'all' || filterActive === '' ||
       (filterActive === 'true' && vehicle.isActive) ||
       (filterActive === 'false' && !vehicle.isActive);
 
@@ -339,7 +342,7 @@ const FleetVehicleList = () => {
               <TextField
                 fullWidth
                 size="small"
-                label="Tır Ara"
+                label="Ara"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 InputProps={{
@@ -360,9 +363,15 @@ const FleetVehicleList = () => {
                   label="Durum"
                   notched
                 >
-                  <MenuItem value="">Tümü</MenuItem>
-                  <MenuItem value="true">Aktif</MenuItem>
-                  <MenuItem value="false">Pasif</MenuItem>
+                  <MenuItem value="all">
+                    <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
+                  </MenuItem>
+                  <MenuItem value="true">
+                    <Chip label="Aktif" size="small" color="success" />
+                  </MenuItem>
+                  <MenuItem value="false">
+                    <Chip label="Pasif" size="small" color="error" />
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -486,7 +495,7 @@ const FleetVehicleList = () => {
               Tır bulunamadı
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {searchTerm || filterActive !== ''
+              {searchTerm || filterActive !== 'all'
                 ? 'Arama kriterlerinizi değiştirmeyi deneyin.'
                 : 'Henüz tır eklenmemiş.'}
             </Typography>

@@ -20,23 +20,27 @@ import {
   Alert,
   CircularProgress,
   Tooltip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import {
   Search,
-  LocalShipping,
-  LocationOn,
-  Schedule,
-  CheckCircle,
-  Warning,
-  DirectionsCar,
-  Assignment,
   Visibility,
   Person as PersonIcon,
+  Assignment,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
 import { usersAPI } from '../../api/users';
 import { useAuth } from '../../contexts/AuthContext';
+import { 
+  STATUS_OPTIONS, 
+  getStatusColor, 
+  getStatusLabel, 
+  getStatusIcon 
+} from '../../constants/statusConstants';
 
 const ApprovedOffers = () => {
   const [offers, setOffers] = useState([]);
@@ -47,15 +51,6 @@ const ApprovedOffers = () => {
   const [assigningOrderId, setAssigningOrderId] = useState(null);
   const { user } = useAuth();
   const navigate = useNavigate();
-
-  // Status options for filtering
-  const statusOptions = [
-    { value: 'all', label: 'Tümü' },
-    { value: 'pending', label: 'Beklemede' },
-    { value: 'approved', label: 'Onaylandı' },
-    { value: 'in_transit', label: 'Yolda' },
-    { value: 'delivered', label: 'Teslim Edildi' },
-  ];
 
   useEffect(() => {
     loadApprovedOffers();
@@ -77,35 +72,7 @@ const ApprovedOffers = () => {
     }
   };
 
-  const getStatusIcon = status => {
-    const statusConfig = {
-      approved: <CheckCircle />,
-      in_transit: <LocalShipping />,
-      delivered: <CheckCircle />,
-      pending: <Schedule />,
-    };
-    return statusConfig[status] || <Schedule />;
-  };
 
-  const getStatusLabel = status => {
-    const statusConfig = {
-      approved: 'Onaylandı',
-      in_transit: 'Yolda',
-      delivered: 'Teslim Edildi',
-      pending: 'Beklemede',
-    };
-    return statusConfig[status] || 'Beklemede';
-  };
-
-  const getStatusColor = status => {
-    const statusConfig = {
-      approved: 'success',
-      in_transit: 'warning',
-      delivered: 'info',
-      pending: 'default',
-    };
-    return statusConfig[status] || 'default';
-  };
 
   const filteredOffers = offers.filter(offer => {
     const matchesSearch =
@@ -255,39 +222,53 @@ const ApprovedOffers = () => {
       </Grid>
 
       {/* Filters */}
-      <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={6}>
-            <TextField
-              fullWidth
-              size="small"
-              label="Ara..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search />
-                  </InputAdornment>
-                ),
-              }}
-            />
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Ara"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+                <InputLabel shrink>Durum Filtresi</InputLabel>
+                <Select
+                  value={filterStatus}
+                  onChange={e => setFilterStatus(e.target.value)}
+                  label="Durum Filtresi"
+                  notched
+                >
+                  <MenuItem value="all">
+                    <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
+                  </MenuItem>
+                  {STATUS_OPTIONS.map(status => (
+                    <MenuItem key={status.value} value={status.value}>
+                      <Chip 
+                        icon={status.icon}
+                        label={status.label} 
+                        color={status.color} 
+                        size="small" 
+                      />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={6}>
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              {statusOptions.map(status => (
-                <Chip
-                  key={status.value}
-                  label={status.label}
-                  onClick={() => setFilterStatus(status.value)}
-                  color={filterStatus === status.value ? 'primary' : 'default'}
-                  variant={filterStatus === status.value ? 'filled' : 'outlined'}
-                />
-              ))}
-            </Box>
-          </Grid>
-        </Grid>
-      </Paper>
+        </CardContent>
+      </Card>
 
       {/* Offers Table */}
       <Paper elevation={2}>
@@ -354,7 +335,6 @@ const ApprovedOffers = () => {
                       label={getStatusLabel(offer.tripStatus || offer.status)}
                       color={getStatusColor(offer.tripStatus || offer.status)}
                       size="small"
-                      variant="outlined"
                     />
                   </TableCell>
                   <TableCell>
