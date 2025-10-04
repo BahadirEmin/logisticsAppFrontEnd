@@ -21,7 +21,6 @@ import FleetTrailerList from '../pages/fleet/FleetTrailerList';
 import AdminDriverList from '../pages/admin/DriverList';
 import FleetDriverList from '../pages/fleet/FleetDriverList';
 import ProtectedRoute from '../components/ProtectedRoute';
-import SalesMyOffers from '../pages/sales/SalesMyOffers';
 import SuppliersList from '../pages/sales/SuppliersList';
 import OrderDetail from '../pages/shared/OrderDetail';
 import OrderEdit from '../pages/shared/OrderEdit';
@@ -207,16 +206,6 @@ const AppRoutes = () => {
             <ProtectedRoute allowedRoles={['sales']}>
               <MainLayout>
                 <SalesOfferList />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/sales/tekliflerim"
-          element={
-            <ProtectedRoute allowedRoles={['sales']}>
-              <MainLayout>
-                <SalesMyOffers />
               </MainLayout>
             </ProtectedRoute>
           }

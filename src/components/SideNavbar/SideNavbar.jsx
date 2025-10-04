@@ -80,7 +80,6 @@ const SideNavbar = () => {
           { text: 'Tedarikçiler', icon: <BusinessIcon />, path: '/sales/tedarikciler' },
           { text: 'Teklif Ver', icon: <AddIcon />, path: '/sales/teklif-ver' },
           { text: 'Teklifler', icon: <AssignmentIcon />, path: '/sales/teklifler' },
-          { text: 'Tekliflerim', icon: <ListAltIcon />, path: '/sales/tekliflerim' },
         ];
       case 'fleet':
         return [
