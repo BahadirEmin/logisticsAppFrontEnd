@@ -40,6 +40,7 @@ import {
   Gavel as LawsuitIcon,
 } from '@mui/icons-material';
 import { customerAPI } from '../../api/customers';
+import { toast } from 'react-toastify';
 import { useFormattedInput } from '../../hooks/useFormattedInput';
 
 const CustomerList = () => {
@@ -186,9 +187,27 @@ const CustomerList = () => {
       if (editingCustomer) {
         await customerAPI.update(editingCustomer.id, customerData);
         //console.log('[CustomerList] Update request sent to /v1/customers/' + editingCustomer.id);
+        
+        toast.success('Müşteri başarıyla güncellendi!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+        });
       } else {
         await customerAPI.create(customerData);
         //console.log('[CustomerList] Create request sent to /v1/customers');
+        
+        toast.success('Müşteri başarıyla eklendi!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+        });
       }
 
       setDialogOpen(false);
@@ -200,6 +219,15 @@ const CustomerList = () => {
         error?.response?.data?.error ||
         'Müşteri kaydedilirken hata oluştu';
       setError(backendMessage);
+      
+      toast.error(backendMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } finally {
       setSaving(false);
     }
@@ -217,9 +245,27 @@ const CustomerList = () => {
       setDeleteDialogOpen(false);
       setCustomerToDelete(null);
       loadData(); // Reload data
+      
+      toast.success('Müşteri başarıyla silindi!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } catch (error) {
       setError('Müşteri silinirken hata oluştu');
       console.error('Delete customer error:', error);
+      
+      toast.error('Müşteri silinirken hata oluştu', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     }
   };
 
@@ -232,6 +278,15 @@ const CustomerList = () => {
       setDialogOpen(false);
       setEditingCustomer(null);
       await loadData();
+      
+      toast.success('Müşteri başarıyla silindi!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } catch (error) {
       console.error('Inline delete error:', error);
       const backendMessage =
@@ -239,6 +294,15 @@ const CustomerList = () => {
         error?.response?.data?.error ||
         'Müşteri silinirken hata oluştu';
       setError(backendMessage);
+      
+      toast.error(backendMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } finally {
       setDeletingInline(false);
     }
