@@ -25,8 +25,10 @@ import { vehicleAPI } from '../api/vehicles';
 import { driversAPI } from '../api/drivers';
 import { trailerAPI } from '../api/trailers';
 import { ordersAPI } from '../api/orders';
+import { useAuth } from '../contexts/AuthContext';
 
 const FleetResourceAssignment = ({ open, onClose, orderId, orderInfo, onSuccess }) => {
+  const { user } = useAuth();
   const [vehicles, setVehicles] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [trailers, setTrailers] = useState([]);
@@ -44,14 +46,21 @@ const FleetResourceAssignment = ({ open, onClose, orderId, orderInfo, onSuccess 
   useEffect(() => {
     if (open) {
       loadResources();
-      // Reset form
-      setSelectedVehicle('');
-      setSelectedDriver('');
-      setSelectedTrailer('');
+      // Load current assignments from orderInfo using correct API field names
+      if (orderInfo) {
+        setSelectedVehicle(orderInfo.assignedTruckId || '');
+        setSelectedDriver(orderInfo.assignedDriverId || '');
+        setSelectedTrailer(orderInfo.assignedTrailerId || '');
+      } else {
+        // Reset form if no orderInfo
+        setSelectedVehicle('');
+        setSelectedDriver('');
+        setSelectedTrailer('');
+      }
       setError(null);
       setSuccess(null);
     }
-  }, [open]);
+  }, [open, orderInfo]);
 
   const loadResources = async () => {
     setLoading(true);
@@ -95,6 +104,12 @@ const FleetResourceAssignment = ({ open, onClose, orderId, orderInfo, onSuccess 
       return;
     }
 
+    // Validate that user is available
+    if (!user || !user.id) {
+      setError('Kullanıcı bilgisi bulunamadı. Lütfen tekrar giriş yapın.');
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
     setSuccess(null);
@@ -105,18 +120,36 @@ const FleetResourceAssignment = ({ open, onClose, orderId, orderInfo, onSuccess 
       if (selectedDriver) resources.driverId = selectedDriver;
       if (selectedTrailer) resources.trailerId = selectedTrailer;
 
-      await ordersAPI.assignFleetResources(orderId, resources);
-
+      const result = await ordersAPI.assignFleetResources(orderId, resources, user.id);
+      
       setSuccess('Kaynaklar başarıyla atandı!');
 
-      // Call success callback after a short delay
-      setTimeout(() => {
-        if (onSuccess) onSuccess();
-        onClose();
-      }, 1500);
+      // Call success callback immediately to close dialog and show toast
+      if (onSuccess) {
+        try {
+          await onSuccess(orderId);
+        } catch (callbackError) {
+          console.error('onSuccess callback failed:', callbackError);
+        }
+      }
+
+      // No need for timeout - dialog will close immediately via callback
     } catch (err) {
       console.error('Error assigning resources:', err);
-      setError(err.response?.data?.message || 'Kaynaklar atanırken bir hata oluştu.');
+      console.error('Error response:', err.response);
+      console.error('Error data:', err.response?.data);
+      
+      let errorMessage = 'Kaynaklar atanırken bir hata oluştu.';
+      
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
     } finally {
       setSubmitting(false);
     }

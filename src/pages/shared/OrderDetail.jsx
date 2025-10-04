@@ -12,6 +12,15 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Avatar,
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon,
@@ -20,6 +29,7 @@ import {
   Person as PersonIcon,
   LocalShipping as CargoIcon,
   Schedule as ScheduleIcon,
+  History as HistoryIcon,
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
@@ -29,6 +39,9 @@ const OrderDetail = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [historyDialog, setHistoryDialog] = useState(false);
+  const [assignmentHistory, setAssignmentHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
   const { orderId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -58,7 +71,6 @@ const OrderDetail = () => {
       
       console.log('Loading order with ID:', orderId);
       const data = await ordersAPI.getById(orderId);
-      console.log('Order data loaded:', data);
       setOrder(data);
     } catch (err) {
       console.error('Sipariş detayları yüklenirken hata:', err);
@@ -99,7 +111,7 @@ const OrderDetail = () => {
   const handleBack = () => {
     switch (user?.role) {
       case 'fleet':
-        navigate('/fleet/tekliflerim');
+        navigate('/fleet/aktif-isler');
         break;
       case 'operator':
         navigate('/operator/onaylanan-teklifler');
@@ -113,6 +125,35 @@ const OrderDetail = () => {
 
   const handleEdit = () => {
     navigate(`/sales/teklifler/${orderId}/duzenle`);
+  };
+
+  const loadAssignmentHistory = async () => {
+    try {
+      setLoadingHistory(true);
+      
+      if (!orderId) {
+        console.error('Order ID bulunamadı');
+        setAssignmentHistory([]);
+        return;
+      }
+
+      const historyData = await ordersAPI.getAssignmentHistory(orderId);
+      setAssignmentHistory(Array.isArray(historyData) ? historyData : []);
+      
+    } catch (err) {
+      console.error('Atama geçmişi yüklenirken hata:', err);
+      setAssignmentHistory([]);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };  const handleOpenHistory = () => {
+    setHistoryDialog(true);
+    loadAssignmentHistory();
+  };
+
+  const handleCloseHistory = () => {
+    setHistoryDialog(false);
+    setAssignmentHistory([]);
   };
 
   if (loading) {
@@ -476,6 +517,17 @@ const OrderDetail = () => {
             <CardHeader
               title="Araç Atamaları"
               avatar={<CargoIcon color="secondary" />}
+              action={
+                <Button
+                  size="small"
+                  startIcon={<HistoryIcon />}
+                  variant="outlined"
+                  onClick={handleOpenHistory}
+                  sx={{ fontSize: '0.75rem' }}
+                >
+                  Geçmiş
+                </Button>
+              }
               sx={{ pb: 1 }}
             />
             <CardContent sx={{ pt: 0 }}>
@@ -517,6 +569,95 @@ const OrderDetail = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Assignment History Dialog */}
+      <Dialog
+        open={historyDialog}
+        onClose={handleCloseHistory}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: { borderRadius: 2 }
+        }}
+      >
+        <DialogTitle sx={{ 
+          backgroundColor: 'primary.main', 
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1
+        }}>
+          <HistoryIcon />
+          Atama Geçmişi - Sipariş #{order?.id}
+        </DialogTitle>
+        <DialogContent sx={{ p: 0 }}>
+          {loadingHistory ? (
+            <Box display="flex" justifyContent="center" alignItems="center" p={4}>
+              <CircularProgress />
+            </Box>
+          ) : assignmentHistory.length === 0 ? (
+            <Box p={3} textAlign="center">
+              <Typography color="text.secondary">
+                Henüz atama geçmişi bulunmuyor.
+              </Typography>
+            </Box>
+          ) : (
+            <List>
+              {assignmentHistory.map((item, index) => (
+                <Box key={item.id}>
+                  <ListItem sx={{ px: 3, py: 2 }}>
+                    <ListItemAvatar>
+                      <Avatar sx={{ 
+                        backgroundColor: item.action.includes('Şoför') ? 'success.main' : 
+                                       item.action.includes('Araç') ? 'primary.main' : 'warning.main'
+                      }}>
+                        {item.action.includes('Şoför') ? '👤' : 
+                         item.action.includes('Araç') ? '🚛' : '🚚'}
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                          <Typography variant="subtitle1" fontWeight="bold">
+                            {item.action || 'Bilinmeyen İşlem'}
+                          </Typography>
+                          <Chip 
+                            label={`Atanan: ${item.resourceName || 'Bilinmiyor'}`} 
+                            size="small" 
+                            color="primary" 
+                            variant="outlined"
+                          />
+                        </Box>
+                      }
+                      secondary={
+                        <Box>
+                          <Typography variant="body2" color="text.primary">
+                            <strong>Atayan Filocu:</strong> {item.assignedBy || 'Bilinmiyor'}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            <strong>Tarih:</strong> {item.assignedAt ? new Date(item.assignedAt).toLocaleString('tr-TR') : 'Bilinmiyor'}
+                          </Typography>
+                          {item.previousValue && (
+                            <Typography variant="body2" color="warning.main">
+                              <strong>Önceki:</strong> {item.previousValue} → <strong>Yeni:</strong> {item.newValue}
+                            </Typography>
+                          )}
+                        </Box>
+                      }
+                    />
+                  </ListItem>
+                  {index < assignmentHistory.length - 1 && <Divider />}
+                </Box>
+              ))}
+            </List>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={handleCloseHistory} variant="contained">
+            Kapat
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

@@ -76,8 +76,6 @@ export const ordersAPI = {
         throw new Error('Order ID and Fleet Person ID are required');
       }
 
-      console.log(`Assigning order ${orderId} to fleet person ${fleetPersonId}`);
-
       const response = await api.post(
         `/v1/orders/${orderId}/assign-fleet?fleetPersonId=${fleetPersonId}`,
         {}, // Empty body since backend expects query parameter
@@ -87,12 +85,9 @@ export const ordersAPI = {
           },
         }
       );
-      console.log('Assign to fleet response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Assign to fleet error:', error);
-      console.error('Error response:', error.response?.data);
-      console.error('Error status:', error.response?.status);
       throw error;
     }
   },
@@ -176,30 +171,72 @@ export const ordersAPI = {
   },
 
   // Assign fleet resources (vehicle, driver, trailer) to order
-  assignFleetResources: async (orderId, resources) => {
+  assignFleetResources: async (orderId, resources, assignedByUserId) => {
     try {
       if (!orderId) {
         throw new Error('Order ID is required');
       }
 
-      // Build query parameters
-      const params = new URLSearchParams();
-      if (resources.vehicleId) params.append('vehicleId', resources.vehicleId);
-      if (resources.driverId) params.append('driverId', resources.driverId);
-      if (resources.trailerId) params.append('trailerId', resources.trailerId);
+      if (!assignedByUserId) {
+        throw new Error('Assigned by user ID is required');
+      }
 
-      const response = await api.post(
-        `/v1/orders/${orderId}/assign-fleet-resources?${params.toString()}`,
-        {}, // Empty body since backend expects query parameters
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      console.log('🚀 Assignment Request:', { orderId, resources, assignedByUserId });
+      
+      // Try individual assignments using the correct endpoints from documentation
+      const assignments = [];
+      const assignmentResults = [];
+      
+      if (resources.vehicleId) {
+        try {
+          // Use correct endpoint: /assign-vehicle with query parameters
+          const vehicleResponse = await api.post(`/v1/orders/${orderId}/assign-vehicle?vehicleId=${resources.vehicleId}&assignedByUserId=${assignedByUserId}`);
+          console.log('✅ Vehicle assignment success:', vehicleResponse.data);
+          assignments.push('vehicle');
+          assignmentResults.push({ type: 'vehicle', success: true, data: vehicleResponse.data });
+        } catch (e) {
+          console.error('❌ Vehicle assignment failed:', e.response?.data || e.message);
+          assignmentResults.push({ type: 'vehicle', success: false, error: e.response?.data || e.message });
         }
-      );
-      return response.data;
+      }
+      
+      if (resources.driverId) {
+        try {
+          // Use correct endpoint: /assign-driver with query parameters
+          const driverResponse = await api.post(`/v1/orders/${orderId}/assign-driver?driverId=${resources.driverId}&assignedByUserId=${assignedByUserId}`);
+          console.log('✅ Driver assignment success:', driverResponse.data);
+          assignments.push('driver');
+          assignmentResults.push({ type: 'driver', success: true, data: driverResponse.data });
+        } catch (e) {
+          console.error('❌ Driver assignment failed:', e.response?.data || e.message);
+          assignmentResults.push({ type: 'driver', success: false, error: e.response?.data || e.message });
+        }
+      }
+      
+      if (resources.trailerId) {
+        try {
+          // Use correct endpoint: /assign-trailer with query parameters
+          const trailerResponse = await api.post(`/v1/orders/${orderId}/assign-trailer?trailerId=${resources.trailerId}&assignedByUserId=${assignedByUserId}`);
+          console.log('✅ Trailer assignment success:', trailerResponse.data);
+          assignments.push('trailer');
+          assignmentResults.push({ type: 'trailer', success: true, data: trailerResponse.data });
+        } catch (e) {
+          console.error('❌ Trailer assignment failed:', e.response?.data || e.message);
+          assignmentResults.push({ type: 'trailer', success: false, error: e.response?.data || e.message });
+        }
+      }
+      
+      if (assignments.length > 0) {
+        const successMessage = `Successfully assigned: ${assignments.join(', ')}`;
+        // Return the last successful response data (should contain updated order)
+        const lastSuccessful = assignmentResults.filter(r => r.success).pop();
+        console.log('🎉 Final assignment result:', lastSuccessful?.data);
+        return lastSuccessful ? lastSuccessful.data : { message: successMessage };
+      } else {
+        throw new Error('All assignments failed');
+      }
     } catch (error) {
-      console.error('Assign fleet resources error:', error);
+      console.error('💥 Assign fleet resources error:', error);
       throw error;
     }
   },
@@ -207,18 +244,13 @@ export const ordersAPI = {
   // Get all orders for fleet management
   getOrdersForFleet: async () => {
     try {
-      const response = await api.get('/v1/orders/fleet');
-      return response;
+      // Fleet endpoint has backend bug - use regular orders endpoint instead
+      const timestamp = new Date().getTime();
+      const response = await api.get(`/v1/orders?_t=${timestamp}`);
+      return { data: response.data || [] };
     } catch (error) {
-      console.error('Get orders for fleet error:', error);
-      // Fallback to regular orders endpoint
-      try {
-        const fallbackResponse = await api.get('/v1/orders');
-        return { data: fallbackResponse.data || [] };
-      } catch (fallbackError) {
-        console.error('Fallback orders API also failed:', fallbackError);
-        return { data: [] };
-      }
+      console.error('Get orders error:', error);
+      throw error;
     }
   },
 
@@ -249,6 +281,21 @@ export const ordersAPI = {
       return response.data;
     } catch (error) {
       console.error('Download driver information document error:', error);
+      throw error;
+    }
+  },
+
+  // Get assignment history for an order
+  getAssignmentHistory: async orderId => {
+    try {
+      if (!orderId) {
+        throw new Error('Order ID is required');
+      }
+
+      const response = await api.get(`/v1/orders/${orderId}/assignment-history`);
+      return response.data;
+    } catch (error) {
+      console.error('Get assignment history error:', error);
       throw error;
     }
   },

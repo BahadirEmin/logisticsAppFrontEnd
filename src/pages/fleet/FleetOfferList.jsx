@@ -1,38 +1,62 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { toast } from 'react-toastify';
 import {
   Container,
   Paper,
+  Typography,
+  Box,
+  Grid,
+  Card,
+  CardContent,
+  Chip,
+  TextField,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
-  TextField,
-  Box,
+  Alert,
+  CircularProgress,
+  IconButton,
+  Tooltip,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Chip,
-  IconButton,
-  Tooltip,
-  Alert,
-  CircularProgress,
-  Grid,
-  TablePagination,
+  Button,
+  Switch,
+  FormControlLabel,
   InputAdornment,
-  Button
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Avatar,
+  Divider
 } from '@mui/material';
 import {
+  Search as SearchIcon,
   Visibility as VisibilityIcon,
+  CheckCircle,
+  Schedule,
+  LocalShipping,
   Assignment as AssignmentIcon,
-  Search as SearchIcon
+  DirectionsCar as TruckIcon,
+  Person as DriverIcon,
+  Person as PersonIcon,
+  LocalShipping as TrailerIcon,
+  History as HistoryIcon
 } from '@mui/icons-material';
 import { ordersAPI } from '../../api/orders';
-import { STATUS_OPTIONS, getStatusColor, getStatusLabel, getStatusIcon } from '../../constants/statusConstants';
+import { usersAPI } from '../../api/users';
+import { useAuth } from '../../contexts/AuthContext';
 import FleetResourceAssignment from '../../components/FleetResourceAssignment';
+import { STATUS_OPTIONS, getStatusColor, getStatusLabel, getStatusIcon } from '../../constants/statusConstants';
 import { useNavigate } from 'react-router-dom';
 
 const OfferList = () => {
@@ -42,149 +66,190 @@ const OfferList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [assignmentDialog, setAssignmentDialog] = useState({ open: false, order: null });
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  const fetchOffers = useCallback(async () => {
+  const loadFleetOffers = useCallback(async () => {
     try {
-      setLoading(true);
       setError(null);
+
+      // Always load all fleet offers, then filter in frontend based on switch
       const response = await ordersAPI.getOrdersForFleet();
-      console.log('Fleet offers API response:', response);
-      console.log('Fleet offers data:', response.data);
       
-      let offersData = response.data || [];
+      const processedOffers = Array.isArray(response.data || response) ? (response.data || response) : [];
       
-      // If no data from API, add test data to verify statistics logic
-      if (!offersData || offersData.length === 0) {
-        console.log('No data from API, using test data');
-        offersData = [
-          {
-            id: 1,
-            customerName: 'Test Customer 1',
-            status: 'Quote',
-            departureCity: 'Istanbul',
-            arrivalCity: 'Ankara',
-            price: 5000
-          },
-          {
-            id: 2,
-            customerName: 'Test Customer 2', 
-            status: 'Quote',
-            departureCity: 'Izmir',
-            arrivalCity: 'Antalya',
-            price: 6000
-          }
-        ];
-      }
-      
-      if (offersData && Array.isArray(offersData) && offersData.length > 0) {
-        console.log('Sample offer structure:', offersData[0]);
-        console.log('Sample offer keys:', Object.keys(offersData[0]));
-        console.log('Sample offer status fields:', {
-          status: offersData[0].status,
-          tripStatus: offersData[0].tripStatus,
-          orderStatus: offersData[0].orderStatus,
-          state: offersData[0].state
-        });
-      }
-      setOffers(offersData);
-    } catch (error) {
-      console.error('Error fetching fleet offers:', error);
-      setError('Teklifler yüklenirken hata oluştu');
-      
-      // Use test data on error
-      const testData = [
-        {
-          id: 1,
-          customerName: 'Test Customer 1',
-          status: 'Quote',
-          departureCity: 'Istanbul',
-          arrivalCity: 'Ankara',
-          price: 5000
-        },
-        {
-          id: 2,
-          customerName: 'Test Customer 2', 
-          status: 'Quote',
-          departureCity: 'Izmir',
-          arrivalCity: 'Antalya',
-          price: 6000
-        }
-      ];
-      setOffers(testData);
-    } finally {
-      setLoading(false);
+      // API response already has correct field names: assignedTruckId, assignedDriverId, assignedTrailerId
+      setOffers(processedOffers);
+    } catch (err) {
+      console.error('Fleet teklifleri yüklenirken hata:', err);
+      setError('Teklifler yüklenirken bir hata oluştu.');
+      setOffers([]);
     }
   }, []);
 
   useEffect(() => {
-    fetchOffers();
-  }, [fetchOffers]);
+    setLoading(true);
+    loadFleetOffers().finally(() => setLoading(false));
+  }, []);
 
-  const handleViewDetails = (orderId) => {
-    navigate(`/fleet/detay/${orderId}`);
-  };
+  const filteredOffers = offers.filter(offer => {
+    const matchesSearch =
+      (offer.customerName || offer.customer?.name || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (offer.departureCity || offer.departureAddress || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (offer.arrivalCity || offer.arrivalAddress || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (offer.cargoType || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      offer.id?.toString().includes(searchTerm);
 
-  const handleAssignResources = order => {
-    setAssignmentDialog({ open: true, order });
+    const matchesStatus =
+      statusFilter === 'all' || (offer.tripStatus || offer.status) === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleViewOffer = orderId => {
+    navigate(`/fleet/aktif-isler/${orderId}`);
+  };  const handleAssignResources = offer => {
+    setAssignmentDialog({ open: true, order: offer });
   };
 
   const handleCloseAssignment = () => {
     setAssignmentDialog({ open: false, order: null });
   };
 
-  const handleAssignmentSuccess = () => {
-    fetchOffers();
+  const handleAssignmentSuccess = async (orderId) => {
+    // Immediately close the dialog
     handleCloseAssignment();
+    
+    // Show success toast with custom styling
+    toast.success('Kaynak ataması başarıyla tamamlandı!', {
+      position: "top-right",
+      autoClose: 2500,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: false,
+      style: {
+        backgroundColor: '#4caf50',
+        color: 'white',
+        fontSize: '14px',
+        padding: '12px 16px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)',
+        border: 'none',
+        fontWeight: '500'
+      },
+      progressStyle: {
+        backgroundColor: 'rgba(255, 255, 255, 0.3)'
+      }
+    });
+
+    try {
+      // Update the specific order data in background
+      if (orderId) {
+        const updatedOrder = await ordersAPI.getById(orderId);
+        
+        // Update the specific offer in the state (API response has correct field names)
+        setOffers(prevOffers => 
+          prevOffers.map(offer => 
+            offer.id === orderId ? updatedOrder : offer
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Failed to fetch updated order:', error);
+      // Fallback to full reload if individual fetch fails
+      loadFleetOffers();
+      
+      // Show error toast if data refresh fails
+      toast.error('Veri güncellenirken hata oluştu, sayfa yenileniyor...', {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: true,
+        style: {
+          backgroundColor: '#f44336',
+          color: 'white',
+          fontSize: '14px',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(244, 67, 54, 0.3)',
+          border: 'none',
+          fontWeight: '500'
+        }
+      });
+    }
   };
 
-  // Filter offers based on search term and status
-  const filteredOffers = offers.filter(offer => {
-    const matchesSearch =
-      !searchTerm ||
-      (offer.id && offer.id.toString().includes(searchTerm.toLowerCase())) ||
-      (offer.customerName && offer.customerName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (offer.customer && offer.customer.name && offer.customer.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (offer.departureCity && offer.departureCity.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (offer.arrivalCity && offer.arrivalCity.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (offer.departureAddress && offer.departureAddress.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (offer.arrivalAddress && offer.arrivalAddress.toLowerCase().includes(searchTerm.toLowerCase()));
+  const renderResourceIcons = offer => {
+    // Use the correct field names from API response
+    const hasVehicle = offer.assignedTruckId;
+    const hasDriver = offer.assignedDriverId;
+    const hasTrailer = offer.assignedTrailerId;
 
-    const matchesStatus = statusFilter === 'all' || !statusFilter || 
-      (offer.status === statusFilter || offer.tripStatus === statusFilter);
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        {/* Truck Icon - Blue */}
+        <Tooltip
+          title={
+            hasVehicle
+              ? `Assigned Vehicle: ${offer.assignedTruckPlateNo || 'Unknown'}`
+              : 'No vehicle assigned'
+          }
+        >
+          <TruckIcon
+            sx={{
+              color: hasVehicle ? 'primary.main' : 'grey.400',
+              fontSize: 20
+            }}
+          />
+        </Tooltip>
 
-    return matchesSearch && matchesStatus;
-  });
+        {/* Driver Icon - Green */}
+        <Tooltip
+          title={
+            hasDriver
+              ? `Assigned Driver: ${offer.assignedDriverName || 'Unknown'}`
+              : 'No driver assigned'
+          }
+        >
+          <DriverIcon
+            sx={{
+              color: hasDriver ? 'success.main' : 'grey.400',
+              fontSize: 20
+            }}
+          />
+        </Tooltip>
 
-  // Calculate statistics
-  const totalOffers = offers.length;
-  const pendingOffers = offers.filter(offer => {
-    const status = offer.status || offer.tripStatus;
-    return status === 'TEKLIF_ASAMASI';
-  }).length;
-  const approvedOffers = offers.filter(offer => {
-    const status = offer.status || offer.tripStatus;
-    return status === 'ONAYLANAN_TEKLIF';
-  }).length;
-  const rejectedOffers = offers.filter(offer => {
-    const status = offer.status || offer.tripStatus;
-    return status === 'REDDEDILDI';
-  }).length;
-
-  console.log('Offers for statistics:', offers.map(o => ({ 
-    id: o.id, 
-    status: o.status, 
-    tripStatus: o.tripStatus,
-    orderStatus: o.orderStatus,
-    state: o.state,
-    allKeys: Object.keys(o)
-  })));
-  console.log('Statistics calculated:', { totalOffers, pendingOffers, approvedOffers, rejectedOffers });
+        {/* Trailer Icon - Orange */}
+        <Tooltip
+          title={
+            hasTrailer
+              ? `Assigned Trailer: ${offer.assignedTrailerNo || 'Unknown'}`
+              : 'No trailer assigned'
+          }
+        >
+          <TrailerIcon
+            sx={{
+              color: hasTrailer ? 'warning.main' : 'grey.400',
+              fontSize: 20
+            }}
+          />
+        </Tooltip>
+      </Box>
+    );
+  };
 
   if (loading) {
     return (
-      <Container maxWidth="xl" sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress />
+      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+          <CircularProgress />
+        </Box>
       </Container>
     );
   }
@@ -192,7 +257,7 @@ const OfferList = () => {
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom sx={{ color: 'primary.main' }}>
-        Filo Teklifleri
+        Aktif İşler
       </Typography>
 
       {/* Statistics Cards */}
@@ -200,7 +265,7 @@ const OfferList = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
             <Typography variant="h4" color="primary" fontWeight="bold">
-              {totalOffers}
+              {offers.length}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Toplam Teklif
@@ -210,7 +275,10 @@ const OfferList = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
             <Typography variant="h4" color="warning.main" fontWeight="bold">
-              {pendingOffers}
+              {offers.filter(o => {
+                const status = o.tripStatus || o.status;
+                return status === 'TEKLIF_ASAMASI';
+              }).length}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Teklif Aşaması
@@ -219,21 +287,21 @@ const OfferList = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="h4" color="success.main" fontWeight="bold">
-              {approvedOffers}
+            <Typography variant="h4" color="primary.main" fontWeight="bold">
+              {offers.filter(o => (o.tripStatus || o.status) === 'YOLA_CIKTI').length}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Onaylanan
+              Yolda
             </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="h4" color="error.main" fontWeight="bold">
-              {rejectedOffers}
+            <Typography variant="h4" color="success.main" fontWeight="bold">
+              ₺{offers.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0).toLocaleString()}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Reddedilen
+              Toplam Değer
             </Typography>
           </Paper>
         </Grid>
@@ -245,61 +313,91 @@ const OfferList = () => {
         </Alert>
       )}
 
-      <Paper>
-        <Box sx={{ p: 2 }}>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Ara"
-                variant="outlined"
-                size="small"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
-                <InputLabel shrink>Durum</InputLabel>
-                <Select
-                  value={statusFilter}
-                  onChange={e => setStatusFilter(e.target.value)}
-                  notched
-                  label="Durum"
-                >
-                  <MenuItem value="all">
-                    <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
-                  </MenuItem>
-                  {STATUS_OPTIONS.map(status => (
-                    <MenuItem key={status.value} value={status.value}>
-                      <Chip
-                        label={status.label}
-                        color={status.color}
-                        size="small"
-                        icon={status.icon}
-                        sx={{ minWidth: 100 }}
-                      />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
+      {/* Resource Icons Legend - Always visible */}
+      <Paper elevation={1} sx={{ p: 2, mb: 2, backgroundColor: '#f8f9fa' }}>
+        <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+          <AssignmentIcon sx={{ mr: 1 }} />
+          Kaynak Durumu Açıklaması:
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <TruckIcon color="primary" sx={{ fontSize: 20 }} />
+            <Typography variant="caption">Araç Atanmış (Mavi)</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <DriverIcon color="success" sx={{ fontSize: 20 }} />
+            <Typography variant="caption">Şoför Atanmış (Yeşil)</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <TrailerIcon color="warning" sx={{ fontSize: 20 }} />
+            <Typography variant="caption">Römork Atanmış (Turuncu)</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <TruckIcon color="disabled" sx={{ fontSize: 20 }} />
+            <Typography variant="caption">Gri = Atanmamış</Typography>
+          </Box>
         </Box>
+      </Paper>
 
+      {/* Filters */}
+      <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          gap: 2,
+          flexWrap: 'wrap'
+        }}>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flex: 1 }}>
+            <TextField
+              size="small"
+              placeholder="Ara"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ minWidth: 250 }}
+            />
+            <FormControl size="small" sx={{ minWidth: 200 }}>
+              <InputLabel shrink>Durum Filtresi</InputLabel>
+              <Select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                label="Durum Filtresi"
+                notched
+              >
+                <MenuItem value="all">
+                  <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
+                </MenuItem>
+                {STATUS_OPTIONS.map(status => (
+                  <MenuItem key={status.value} value={status.value}>
+                    <Chip
+                      label={status.label}
+                      size="small"
+                      color={status.color}
+                      icon={status.icon}
+                    />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        </Box>
+      </Paper>
+
+      {/* Offers Table */}
+      <Paper elevation={2}>
         <TableContainer>
           <Table>
             <TableHead>
-              <TableRow sx={{ backgroundColor: 'grey.50' }}>
+              <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
                 <TableCell>
-                  <strong>Sipariş No</strong>
+                  <strong>Teklif No</strong>
                 </TableCell>
                 <TableCell>
                   <strong>Müşteri</strong>
@@ -311,103 +409,113 @@ const OfferList = () => {
                   <strong>Nereye</strong>
                 </TableCell>
                 <TableCell>
-                  <strong>Tarih</strong>
+                  <strong>Yük Bilgisi</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Kaynak Durumu</strong>
                 </TableCell>
                 <TableCell>
                   <strong>Durum</strong>
                 </TableCell>
                 <TableCell>
-                  <strong>Tutar</strong>
+                  <strong>Atanma Tarihi</strong>
                 </TableCell>
-                <TableCell align="center">
+                <TableCell>
+                  <strong>Tahmini Teslimat</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Fiyat</strong>
+                </TableCell>
+                <TableCell>
                   <strong>İşlemler</strong>
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredOffers.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
-                    <Typography variant="body1" color="text.secondary">
-                      Teklif bulunamadı
+              {filteredOffers.map(offer => (
+                <TableRow key={offer.id} hover>
+                  <TableCell>#{offer.id}</TableCell>
+                  <TableCell>{offer.customerName || offer.customer?.name || 'N/A'}</TableCell>
+                  <TableCell>
+                    <Typography variant="body2">
+                      {offer.departureCity || offer.departureAddress || 'N/A'}
                     </Typography>
                   </TableCell>
-                </TableRow>
-              ) : (
-                filteredOffers.map(offer => (
-                  <TableRow key={offer.id} hover>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight="medium">
-                        #{offer.id}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>{offer.customerName || offer.customer?.name || 'N/A'}</TableCell>
-                    <TableCell>{offer.departureCity || offer.departureAddress || 'N/A'}</TableCell>
-                    <TableCell>{offer.arrivalCity || offer.arrivalAddress || 'N/A'}</TableCell>
-                    <TableCell>
-                      {offer.pickupDate
-                        ? new Date(offer.pickupDate).toLocaleDateString('tr-TR')
-                        : offer.createdAt
-                        ? new Date(offer.createdAt).toLocaleDateString('tr-TR')
-                        : 'N/A'}
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        icon={getStatusIcon(offer.status || offer.tripStatus)}
-                        label={getStatusLabel(offer.status || offer.tripStatus)}
-                        color={getStatusColor(offer.status || offer.tripStatus)}
+                  <TableCell>
+                    <Typography variant="body2">
+                      {offer.arrivalCity || offer.arrivalAddress || 'N/A'}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2">{offer.cargoType || 'N/A'}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {offer.cargoWeightKg ? `${offer.cargoWeightKg} kg` : 'N/A'}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>{renderResourceIcons(offer)}</TableCell>
+                  <TableCell>
+                    <Chip
+                      icon={getStatusIcon(offer.tripStatus || offer.status)}
+                      label={getStatusLabel(offer.tripStatus || offer.status)}
+                      color={getStatusColor(offer.tripStatus || offer.status)}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {offer.createdAt
+                      ? new Date(offer.createdAt).toLocaleDateString('tr-TR')
+                      : 'N/A'}
+                  </TableCell>
+                  <TableCell>
+                    {offer.estimatedDeliveryDate
+                      ? new Date(offer.estimatedDeliveryDate).toLocaleDateString('tr-TR')
+                      : 'N/A'}
+                  </TableCell>
+                  <TableCell>
+                    <strong>{offer.price ? `₺${offer.price}` : 'N/A'}</strong>
+                  </TableCell>
+                  <TableCell>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                      <Button
                         size="small"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight="medium">
-                        {offer.actualPrice ? `₺${Number(offer.actualPrice).toLocaleString('tr-TR')}` : 
-                         offer.quotePrice ? `₺${Number(offer.quotePrice).toLocaleString('tr-TR')}` :
-                         offer.price ? `₺${Number(offer.price).toLocaleString('tr-TR')}` : 
-                         offer.totalAmount ? `₺${Number(offer.totalAmount).toLocaleString('tr-TR')}` : 'N/A'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                        <Button
-                          size="small"
-                          startIcon={<VisibilityIcon />}
-                          variant="outlined"
-                          onClick={() => handleViewDetails(offer.id)}
-                        >
-                          Detay
-                        </Button>
-                        {(offer.status === 'ONAYLANAN_TEKLIF' || offer.tripStatus === 'ONAYLANAN_TEKLIF') && (
-                          <Button
-                            size="small"
-                            startIcon={<AssignmentIcon />}
-                            variant="contained"
-                            color="primary"
-                            onClick={() => handleAssignResources(offer)}
-                          >
-                            Kaynak Ata
-                          </Button>
-                        )}
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
+                        startIcon={<VisibilityIcon />}
+                        variant="outlined"
+                        onClick={() => handleViewOffer(offer.id)}
+                      >
+                        Detay
+                      </Button>
+                      <Button
+                        size="small"
+                        startIcon={<AssignmentIcon />}
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleAssignResources(offer)}
+                      >
+                        Kaynak Ata
+                      </Button>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
       </Paper>
 
-      {/* Resource Assignment Dialog */}
-      {assignmentDialog.open && (
-        <FleetResourceAssignment
-          open={assignmentDialog.open}
-          onClose={handleCloseAssignment}
-          orderId={assignmentDialog.order?.id}
-          orderInfo={assignmentDialog.order}
-          onSuccess={handleAssignmentSuccess}
-        />
+            {filteredOffers.length === 0 && (
+        <Alert severity="info" sx={{ mt: 3 }}>
+          Arama kriterlerinize uygun teklif bulunamadı.
+        </Alert>
       )}
+
+      {/* Fleet Resource Assignment Dialog */}
+      <FleetResourceAssignment
+        open={assignmentDialog.open}
+        onClose={handleCloseAssignment}
+        orderId={assignmentDialog.order?.id}
+        orderInfo={assignmentDialog.order}
+        onSuccess={handleAssignmentSuccess}
+      />
     </Container>
   );
 };

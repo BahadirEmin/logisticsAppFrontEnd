@@ -83,11 +83,10 @@ const SideNavbar = () => {
       case 'fleet':
         return [
           { text: 'Dashboard', icon: <HomeIcon />, path: '/fleet' },
-          { text: 'Tekliflerim', icon: <ListAltIcon />, path: '/fleet/tekliflerim' },
           { text: 'Tırlar', icon: <LocalShippingIcon />, path: '/fleet/tirlar' },
           { text: 'Sürücüler', icon: <PersonIcon />, path: '/fleet/suruculer' },
           { text: 'Römorklar', icon: <DirectionsCarIcon />, path: '/fleet/romorklar' },
-          { text: 'Teklifler', icon: <AssignmentIcon />, path: '/fleet/teklifler' },
+          { text: 'Aktif İşler', icon: <AssignmentIcon />, path: '/fleet/aktif-isler' },
         ];
       default:
         return [];

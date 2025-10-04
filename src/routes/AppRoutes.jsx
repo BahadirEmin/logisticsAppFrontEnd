@@ -7,7 +7,6 @@ import OperatorDashboard from '../pages/operator/OperatorDashboard';
 import OperatorProfile from '../pages/operator/OperatorProfile';
 import ApprovedOffers from '../pages/operator/ApprovedOffers';
 import TripTracking from '../pages/shared/TripTracking';
-import FleetMyOffers from '../pages/fleet/FleetMyOffers';
 import SalesDashboard from '../pages/sales/SalesDashboard';
 import OfferForm from '../pages/sales/OfferForm';
 import CustomerList from '../pages/sales/CustomerList';
@@ -262,7 +261,7 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/fleet/teklifler"
+          path="/fleet/aktif-isler"
           element={
             <ProtectedRoute allowedRoles={['fleet']}>
               <MainLayout>
@@ -272,17 +271,7 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/fleet/tekliflerim"
-          element={
-            <ProtectedRoute allowedRoles={['fleet']}>
-              <MainLayout>
-                <FleetMyOffers />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/fleet/detay/:orderId"
+          path="/fleet/aktif-isler/:orderId"
           element={
             <ProtectedRoute allowedRoles={['fleet']}>
               <MainLayout>
