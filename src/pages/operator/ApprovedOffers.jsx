@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import {
   Container,
   Paper,
@@ -124,7 +125,19 @@ const ApprovedOffers = () => {
       setAssigningOrderId(offerId);
 
       if (!user?.id) {
-        alert('Kullanıcı bilgisi bulunamadı. Lütfen tekrar giriş yapın.');
+        toast.error('Kullanıcı bilgisi bulunamadı. Lütfen tekrar giriş yapın.', {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#f44336',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
         return;
       }
 
@@ -133,20 +146,66 @@ const ApprovedOffers = () => {
         await usersAPI.validateUser(user.id);
       } catch (validationError) {
         console.error('User validation failed:', validationError);
-        alert(
-          "Kullanıcı ID'niz users tablosunda bulunamadı. Lütfen sistem yöneticisi ile iletişime geçin."
-        );
+        toast.error("Kullanıcı ID'niz users tablosunda bulunamadı. Lütfen sistem yöneticisi ile iletişime geçin.", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#f44336',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
         return;
       }
 
       if (user?.role === 'operator' || user?.role === 'operation') {
         await ordersAPI.assignToOperation(offerId, user.id);
-        alert('Teklif başarıyla size atandı!');
+        toast.success('Teklif başarıyla size atandı!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#4caf50',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
       } else if (user?.role === 'fleet') {
         await ordersAPI.assignToFleet(offerId, user.id);
-        alert('Teklif başarıyla size atandı!');
+        toast.success('Teklif başarıyla size atandı!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#4caf50',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
       } else {
-        alert('Bu işlem için yetkiniz bulunmamaktadır.');
+        toast.warning('Bu işlem için yetkiniz bulunmamaktadır.', {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#ff9800',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
         return;
       }
 
@@ -168,7 +227,19 @@ const ApprovedOffers = () => {
         errorMessage = error.response.data.message;
       }
 
-      alert(errorMessage);
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        style: {
+          backgroundColor: '#f44336',
+          color: 'white',
+          fontSize: '14px',
+          fontWeight: '500'
+        }
+      });
     } finally {
       setAssigningOrderId(null);
     }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import {
   Container,
   Paper,
@@ -69,6 +70,23 @@ const OfferList = () => {
     } catch (err) {
       console.error('Teklifler yüklenirken hata:', err);
       setError('Teklifler yüklenirken bir hata oluştu.');
+      
+      // Detaylı hata mesajı
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'Bilinmeyen bir hata oluştu';
+      
+      toast.warning(`Teklifler yüklenirken sorun: ${errorMessage}`, {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        style: {
+          backgroundColor: '#ff9800',
+          color: 'white',
+          fontSize: '14px',
+          fontWeight: '500'
+        }
+      });
     } finally {
       setLoading(false);
     }
@@ -105,9 +123,40 @@ const OfferList = () => {
       try {
         await ordersAPI.delete(offerId);
         await loadOffers(); // Reload the list
+        
+        toast.success('Teklif başarıyla silindi!', {
+          position: "top-right",
+          autoClose: 2500,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#4caf50',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
+        
       } catch (err) {
         console.error('Teklif silinirken hata:', err);
-        alert('Teklif silinirken bir hata oluştu.');
+        
+        // Detaylı hata mesajı
+        const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'Bilinmeyen bir hata oluştu';
+        
+        toast.error(`Teklif silinemedi: ${errorMessage}`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#f44336',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
       }
     }
   };
@@ -152,10 +201,42 @@ const OfferList = () => {
       setApprovalDialog({ open: false, offer: null });
       await loadOffers();
 
-      // Show success message
+      // Show success toast
+      toast.success('Teklif başarıyla onaylandı!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        style: {
+          backgroundColor: '#4caf50',
+          color: 'white',
+          fontSize: '14px',
+          fontWeight: '500'
+        }
+      });
+
       setError(null);
     } catch (err) {
       console.error('Teklif onaylanırken hata:', err);
+      
+      // Detaylı hata mesajı
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'Bilinmeyen bir hata oluştu';
+      
+      toast.error(`Teklif onaylanamadı: ${errorMessage}`, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        style: {
+          backgroundColor: '#f44336',
+          color: 'white',
+          fontSize: '14px',
+          fontWeight: '500'
+        }
+      });
+      
       setError('Teklif onaylanırken bir hata oluştu.');
     } finally {
       setApproving(false);

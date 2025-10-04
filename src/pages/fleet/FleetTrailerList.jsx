@@ -39,6 +39,7 @@ import {
   LocalShipping as TrailerIcon,
 } from '@mui/icons-material';
 import { trailerAPI } from '../../api/trailers';
+import { toast } from 'react-toastify';
 
 const TrailerList = () => {
   const [trailers, setTrailers] = useState([]);
@@ -217,8 +218,26 @@ const TrailerList = () => {
 
       if (editingTrailer) {
         await trailerAPI.update(editingTrailer.id, trailerData);
+        
+        toast.success('Römork başarıyla güncellendi!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+        });
       } else {
         await trailerAPI.create(trailerData);
+        
+        toast.success('Römork başarıyla eklendi!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+        });
       }
 
       setDialogOpen(false);
@@ -230,6 +249,15 @@ const TrailerList = () => {
         error?.response?.data?.error ||
         'Römork kaydedilirken hata oluştu';
       setError(backendMessage);
+      
+      toast.error(backendMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } finally {
       setSaving(false);
     }
@@ -247,9 +275,27 @@ const TrailerList = () => {
       setDeleteDialogOpen(false);
       setTrailerToDelete(null);
       loadData();
+      
+      toast.success('Römork başarıyla silindi!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } catch (error) {
       setError('Römork silinirken hata oluştu');
       console.error('Delete trailer error:', error);
+      
+      toast.error('Römork silinirken hata oluştu', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     }
   };
 
@@ -262,6 +308,15 @@ const TrailerList = () => {
       setDialogOpen(false);
       setEditingTrailer(null);
       await loadData();
+      
+      toast.success('Römork başarıyla silindi!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } catch (error) {
       console.error('Inline delete error:', error);
       const backendMessage =
@@ -269,6 +324,15 @@ const TrailerList = () => {
         error?.response?.data?.error ||
         'Römork silinirken hata oluştu';
       setError(backendMessage);
+      
+      toast.error(backendMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } finally {
       setDeletingInline(false);
     }

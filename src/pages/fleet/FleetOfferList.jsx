@@ -298,7 +298,7 @@ const OfferList = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
             <Typography variant="h4" color="success.main" fontWeight="bold">
-              ₺{offers.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0).toLocaleString()}
+              {offers.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0).toLocaleString()}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Toplam Değer
@@ -351,7 +351,7 @@ const OfferList = () => {
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flex: 1 }}>
             <TextField
               size="small"
-              placeholder="Ara"
+              label="Ara"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
@@ -492,7 +492,7 @@ const OfferList = () => {
                       : 'N/A'}
                   </TableCell>
                   <TableCell>
-                    <strong>{offer.price ? `₺${offer.price}` : 'N/A'}</strong>
+                    <strong>{offer.price ? `${offer.price}` : 'N/A'}</strong>
                   </TableCell>
                   <TableCell>
                     <Button

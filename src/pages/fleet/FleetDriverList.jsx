@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import {
   Container,
   Paper,
@@ -30,7 +31,6 @@ import {
   Select,
   MenuItem,
   FormHelperText,
-  Snackbar,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -55,7 +55,6 @@ const DriverList = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [openDialog, setOpenDialog] = useState(false);
   const [editingDriver, setEditingDriver] = useState(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const { user } = useAuth();
 
   // Form state
@@ -177,10 +176,18 @@ const DriverList = () => {
       !formData.phoneNumber ||
       !formData.email
     ) {
-      setSnackbar({
-        open: true,
-        message: 'Lütfen tüm zorunlu alanları doldurun!',
-        severity: 'error',
+      toast.error('Lütfen tüm zorunlu alanları doldurun!', {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        style: {
+          backgroundColor: '#f44336',
+          color: 'white',
+          fontSize: '14px',
+          fontWeight: '500'
+        }
       });
       return;
     }
@@ -188,12 +195,21 @@ const DriverList = () => {
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setSnackbar({ open: true, message: 'Geçerli bir e-posta adresi girin!', severity: 'error' });
+      toast.error('Geçerli bir e-posta adresi girin!', {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        style: {
+          backgroundColor: '#f44336',
+          color: 'white',
+          fontSize: '14px',
+          fontWeight: '500'
+        }
+      });
       return;
     }
-
-    // Show loading state
-    setSnackbar({ open: true, message: 'Kaydediliyor...', severity: 'info' });
 
     try {
       console.log('Submitting driver data:', formData);
@@ -201,11 +217,35 @@ const DriverList = () => {
       if (editingDriver) {
         const result = await driversAPI.update(editingDriver.id, formData);
         console.log('Driver updated successfully:', result);
-        setSnackbar({ open: true, message: 'Sürücü başarıyla güncellendi!', severity: 'success' });
+        toast.success('Sürücü başarıyla güncellendi!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#4caf50',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
       } else {
         const result = await driversAPI.create(formData);
         console.log('Driver created successfully:', result);
-        setSnackbar({ open: true, message: 'Sürücü başarıyla oluşturuldu!', severity: 'success' });
+        toast.success('Sürücü başarıyla oluşturuldu!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#4caf50',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
       }
       handleCloseDialog();
       loadDrivers();
@@ -214,7 +254,19 @@ const DriverList = () => {
       console.error('Error response:', err.response);
       console.error('Error data:', err.response?.data);
       const errorMessage = err.response?.data?.message || err.message || 'Bir hata oluştu!';
-      setSnackbar({ open: true, message: errorMessage, severity: 'error' });
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        style: {
+          backgroundColor: '#f44336',
+          color: 'white',
+          fontSize: '14px',
+          fontWeight: '500'
+        }
+      });
     }
   };
 
@@ -222,11 +274,35 @@ const DriverList = () => {
     if (window.confirm('Bu sürücüyü silmek istediğinizden emin misiniz?')) {
       try {
         await driversAPI.delete(driverId);
-        setSnackbar({ open: true, message: 'Sürücü başarıyla silindi!', severity: 'success' });
+        toast.success('Sürücü başarıyla silindi!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#4caf50',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
         loadDrivers();
       } catch (err) {
         console.error('Sürücü silinirken hata:', err);
-        setSnackbar({ open: true, message: 'Silme işlemi başarısız!', severity: 'error' });
+        toast.error('Silme işlemi başarısız!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#f44336',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
       }
     }
   };
@@ -453,9 +529,6 @@ const DriverList = () => {
                         <Typography variant="body2" fontWeight="bold">
                           {driver.firstName} {driver.lastName}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          ID: #{driver.id}
-                        </Typography>
                       </Box>
                     </Box>
                   </TableCell>
@@ -678,20 +751,6 @@ const DriverList = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Snackbar for notifications */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-      >
-        <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </Container>
   );
 };

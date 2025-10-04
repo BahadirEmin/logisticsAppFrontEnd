@@ -39,6 +39,7 @@ import {
   LocalShipping as TruckIcon,
 } from '@mui/icons-material';
 import { vehicleAPI } from '../../api/vehicles';
+import { toast } from 'react-toastify';
 import { useFormattedInput } from '../../hooks/useFormattedInput';
 
 const FleetVehicleList = () => {
@@ -230,8 +231,26 @@ const FleetVehicleList = () => {
 
       if (editingVehicle) {
         await vehicleAPI.update(editingVehicle.id, vehicleData);
+        
+        toast.success('Araç başarıyla güncellendi!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+        });
       } else {
         await vehicleAPI.create(vehicleData);
+        
+        toast.success('Araç başarıyla eklendi!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+        });
       }
 
       setDialogOpen(false);
@@ -243,6 +262,15 @@ const FleetVehicleList = () => {
         error?.response?.data?.error ||
         'Araç kaydedilirken hata oluştu';
       setError(backendMessage);
+      
+      toast.error(backendMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } finally {
       setSaving(false);
     }
@@ -316,7 +344,7 @@ const FleetVehicleList = () => {
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
           <Typography variant="h4" component="h1" sx={{ color: '#1976d2' }}>
-            Tır Listesi (Fleet)
+            Tır Listesi
           </Typography>
           <Button
             variant="contained"
