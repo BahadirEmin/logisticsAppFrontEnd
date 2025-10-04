@@ -427,7 +427,10 @@ const OfferList = () => {
                   <strong>Fiyat</strong>
                 </TableCell>
                 <TableCell>
-                  <strong>İşlemler</strong>
+                  <strong>Detay Görüntüle</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Kaynak Yönetimi</strong>
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -475,25 +478,27 @@ const OfferList = () => {
                     <strong>{offer.price ? `₺${offer.price}` : 'N/A'}</strong>
                   </TableCell>
                   <TableCell>
-                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                      <Button
-                        size="small"
-                        startIcon={<VisibilityIcon />}
-                        variant="outlined"
-                        onClick={() => handleViewOffer(offer.id)}
-                      >
-                        Detay
-                      </Button>
-                      <Button
-                        size="small"
-                        startIcon={<AssignmentIcon />}
-                        variant="contained"
-                        color="primary"
-                        onClick={() => handleAssignResources(offer)}
-                      >
-                        Kaynak Ata
-                      </Button>
-                    </Box>
+                    <Button
+                      size="small"
+                      startIcon={<VisibilityIcon />}
+                      variant="outlined"
+                      onClick={() => handleViewOffer(offer.id)}
+                      fullWidth
+                    >
+                      Detay
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      size="small"
+                      startIcon={<AssignmentIcon />}
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleAssignResources(offer)}
+                      fullWidth
+                    >
+                      Kaynak Ata
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
