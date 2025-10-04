@@ -307,16 +307,33 @@ const OfferList = () => {
             </FormControl>
           </Box>
           
-          <FormControlLabel
-            control={
-              <Switch
-                checked={showMyOffersOnly}
-                onChange={(e) => setShowMyOffersOnly(e.target.checked)}
-                color="primary"
-              />
-            }
-            label="Sadece Tekliflerim"
-          />
+          <Box 
+            sx={{ 
+              backgroundColor: showMyOffersOnly ? 'primary.100' : 'grey.100',
+              borderRadius: 2,
+              px: 2,
+              py: 0.5,
+              transition: 'all 0.3s ease-in-out',
+              border: showMyOffersOnly ? '1px solid primary.300' : '1px solid grey.300',
+              '&:hover': {
+                backgroundColor: showMyOffersOnly ? 'primary.200' : 'grey.200',
+                transform: 'translateY(-1px)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              }
+            }}
+          >
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showMyOffersOnly}
+                  onChange={(e) => setShowMyOffersOnly(e.target.checked)}
+                  color="primary"
+                />
+              }
+              label="Tekliflerim"
+              sx={{ margin: 0 }}
+            />
+          </Box>
         </Box>
       </Paper>
 
