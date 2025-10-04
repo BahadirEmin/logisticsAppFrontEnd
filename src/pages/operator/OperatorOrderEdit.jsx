@@ -27,21 +27,98 @@ import {
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
+import { usersAPI } from '../../api/users';
+import { driversAPI } from '../../api/drivers';
+import { vehicleAPI } from '../../api/vehicles';
+import { trailerAPI } from '../../api/trailers';
 import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'react-toastify';
 import { STATUS_OPTIONS } from '../../constants/statusConstants';
 
 const OperatorOrderEdit = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [dropdownLoading, setDropdownLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [drivers, setDrivers] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
+  const [trailers, setTrailers] = useState([]);
   const { orderId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
 
+
+
   useEffect(() => {
     loadOrder();
+    loadDropdownData();
   }, [orderId]);
+
+  // Order yüklendikten sonra default değerleri set et
+  useEffect(() => {
+    if (order && users.length > 0 && drivers.length > 0 && vehicles.length > 0 && trailers.length > 0) {
+      console.log('Setting default values from order:', order);
+      
+      // Operasyon personeli eşleştir
+      if (order.operationPersonName && !order.operationPersonId) {
+        const foundUser = users.find(user => 
+          (user.fullName === order.operationPersonName || user.username === order.operationPersonName) &&
+          (user.role === 'OPERATOR' || user.role === 'OPERATION')
+        );
+        if (foundUser) {
+          console.log('Found operation person:', foundUser);
+          handleInputChange('operationPersonId', foundUser.id);
+        }
+      }
+
+      // Şoför eşleştir
+      if (order.assignedDriverName && !order.assignedDriverId) {
+        const foundDriver = drivers.find(driver => 
+          driver.name === order.assignedDriverName
+        );
+        if (foundDriver) {
+          console.log('Found driver:', foundDriver);
+          handleInputChange('assignedDriverId', foundDriver.id);
+        }
+      }
+
+      // Tır eşleştir (plaka ile)
+      if (order.assignedTruckPlateNo && !order.assignedTruckId) {
+        const foundVehicle = vehicles.find(vehicle => 
+          vehicle.plateNo === order.assignedTruckPlateNo
+        );
+        if (foundVehicle) {
+          console.log('Found vehicle:', foundVehicle);
+          handleInputChange('assignedTruckId', foundVehicle.id);
+        }
+      }
+
+      // Römork eşleştir (römork numarası ile)
+      if (order.assignedTrailerNo && !order.assignedTrailerId) {
+        const foundTrailer = trailers.find(trailer => 
+          trailer.trailerNo === order.assignedTrailerNo
+        );
+        if (foundTrailer) {
+          console.log('Found trailer:', foundTrailer);
+          handleInputChange('assignedTrailerId', foundTrailer.id);
+        }
+      }
+
+      // Gümrük personeli eşleştir
+      if (order.customsPersonName && !order.customsPersonId) {
+        const foundUser = users.find(user => 
+          (user.fullName === order.customsPersonName || user.username === order.customsPersonName) &&
+          user.role === 'CUSTOMS'
+        );
+        if (foundUser) {
+          console.log('Found customs person:', foundUser);
+          handleInputChange('customsPersonId', foundUser.id);
+        }
+      }
+    }
+  }, [order, users, drivers, vehicles, trailers]);
 
   const loadOrder = async () => {
     try {
@@ -57,7 +134,96 @@ const OperatorOrderEdit = () => {
     }
   };
 
-  const handleInputChange = (field, value) => {
+  const loadDropdownData = async () => {
+    try {
+      setDropdownLoading(true);
+      console.log('Loading dropdown data...');
+      
+      // Load each API separately to handle individual failures
+      const loadUsers = async () => {
+        try {
+          const response = await usersAPI.getAll();
+          console.log('Raw users response:', response);
+          // Handle different response structures
+          const userData = response?.data || response || [];
+          setUsers(Array.isArray(userData) ? userData : []);
+          console.log('Users loaded:', Array.isArray(userData) ? userData.length : 0);
+        } catch (error) {
+          console.error('Users API failed:', error);
+          setUsers([]);
+        }
+      };
+
+      const loadDrivers = async () => {
+        try {
+          const response = await driversAPI.getAll();
+          console.log('Raw drivers response:', response);
+          console.log('Response type:', typeof response);
+          console.log('Is array?:', Array.isArray(response));
+          // Handle different response structures
+          const driversData = response?.data || response || [];
+          setDrivers(Array.isArray(driversData) ? driversData : []);
+          console.log('Drivers loaded:', Array.isArray(driversData) ? driversData.length : 0);
+          if (Array.isArray(driversData) && driversData.length > 0) {
+            console.log('Sample driver:', driversData[0]);
+          }
+        } catch (error) {
+          console.error('Drivers API failed:', error);
+          setDrivers([]);
+        }
+      };
+
+      const loadVehicles = async () => {
+        try {
+          const response = await vehicleAPI.getAll();
+          console.log('Raw vehicles response:', response);
+          // Handle different response structures
+          const vehiclesData = response?.data || response || [];
+          setVehicles(Array.isArray(vehiclesData) ? vehiclesData : []);
+          console.log('Vehicles loaded:', Array.isArray(vehiclesData) ? vehiclesData.length : 0);
+          if (Array.isArray(vehiclesData) && vehiclesData.length > 0) {
+            console.log('Sample vehicle:', vehiclesData[0]);
+          }
+        } catch (error) {
+          console.error('Vehicles API failed:', error);
+          setVehicles([]);
+        }
+      };
+
+      const loadTrailers = async () => {
+        try {
+          const response = await trailerAPI.getAll();
+          console.log('Raw trailers response:', response);
+          // Handle different response structures
+          const trailersData = response?.data || response || [];
+          setTrailers(Array.isArray(trailersData) ? trailersData : []);
+          console.log('Trailers loaded:', Array.isArray(trailersData) ? trailersData.length : 0);
+        } catch (error) {
+          console.error('Trailers API failed:', error);
+          setTrailers([]);
+        }
+      };
+
+      // Load all data in parallel but handle each separately
+      await Promise.all([
+        loadUsers(),
+        loadDrivers(),
+        loadVehicles(),
+        loadTrailers()
+      ]);
+      
+      console.log('All dropdown data loading completed');
+    } catch (error) {
+      console.error('Critical error in loadDropdownData:', error);
+      // Ensure all states are set to empty arrays in case of critical failure
+      setUsers([]);
+      setDrivers([]);
+      setVehicles([]);
+      setTrailers([]);
+    } finally {
+      setDropdownLoading(false);
+    }
+  };  const handleInputChange = (field, value) => {
     setOrder(prev => ({
       ...prev,
       [field]: value,
@@ -70,10 +236,29 @@ const OperatorOrderEdit = () => {
       setSaving(true);
       setError(null);
       await ordersAPI.update(orderId, order);
+      
+      toast.success('Sipariş başarıyla güncellendi!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
+      
       navigate(`/operator/teklifler/${orderId}`);
     } catch (err) {
       console.error('Sipariş güncellenirken hata:', err);
       setError('Sipariş güncellenirken bir hata oluştu.');
+      
+      toast.error('Sipariş güncellenirken bir hata oluştu.', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } finally {
       setSaving(false);
     }
@@ -102,7 +287,7 @@ const OperatorOrderEdit = () => {
         <Button
           variant="outlined"
           startIcon={<ArrowBackIcon />}
-          onClick={() => navigate('/operator/tekliflerim')}
+          onClick={() => navigate('/operator/onaylanan-teklifler')}
         >
           Geri Dön
         </Button>
@@ -119,7 +304,7 @@ const OperatorOrderEdit = () => {
         <Button
           variant="outlined"
           startIcon={<ArrowBackIcon />}
-          onClick={() => navigate('/operator/tekliflerim')}
+          onClick={() => navigate('/operator/onaylanan-teklifler')}
         >
           Geri Dön
         </Button>
@@ -462,56 +647,224 @@ const OperatorOrderEdit = () => {
                   <Grid item xs={12} md={6}>
                     <TextField
                       fullWidth
-                      label="Müşteri ID"
-                      type="number"
-                      value={order.customerId || ''}
-                      onChange={e => handleInputChange('customerId', Number(e.target.value))}
+                      label="Müşteri Adı"
+                      value={order.customerName || ''}
+                      onChange={e => handleInputChange('customerName', e.target.value)}
+                      disabled
+                      helperText="Değiştirilemez"
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
                     <TextField
                       fullWidth
-                      label="Satış Personeli ID"
-                      type="number"
-                      value={order.salesPersonId || ''}
-                      onChange={e => handleInputChange('salesPersonId', Number(e.target.value))}
+                      label="Satış Personeli"
+                      value={order.salesPersonName || ''}
+                      onChange={e => handleInputChange('salesPersonName', e.target.value)}
+                      disabled
+                      helperText="Değiştirilemez"
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
-                    <TextField
-                      fullWidth
-                      label="Operasyon Personeli ID"
-                      type="number"
-                      value={order.operationPersonId || ''}
-                      onChange={e => handleInputChange('operationPersonId', Number(e.target.value))}
-                    />
+                    <FormControl fullWidth sx={{ minWidth: 300 }}>
+                      <InputLabel>Operasyon Personeli</InputLabel>
+                      <Select
+                        value={order.operationPersonId || ''}
+                        onChange={e => handleInputChange('operationPersonId', e.target.value)}
+                        label="Operasyon Personeli"
+                        disabled={dropdownLoading}
+                        MenuProps={{
+                          PaperProps: {
+                            style: {
+                              maxHeight: 300,
+                              width: 350,
+                            },
+                          },
+                        }}
+                      >
+                        <MenuItem value="">
+                          <em>Seçiniz</em>
+                        </MenuItem>
+                        {loading ? (
+                          <MenuItem disabled>
+                            <em>Yükleniyor...</em>
+                          </MenuItem>
+                        ) : users.length === 0 ? (
+                          <MenuItem disabled>
+                            <em>Operasyon personeli bulunamadı</em>
+                          </MenuItem>
+                        ) : (
+                          users
+                            .filter(user => user && (user.role === 'OPERATOR' || user.role === 'OPERATION'))
+                            .map(user => (
+                              <MenuItem key={user.id} value={user.id}>
+                                {user.fullName || user.username || user.name || `User ${user.id}`} ({user.role})
+                              </MenuItem>
+                            ))
+                        )}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <FormControl fullWidth sx={{ minWidth: 300 }}>
+                      <InputLabel>Atanan Soför</InputLabel>
+                      <Select
+                        value={order.assignedDriverId || ''}
+                        onChange={e => handleInputChange('assignedDriverId', e.target.value)}
+                        label="Atanan Soför"
+                        disabled={dropdownLoading}
+                        MenuProps={{
+                          PaperProps: {
+                            style: {
+                              maxHeight: 300,
+                              width: 400,
+                            },
+                          },
+                        }}
+                      >
+                        <MenuItem value="">
+                          <em>Seçiniz</em>
+                        </MenuItem>
+                        {dropdownLoading ? (
+                          <MenuItem disabled>
+                            <em>Yükleniyor...</em>
+                          </MenuItem>
+                        ) : drivers.length === 0 ? (
+                          <MenuItem disabled>
+                            <em>Şoför bulunamadı</em>
+                          </MenuItem>
+                        ) : (
+                          drivers
+                            .filter(driver => driver && driver.id)
+                            .map(driver => (
+                              <MenuItem key={driver.id} value={driver.id}>
+                                {driver.fullName || driver.firstName + ' ' + driver.lastName || `Şoför ${driver.id}`}
+                                {driver.licenseNo ? ` - ${driver.licenseNo}` : ''}
+                              </MenuItem>
+                            ))
+                        )}
+                      </Select>
+                    </FormControl>
                   </Grid>
                   <Grid item xs={12} md={6}>
-                    <TextField
-                      fullWidth
-                      label="Filo Personeli ID"
-                      type="number"
-                      value={order.fleetPersonId || ''}
-                      onChange={e => handleInputChange('fleetPersonId', Number(e.target.value))}
-                    />
+                    <FormControl fullWidth sx={{ minWidth: 300 }}>
+                      <InputLabel>Atanan Tır</InputLabel>
+                      <Select
+                        value={order.assignedTruckId || ''}
+                        onChange={e => handleInputChange('assignedTruckId', e.target.value)}
+                        label="Atanan Tır"
+                        disabled={dropdownLoading}
+                        MenuProps={{
+                          PaperProps: {
+                            style: {
+                              maxHeight: 300,
+                              width: 450,
+                            },
+                          },
+                        }}
+                      >
+                        <MenuItem value="">
+                          <em>Seçiniz</em>
+                        </MenuItem>
+                        {dropdownLoading ? (
+                          <MenuItem disabled>
+                            <em>Yükleniyor...</em>
+                          </MenuItem>
+                        ) : vehicles.length === 0 ? (
+                          <MenuItem disabled>
+                            <em>Araç bulunamadı</em>
+                          </MenuItem>
+                        ) : (
+                          vehicles
+                            .filter(vehicle => vehicle && vehicle.id)
+                            .map(vehicle => (
+                              <MenuItem key={vehicle.id} value={vehicle.id}>
+                                {vehicle.plateNo || 'Plaka Yok'} - {vehicle.make || ''} {vehicle.model || ''}
+                              </MenuItem>
+                            ))
+                        )}
+                      </Select>
+                    </FormControl>
                   </Grid>
                   <Grid item xs={12} md={6}>
-                    <TextField
-                      fullWidth
-                      label="Atanan Tır ID"
-                      type="number"
-                      value={order.assignedTruckId || ''}
-                      onChange={e => handleInputChange('assignedTruckId', Number(e.target.value))}
-                    />
+                    <FormControl fullWidth sx={{ minWidth: 300 }}>
+                      <InputLabel>Atanan Römork</InputLabel>
+                      <Select
+                        value={order.assignedTrailerId || ''}
+                        onChange={e => handleInputChange('assignedTrailerId', e.target.value)}
+                        label="Atanan Römork"
+                        disabled={dropdownLoading}
+                        MenuProps={{
+                          PaperProps: {
+                            style: {
+                              maxHeight: 300,
+                              width: 400,
+                            },
+                          },
+                        }}
+                      >
+                        <MenuItem value="">
+                          <em>Seçiniz</em>
+                        </MenuItem>
+                        {dropdownLoading ? (
+                          <MenuItem disabled>
+                            <em>Yükleniyor...</em>
+                          </MenuItem>
+                        ) : trailers.length === 0 ? (
+                          <MenuItem disabled>
+                            <em>Römork bulunamadı</em>
+                          </MenuItem>
+                        ) : (
+                          trailers
+                            .filter(trailer => trailer && trailer.id)
+                            .map(trailer => (
+                              <MenuItem key={trailer.id} value={trailer.id}>
+                                {trailer.trailerNo || 'Römork No Yok'} - {trailer.trailerType || 'Tip Yok'}
+                              </MenuItem>
+                            ))
+                        )}
+                      </Select>
+                    </FormControl>
                   </Grid>
                   <Grid item xs={12} md={6}>
-                    <TextField
-                      fullWidth
-                      label="Atanan Romork ID"
-                      type="number"
-                      value={order.assignedTrailerId || ''}
-                      onChange={e => handleInputChange('assignedTrailerId', Number(e.target.value))}
-                    />
+                    <FormControl fullWidth sx={{ minWidth: 300 }}>
+                      <InputLabel>Gümrük Personeli</InputLabel>
+                      <Select
+                        value={order.customsPersonId || ''}
+                        onChange={e => handleInputChange('customsPersonId', e.target.value)}
+                        label="Gümrük Personeli"
+                        disabled={dropdownLoading}
+                        MenuProps={{
+                          PaperProps: {
+                            style: {
+                              maxHeight: 300,
+                              width: 350,
+                            },
+                          },
+                        }}
+                      >
+                        <MenuItem value="">
+                          <em>Seçiniz</em>
+                        </MenuItem>
+                        {dropdownLoading ? (
+                          <MenuItem disabled>
+                            <em>Yükleniyor...</em>
+                          </MenuItem>
+                        ) : users.length === 0 ? (
+                          <MenuItem disabled>
+                            <em>Gümrük personeli bulunamadı</em>
+                          </MenuItem>
+                        ) : (
+                          users
+                            .filter(user => user && user.role === 'CUSTOMS')
+                            .map(user => (
+                              <MenuItem key={user.id} value={user.id}>
+                                {user.fullName || user.username || user.name || `User ${user.id}`} ({user.role})
+                              </MenuItem>
+                            ))
+                        )}
+                      </Select>
+                    </FormControl>
                   </Grid>
                   <Grid item xs={12} md={6}>
                     <TextField
@@ -519,15 +872,6 @@ const OperatorOrderEdit = () => {
                       label="Gümrük Adresi"
                       value={order.customsAddress || ''}
                       onChange={e => handleInputChange('customsAddress', e.target.value)}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      fullWidth
-                      label="Gümrük Personeli ID"
-                      type="number"
-                      value={order.customsPersonId || ''}
-                      onChange={e => handleInputChange('customsPersonId', Number(e.target.value))}
                     />
                   </Grid>
                 </Grid>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import {
   Container,
   Paper,
@@ -27,6 +28,9 @@ import {
   DialogActions,
   Button,
   Divider,
+  FormControlLabel,
+  Switch,
+  InputAdornment,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -39,6 +43,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
 import { STATUS_OPTIONS, getStatusColor, getStatusLabel, getStatusIcon } from '../../constants/statusConstants';
+import { useAuth } from '../../contexts/AuthContext';
 
 const OfferList = () => {
   const [offers, setOffers] = useState([]);
@@ -46,9 +51,11 @@ const OfferList = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [showMyOffersOnly, setShowMyOffersOnly] = useState(false);
   const [approvalDialog, setApprovalDialog] = useState({ open: false, offer: null });
   const [approving, setApproving] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     loadOffers();
@@ -63,6 +70,23 @@ const OfferList = () => {
     } catch (err) {
       console.error('Teklifler yüklenirken hata:', err);
       setError('Teklifler yüklenirken bir hata oluştu.');
+      
+      // Detaylı hata mesajı
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'Bilinmeyen bir hata oluştu';
+      
+      toast.warning(`Teklifler yüklenirken sorun: ${errorMessage}`, {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        style: {
+          backgroundColor: '#ff9800',
+          color: 'white',
+          fontSize: '14px',
+          fontWeight: '500'
+        }
+      });
     } finally {
       setLoading(false);
     }
@@ -78,7 +102,13 @@ const OfferList = () => {
 
     const matchesStatus = statusFilter === 'all' || !statusFilter || offer.tripStatus === statusFilter;
 
-    return matchesSearch && matchesStatus;
+    // Check if offer belongs to current user
+    const matchesOwnership = !showMyOffersOnly || 
+      offer.createdBy === user?.id || 
+      offer.salesPersonId === user?.id ||
+      offer.userId === user?.id;
+
+    return matchesSearch && matchesStatus && matchesOwnership;
   });
   const handleViewOffer = offerId => {
     navigate(`/sales/teklifler/${offerId}`);
@@ -93,9 +123,40 @@ const OfferList = () => {
       try {
         await ordersAPI.delete(offerId);
         await loadOffers(); // Reload the list
+        
+        toast.success('Teklif başarıyla silindi!', {
+          position: "top-right",
+          autoClose: 2500,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#4caf50',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
+        
       } catch (err) {
         console.error('Teklif silinirken hata:', err);
-        alert('Teklif silinirken bir hata oluştu.');
+        
+        // Detaylı hata mesajı
+        const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'Bilinmeyen bir hata oluştu';
+        
+        toast.error(`Teklif silinemedi: ${errorMessage}`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#f44336',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
       }
     }
   };
@@ -140,10 +201,42 @@ const OfferList = () => {
       setApprovalDialog({ open: false, offer: null });
       await loadOffers();
 
-      // Show success message
+      // Show success toast
+      toast.success('Teklif başarıyla onaylandı!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        style: {
+          backgroundColor: '#4caf50',
+          color: 'white',
+          fontSize: '14px',
+          fontWeight: '500'
+        }
+      });
+
       setError(null);
     } catch (err) {
       console.error('Teklif onaylanırken hata:', err);
+      
+      // Detaylı hata mesajı
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'Bilinmeyen bir hata oluştu';
+      
+      toast.error(`Teklif onaylanamadı: ${errorMessage}`, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        style: {
+          backgroundColor: '#f44336',
+          color: 'white',
+          fontSize: '14px',
+          fontWeight: '500'
+        }
+      });
+      
       setError('Teklif onaylanırken bir hata oluştu.');
     } finally {
       setApproving(false);
@@ -170,49 +263,63 @@ const OfferList = () => {
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#1976d2', mb: 3 }}>
-        Teklifler
-      </Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Typography variant="h4" component="h1" sx={{ color: '#1976d2' }}>
+          Teklifler
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={handleCreateOffer}
+          sx={{
+            backgroundColor: 'primary.main',
+            '&:hover': { backgroundColor: 'primary.dark' },
+          }}
+        >
+          Yeni Teklif
+        </Button>
+      </Box>
 
       {/* Statistics Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography color="textSecondary" gutterBottom>
-              Toplam Teklif
-            </Typography>
-            <Typography variant="h4" component="div" color="primary.main">
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="primary" fontWeight="bold">
               {offers.length}
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Toplam Teklif
+            </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography color="textSecondary" gutterBottom>
-              Teklif Aşamasında
-            </Typography>
-            <Typography variant="h4" component="div" color="warning.main">
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="warning.main" fontWeight="bold">
               {offers.filter(o => o.tripStatus === 'TEKLIF_ASAMASI').length}
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Teklif Aşamasında
+            </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography color="textSecondary" gutterBottom>
-              Onaylanan
-            </Typography>
-            <Typography variant="h4" component="div" color="success.main">
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="success.main" fontWeight="bold">
               {offers.filter(o => o.tripStatus === 'ONAYLANAN_TEKLIF').length}
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Onaylanan
+            </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography color="textSecondary" gutterBottom>
-              Reddedilen
-            </Typography>
-            <Typography variant="h4" component="div" color="error.main">
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="error.main" fontWeight="bold">
               {offers.filter(o => o.tripStatus === 'REDDEDILDI').length}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Reddedilen
             </Typography>
           </Paper>
         </Grid>
@@ -235,21 +342,29 @@ const OfferList = () => {
 
       {/* Filters and Actions */}
       <Paper sx={{ p: 2, mb: 2 }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={3}>
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
             <TextField
-              fullWidth
               size="small"
               label="Ara"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
+              sx={{ width: 300 }}
               InputProps={{
-                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
               }}
             />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+            <FormControl size="small" sx={{ width: 200 }}>
               <InputLabel shrink>Durum Filtresi</InputLabel>
               <Select
                 value={statusFilter}
@@ -276,25 +391,36 @@ const OfferList = () => {
                 ))}
               </Select>
             </FormControl>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Box display="flex" justifyContent="flex-end">
-              <Tooltip title="Yeni Teklif Oluştur">
-                <IconButton
+          </Box>
+          
+          <Box 
+            sx={{ 
+              backgroundColor: showMyOffersOnly ? 'primary.100' : 'grey.100',
+              borderRadius: 2,
+              px: 2,
+              py: 0.5,
+              transition: 'all 0.3s ease-in-out',
+              border: showMyOffersOnly ? '1px solid primary.300' : '1px solid grey.300',
+              '&:hover': {
+                backgroundColor: showMyOffersOnly ? 'primary.200' : 'grey.200',
+                transform: 'translateY(-1px)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              }
+            }}
+          >
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showMyOffersOnly}
+                  onChange={(e) => setShowMyOffersOnly(e.target.checked)}
                   color="primary"
-                  onClick={handleCreateOffer}
-                  sx={{
-                    backgroundColor: 'primary.main',
-                    color: 'white',
-                    '&:hover': { backgroundColor: 'primary.dark' },
-                  }}
-                >
-                  <AddIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          </Grid>
-        </Grid>
+                />
+              }
+              label="Tekliflerim"
+              sx={{ margin: 0 }}
+            />
+          </Box>
+        </Box>
       </Paper>
 
       {/* Offers Table */}
@@ -309,14 +435,16 @@ const OfferList = () => {
                 <TableCell>Nereye</TableCell>
                 <TableCell>Yük Bilgileri</TableCell>
                 <TableCell>Durum</TableCell>
-                <TableCell>Tarih</TableCell>
+                <TableCell>Kalkış Tarihi</TableCell>
+                <TableCell>Tahmini Teslimat</TableCell>
+                <TableCell>Teklif Fiyatı</TableCell>
                 <TableCell align="center">İşlemler</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredOffers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} align="center">
+                  <TableCell colSpan={10} align="center">
                     <Typography variant="body2" color="textSecondary">
                       {searchTerm || statusFilter
                         ? 'Arama kriterlerinize uygun teklif bulunamadı.'
@@ -335,9 +463,6 @@ const OfferList = () => {
                     <TableCell>
                       <Typography variant="body2" fontWeight="medium">
                         {offer.customerName}
-                      </Typography>
-                      <Typography variant="caption" color="textSecondary">
-                        ID: {offer.customerId}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -376,10 +501,39 @@ const OfferList = () => {
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2">
-                        {new Date(offer.createdAt).toLocaleDateString('tr-TR')}
+                        {offer.departureDate 
+                          ? new Date(offer.departureDate).toLocaleDateString('tr-TR')
+                          : 'Belirtilmemiş'}
                       </Typography>
                       <Typography variant="caption" color="textSecondary">
-                        {new Date(offer.createdAt).toLocaleTimeString('tr-TR')}
+                        {offer.departureDate 
+                          ? new Date(offer.departureDate).toLocaleTimeString('tr-TR', { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })
+                          : 'Saat yok'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2">
+                        {offer.estimatedDeliveryDate || offer.arrivalDate
+                          ? new Date(offer.estimatedDeliveryDate || offer.arrivalDate).toLocaleDateString('tr-TR')
+                          : 'Belirtilmemiş'}
+                      </Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        {offer.estimatedDeliveryDate || offer.arrivalDate
+                          ? new Date(offer.estimatedDeliveryDate || offer.arrivalDate).toLocaleTimeString('tr-TR', { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })
+                          : 'Saat yok'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" fontWeight="bold" color="primary">
+                        {offer.quotePrice || offer.price 
+                          ? `₺${(offer.quotePrice || offer.price).toLocaleString('tr-TR')}` 
+                          : 'Belirtilmemiş'}
                       </Typography>
                     </TableCell>
                     <TableCell align="center">

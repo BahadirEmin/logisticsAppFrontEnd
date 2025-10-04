@@ -65,10 +65,9 @@ const SideNavbar = () => {
         return [
           { text: 'Dashboard', icon: <HomeIcon />, path: '/operator' },
           { text: 'Hesabım', icon: <AccountCircleIcon />, path: '/operator/hesabim' },
-          { text: 'Tekliflerim', icon: <ListAltIcon />, path: '/operator/tekliflerim' },
           {
-            text: 'Onaylanan Teklifler',
-            icon: <CheckCircleIcon />,
+            text: 'Teklifler',
+            icon: <AssignmentIcon />,
             path: '/operator/onaylanan-teklifler',
           },
           { text: 'Sefer Takip Ekranı', icon: <TimelineIcon />, path: '/operator/sefer-takip' },
@@ -80,16 +79,14 @@ const SideNavbar = () => {
           { text: 'Tedarikçiler', icon: <BusinessIcon />, path: '/sales/tedarikciler' },
           { text: 'Teklif Ver', icon: <AddIcon />, path: '/sales/teklif-ver' },
           { text: 'Teklifler', icon: <AssignmentIcon />, path: '/sales/teklifler' },
-          { text: 'Tekliflerim', icon: <ListAltIcon />, path: '/sales/tekliflerim' },
         ];
       case 'fleet':
         return [
           { text: 'Dashboard', icon: <HomeIcon />, path: '/fleet' },
-          { text: 'Tekliflerim', icon: <ListAltIcon />, path: '/fleet/tekliflerim' },
           { text: 'Tırlar', icon: <LocalShippingIcon />, path: '/fleet/tirlar' },
           { text: 'Sürücüler', icon: <PersonIcon />, path: '/fleet/suruculer' },
           { text: 'Römorklar', icon: <DirectionsCarIcon />, path: '/fleet/romorklar' },
-          { text: 'Teklifler', icon: <AssignmentIcon />, path: '/fleet/teklifler' },
+          { text: 'Aktif İşler', icon: <AssignmentIcon />, path: '/fleet/aktif-isler' },
         ];
       default:
         return [];

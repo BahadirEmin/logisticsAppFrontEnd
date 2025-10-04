@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import {
   Container,
   Paper,
@@ -24,6 +25,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  FormControlLabel,
+  Switch,
 } from '@mui/material';
 import {
   Search,
@@ -47,6 +50,7 @@ const ApprovedOffers = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [showMyOffersOnly, setShowMyOffersOnly] = useState(false);
   const [error, setError] = useState(null);
   const [assigningOrderId, setAssigningOrderId] = useState(null);
   const { user } = useAuth();
@@ -91,7 +95,15 @@ const ApprovedOffers = () => {
     const matchesStatus =
       filterStatus === 'all' || (offer.tripStatus || offer.status) === filterStatus;
 
-    return matchesSearch && matchesStatus;
+    // Check if offer belongs to current user
+    const matchesOwnership = !showMyOffersOnly || 
+      offer.operationPersonId === user?.id || 
+      offer.fleetPersonId === user?.id ||
+      offer.createdBy === user?.id ||
+      offer.salesPersonId === user?.id ||
+      offer.userId === user?.id;
+
+    return matchesSearch && matchesStatus && matchesOwnership;
   });
 
   if (loading) {
@@ -113,7 +125,19 @@ const ApprovedOffers = () => {
       setAssigningOrderId(offerId);
 
       if (!user?.id) {
-        alert('Kullanıcı bilgisi bulunamadı. Lütfen tekrar giriş yapın.');
+        toast.error('Kullanıcı bilgisi bulunamadı. Lütfen tekrar giriş yapın.', {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#f44336',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
         return;
       }
 
@@ -122,20 +146,66 @@ const ApprovedOffers = () => {
         await usersAPI.validateUser(user.id);
       } catch (validationError) {
         console.error('User validation failed:', validationError);
-        alert(
-          "Kullanıcı ID'niz users tablosunda bulunamadı. Lütfen sistem yöneticisi ile iletişime geçin."
-        );
+        toast.error("Kullanıcı ID'niz users tablosunda bulunamadı. Lütfen sistem yöneticisi ile iletişime geçin.", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#f44336',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
         return;
       }
 
       if (user?.role === 'operator' || user?.role === 'operation') {
         await ordersAPI.assignToOperation(offerId, user.id);
-        alert('Teklif başarıyla size atandı!');
+        toast.success('Teklif başarıyla size atandı!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#4caf50',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
       } else if (user?.role === 'fleet') {
         await ordersAPI.assignToFleet(offerId, user.id);
-        alert('Teklif başarıyla size atandı!');
+        toast.success('Teklif başarıyla size atandı!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#4caf50',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
       } else {
-        alert('Bu işlem için yetkiniz bulunmamaktadır.');
+        toast.warning('Bu işlem için yetkiniz bulunmamaktadır.', {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          style: {
+            backgroundColor: '#ff9800',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        });
         return;
       }
 
@@ -157,7 +227,19 @@ const ApprovedOffers = () => {
         errorMessage = error.response.data.message;
       }
 
-      alert(errorMessage);
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        style: {
+          backgroundColor: '#f44336',
+          color: 'white',
+          fontSize: '14px',
+          fontWeight: '500'
+        }
+      });
     } finally {
       setAssigningOrderId(null);
     }
@@ -166,109 +248,131 @@ const ApprovedOffers = () => {
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#1976d2', mb: 4 }}>
-        Onaylanan Teklifler
+        Teklifler
       </Typography>
 
-      {/* Stats Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      {/* Statistics Cards */}
+      <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Toplam Onaylanan
-              </Typography>
-              <Typography variant="h4" component="div">
-                {offers.length}
-              </Typography>
-            </CardContent>
-          </Card>
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="primary" fontWeight="bold">
+              {offers.length}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Toplam Teklif
+            </Typography>
+          </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Yolda Olan
-              </Typography>
-              <Typography variant="h4" component="div" color="warning.main">
-                {offers.filter(o => (o.tripStatus || o.status) === 'in_transit').length}
-              </Typography>
-            </CardContent>
-          </Card>
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="warning.main" fontWeight="bold">
+              {offers.filter(o => (o.tripStatus || o.status) === 'in_transit').length}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Yolda Olan
+            </Typography>
+          </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Teslim Edilen
-              </Typography>
-              <Typography variant="h4" component="div" color="success.main">
-                {offers.filter(o => (o.tripStatus || o.status) === 'delivered').length}
-              </Typography>
-            </CardContent>
-          </Card>
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="success.main" fontWeight="bold">
+              {offers.filter(o => (o.tripStatus || o.status) === 'delivered').length}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Teslim Edilen
+            </Typography>
+          </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Toplam Değer
-              </Typography>
-              <Typography variant="h4" component="div" color="primary.main">
-                ₺{offers.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0).toLocaleString()}
-              </Typography>
-            </CardContent>
-          </Card>
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="success.main" fontWeight="bold">
+              {offers.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0).toLocaleString()}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Toplam Değer
+            </Typography>
+          </Paper>
         </Grid>
       </Grid>
 
-      {/* Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                size="small"
-                label="Ara"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
-                <InputLabel shrink>Durum Filtresi</InputLabel>
-                <Select
-                  value={filterStatus}
-                  onChange={e => setFilterStatus(e.target.value)}
-                  label="Durum Filtresi"
-                  notched
-                >
-                  <MenuItem value="all">
-                    <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
+      {/* Filters and Actions */}
+      <Paper sx={{ p: 2, mb: 2 }}>
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            <TextField
+              size="small"
+              label="Ara"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              sx={{ width: 300 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <FormControl size="small" sx={{ width: 200 }}>
+              <InputLabel shrink>Durum Filtresi</InputLabel>
+              <Select
+                value={filterStatus}
+                onChange={e => setFilterStatus(e.target.value)}
+                label="Durum Filtresi"
+                notched
+              >
+                <MenuItem value="all">
+                  <Chip label="Tümü" size="small" sx={{ backgroundColor: 'white', color: 'black', border: '1px solid #ddd' }} />
+                </MenuItem>
+                {STATUS_OPTIONS.map(status => (
+                  <MenuItem key={status.value} value={status.value}>
+                    <Chip 
+                      icon={status.icon}
+                      label={status.label} 
+                      color={status.color} 
+                      size="small" 
+                    />
                   </MenuItem>
-                  {STATUS_OPTIONS.map(status => (
-                    <MenuItem key={status.value} value={status.value}>
-                      <Chip 
-                        icon={status.icon}
-                        label={status.label} 
-                        color={status.color} 
-                        size="small" 
-                      />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+          
+          <Box 
+            sx={{ 
+              backgroundColor: showMyOffersOnly ? 'primary.100' : 'grey.100',
+              borderRadius: 2,
+              px: 2,
+              py: 0.5,
+              transition: 'all 0.3s ease-in-out',
+              border: showMyOffersOnly ? '1px solid primary.300' : '1px solid grey.300',
+              '&:hover': {
+                backgroundColor: showMyOffersOnly ? 'primary.200' : 'grey.200',
+                transform: 'translateY(-1px)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              }
+            }}
+          >
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showMyOffersOnly}
+                  onChange={(e) => setShowMyOffersOnly(e.target.checked)}
+                  color="primary"
+                />
+              }
+              label="Tekliflerim"
+              sx={{ margin: 0 }}
+            />
+          </Box>
+        </Box>
+      </Paper>
 
       {/* Offers Table */}
       <Paper elevation={2}>
@@ -295,7 +399,7 @@ const ApprovedOffers = () => {
                   <strong>Durum</strong>
                 </TableCell>
                 <TableCell>
-                  <strong>Onay Tarihi</strong>
+                  <strong>Kalkış Tarihi</strong>
                 </TableCell>
                 <TableCell>
                   <strong>Tahmini Teslimat</strong>
@@ -338,9 +442,11 @@ const ApprovedOffers = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    {offer.createdAt
-                      ? new Date(offer.createdAt).toLocaleDateString('tr-TR')
-                      : 'N/A'}
+                    {offer.departureDate
+                      ? new Date(offer.departureDate).toLocaleDateString('tr-TR')
+                      : offer.createdAt
+                        ? new Date(offer.createdAt).toLocaleDateString('tr-TR')
+                        : 'N/A'}
                   </TableCell>
                   <TableCell>
                     {offer.estimatedDeliveryDate

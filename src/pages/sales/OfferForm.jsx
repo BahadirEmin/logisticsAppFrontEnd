@@ -28,6 +28,7 @@ import { countriesAPI } from '../../api/countries';
 import { ordersAPI } from '../../api/orders';
 import { parseNumber } from '../../utils/numberFormatter';
 import { useFormattedInput, useCargoFormattedInput } from '../../hooks/useFormattedInput';
+import { toast } from 'react-toastify';
 
 const steps = ['Rota ve Yük Bilgileri', 'Bilgileri Onayla', 'Teklif Fiyatı ve Gönder'];
 
@@ -145,6 +146,15 @@ const OfferForm = () => {
       setCustomers(customersData);
     } catch (error) {
       console.error('Error loading customers:', error);
+      
+      toast.error('Müşteri listesi yüklenirken hata oluştu.', {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } finally {
       setLoading(false);
     }
@@ -172,6 +182,15 @@ const OfferForm = () => {
       setCountries(sortedCountries);
     } catch (error) {
       console.error('Error loading countries:', error);
+      
+      toast.error('Ülke listesi yüklenirken hata oluştu.', {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     }
   };
 
@@ -342,10 +361,27 @@ const OfferForm = () => {
       console.log('Order created successfully:', response);
 
       // Success - redirect to offers list
+      toast.success('Teklif başarıyla gönderildi!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
+      
       navigate('/sales/tekliflerim');
     } catch (error) {
       console.error('Teklif gönderme hatası:', error);
-      // You can add error handling here (show error message to user)
+      
+      toast.error('Teklif gönderilirken bir hata oluştu. Lütfen tekrar deneyin.', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } finally {
       setSubmitting(false);
     }

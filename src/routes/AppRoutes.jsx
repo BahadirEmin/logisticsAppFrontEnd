@@ -7,8 +7,6 @@ import OperatorDashboard from '../pages/operator/OperatorDashboard';
 import OperatorProfile from '../pages/operator/OperatorProfile';
 import ApprovedOffers from '../pages/operator/ApprovedOffers';
 import TripTracking from '../pages/shared/TripTracking';
-import OperatorMyOffers from '../pages/operator/OperatorMyOffers';
-import FleetMyOffers from '../pages/fleet/FleetMyOffers';
 import SalesDashboard from '../pages/sales/SalesDashboard';
 import OfferForm from '../pages/sales/OfferForm';
 import CustomerList from '../pages/sales/CustomerList';
@@ -21,7 +19,6 @@ import FleetTrailerList from '../pages/fleet/FleetTrailerList';
 import AdminDriverList from '../pages/admin/DriverList';
 import FleetDriverList from '../pages/fleet/FleetDriverList';
 import ProtectedRoute from '../components/ProtectedRoute';
-import SalesMyOffers from '../pages/sales/SalesMyOffers';
 import SuppliersList from '../pages/sales/SuppliersList';
 import OrderDetail from '../pages/shared/OrderDetail';
 import OrderEdit from '../pages/shared/OrderEdit';
@@ -130,16 +127,6 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/operator/tekliflerim"
-          element={
-            <ProtectedRoute allowedRoles={['operator', 'operation']}>
-              <MainLayout>
-                <OperatorMyOffers />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/operator/teklifler/:orderId"
           element={
             <ProtectedRoute allowedRoles={['operator', 'operation']}>
@@ -212,16 +199,6 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/sales/tekliflerim"
-          element={
-            <ProtectedRoute allowedRoles={['sales']}>
-              <MainLayout>
-                <SalesMyOffers />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/sales/teklifler/:orderId"
           element={
             <ProtectedRoute allowedRoles={['sales']}>
@@ -284,7 +261,7 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/fleet/teklifler"
+          path="/fleet/aktif-isler"
           element={
             <ProtectedRoute allowedRoles={['fleet']}>
               <MainLayout>
@@ -294,17 +271,7 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/fleet/tekliflerim"
-          element={
-            <ProtectedRoute allowedRoles={['fleet']}>
-              <MainLayout>
-                <FleetMyOffers />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/fleet/detay/:orderId"
+          path="/fleet/aktif-isler/:orderId"
           element={
             <ProtectedRoute allowedRoles={['fleet']}>
               <MainLayout>

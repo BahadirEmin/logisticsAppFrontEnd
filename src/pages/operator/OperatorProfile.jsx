@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { Person, Save, Edit } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'react-toastify';
 
 const OperatorProfile = () => {
   const { user, updateUser } = useAuth();
@@ -45,9 +46,28 @@ const OperatorProfile = () => {
       updateUser({ ...user, ...formData });
       setEditing(false);
       setMessage('Profil başarıyla güncellendi!');
+      
+      toast.success('Profil başarıyla güncellendi!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
+      
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       setMessage('Profil güncellenirken hata oluştu.');
+      
+      toast.error('Profil güncellenirken hata oluştu.', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } finally {
       setLoading(false);
     }

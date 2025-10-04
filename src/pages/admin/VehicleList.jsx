@@ -39,6 +39,7 @@ import {
   LocalShipping as TruckIcon,
 } from '@mui/icons-material';
 import { vehicleAPI } from '../../api/vehicles';
+import { toast } from 'react-toastify';
 
 const VehicleList = () => {
   const [vehicles, setVehicles] = useState([]);
@@ -240,8 +241,26 @@ const VehicleList = () => {
 
       if (editingVehicle) {
         await vehicleAPI.update(editingVehicle.id, vehicleData);
+        
+        toast.success('Araç başarıyla güncellendi!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+        });
       } else {
         await vehicleAPI.create(vehicleData);
+        
+        toast.success('Araç başarıyla eklendi!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+        });
       }
 
       setDialogOpen(false);
@@ -253,6 +272,15 @@ const VehicleList = () => {
         error?.response?.data?.error ||
         'Araç kaydedilirken hata oluştu';
       setError(backendMessage);
+      
+      toast.error(backendMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } finally {
       setSaving(false);
     }
@@ -270,9 +298,27 @@ const VehicleList = () => {
       setDeleteDialogOpen(false);
       setVehicleToDelete(null);
       loadData();
+      
+      toast.success('Araç başarıyla silindi!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } catch (error) {
       setError('Araç silinirken hata oluştu');
       console.error('Delete vehicle error:', error);
+      
+      toast.error('Araç silinirken hata oluştu', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     }
   };
 
@@ -285,6 +331,15 @@ const VehicleList = () => {
       setDialogOpen(false);
       setEditingVehicle(null);
       await loadData();
+      
+      toast.success('Araç başarıyla silindi!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } catch (error) {
       console.error('Inline delete error:', error);
       const backendMessage =
@@ -292,6 +347,15 @@ const VehicleList = () => {
         error?.response?.data?.error ||
         'Araç silinirken hata oluştu';
       setError(backendMessage);
+      
+      toast.error(backendMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } finally {
       setDeletingInline(false);
     }
@@ -471,20 +535,22 @@ const VehicleList = () => {
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleEditVehicle(vehicle)}
-                      color="primary"
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleDeleteVehicle(vehicle)}
-                      color="error"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
+                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleEditVehicle(vehicle)}
+                        color="primary"
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleDeleteVehicle(vehicle)}
+                        color="error"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))}

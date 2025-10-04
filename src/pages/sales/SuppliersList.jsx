@@ -41,6 +41,7 @@ import {
   Cancel as CancelIcon,
 } from '@mui/icons-material';
 import { supplierAPI } from '../../api/suppliers';
+import { toast } from 'react-toastify';
 
 const SuppliersList = () => {
   const [suppliers, setSuppliers] = useState([]);
@@ -201,8 +202,26 @@ const SuppliersList = () => {
 
       if (editingSupplier) {
         await supplierAPI.update(editingSupplier.id, supplierData);
+        
+        toast.success('Tedarikçi başarıyla güncellendi!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+        });
       } else {
         await supplierAPI.create(supplierData);
+        
+        toast.success('Tedarikçi başarıyla eklendi!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+        });
       }
 
       setDialogOpen(false);
@@ -214,6 +233,15 @@ const SuppliersList = () => {
         error?.response?.data?.error ||
         'Tedarikçi kaydedilirken hata oluştu';
       setError(backendMessage);
+      
+      toast.error(backendMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } finally {
       setSaving(false);
     }
@@ -231,9 +259,27 @@ const SuppliersList = () => {
       setDeleteDialogOpen(false);
       setSupplierToDelete(null);
       loadData(); // Reload data
+      
+      toast.success('Tedarikçi başarıyla silindi!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } catch (error) {
       setError('Tedarikçi silinirken hata oluştu');
       console.error('Delete supplier error:', error);
+      
+      toast.error('Tedarikçi silinirken hata oluştu', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     }
   };
 
@@ -246,6 +292,15 @@ const SuppliersList = () => {
       setDialogOpen(false);
       setEditingSupplier(null);
       await loadData();
+      
+      toast.success('Tedarikçi başarıyla silindi!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } catch (error) {
       console.error('Inline delete error:', error);
       const backendMessage =
@@ -253,6 +308,15 @@ const SuppliersList = () => {
         error?.response?.data?.error ||
         'Tedarikçi silinirken hata oluştu';
       setError(backendMessage);
+      
+      toast.error(backendMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
     } finally {
       setDeletingInline(false);
     }
