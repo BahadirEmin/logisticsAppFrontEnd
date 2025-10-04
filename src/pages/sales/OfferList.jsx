@@ -260,21 +260,25 @@ const OfferList = () => {
 
       {/* Filters and Actions */}
       <Paper sx={{ p: 2, mb: 2 }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={3}>
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
             <TextField
-              fullWidth
               size="small"
               label="Ara"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
+              sx={{ width: 300 }}
               InputProps={{
                 startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
               }}
             />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+            <FormControl size="small" sx={{ width: 200 }}>
               <InputLabel shrink>Durum Filtresi</InputLabel>
               <Select
                 value={statusFilter}
@@ -301,23 +305,19 @@ const OfferList = () => {
                 ))}
               </Select>
             </FormControl>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={showMyOffersOnly}
-                  onChange={(e) => setShowMyOffersOnly(e.target.checked)}
-                  color="primary"
-                />
-              }
-              label="Sadece Tekliflerim"
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            {/* Empty space - button moved to header */}
-          </Grid>
-        </Grid>
+          </Box>
+          
+          <FormControlLabel
+            control={
+              <Switch
+                checked={showMyOffersOnly}
+                onChange={(e) => setShowMyOffersOnly(e.target.checked)}
+                color="primary"
+              />
+            }
+            label="Sadece Tekliflerim"
+          />
+        </Box>
       </Paper>
 
       {/* Offers Table */}
