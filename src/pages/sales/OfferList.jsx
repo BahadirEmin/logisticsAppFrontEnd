@@ -27,6 +27,8 @@ import {
   DialogActions,
   Button,
   Divider,
+  FormControlLabel,
+  Switch,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -39,6 +41,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../../api/orders';
 import { STATUS_OPTIONS, getStatusColor, getStatusLabel, getStatusIcon } from '../../constants/statusConstants';
+import { useAuth } from '../../contexts/AuthContext';
 
 const OfferList = () => {
   const [offers, setOffers] = useState([]);
@@ -46,9 +49,11 @@ const OfferList = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [showMyOffersOnly, setShowMyOffersOnly] = useState(false);
   const [approvalDialog, setApprovalDialog] = useState({ open: false, offer: null });
   const [approving, setApproving] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     loadOffers();
@@ -78,7 +83,13 @@ const OfferList = () => {
 
     const matchesStatus = statusFilter === 'all' || !statusFilter || offer.tripStatus === statusFilter;
 
-    return matchesSearch && matchesStatus;
+    // Check if offer belongs to current user
+    const matchesOwnership = !showMyOffersOnly || 
+      offer.createdBy === user?.id || 
+      offer.salesPersonId === user?.id ||
+      offer.userId === user?.id;
+
+    return matchesSearch && matchesStatus && matchesOwnership;
   });
   const handleViewOffer = offerId => {
     navigate(`/sales/teklifler/${offerId}`);
@@ -170,9 +181,23 @@ const OfferList = () => {
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#1976d2', mb: 3 }}>
-        Teklifler
-      </Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Typography variant="h4" component="h1" sx={{ color: '#1976d2' }}>
+          Teklifler
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={handleCreateOffer}
+          sx={{
+            backgroundColor: 'primary.main',
+            '&:hover': { backgroundColor: 'primary.dark' },
+          }}
+        >
+          Yeni Teklif
+        </Button>
+      </Box>
 
       {/* Statistics Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -278,21 +303,19 @@ const OfferList = () => {
             </FormControl>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Box display="flex" justifyContent="flex-end">
-              <Tooltip title="Yeni Teklif Oluştur">
-                <IconButton
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showMyOffersOnly}
+                  onChange={(e) => setShowMyOffersOnly(e.target.checked)}
                   color="primary"
-                  onClick={handleCreateOffer}
-                  sx={{
-                    backgroundColor: 'primary.main',
-                    color: 'white',
-                    '&:hover': { backgroundColor: 'primary.dark' },
-                  }}
-                >
-                  <AddIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
+                />
+              }
+              label="Sadece Tekliflerim"
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            {/* Empty space - button moved to header */}
           </Grid>
         </Grid>
       </Paper>
