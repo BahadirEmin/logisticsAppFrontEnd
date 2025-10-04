@@ -475,15 +475,27 @@ const OrderDetail = () => {
             />
             <CardContent sx={{ pt: 0 }}>
               <Typography variant="body2" sx={{ mb: 1, mt: 1 }}>
-                <strong>Müşteri ID:</strong> {order.customerId}
+                <strong>Müşteri:</strong>
+                <Chip
+                  label={order.customerName || order.customer?.name || 'Belirtilmemiş'}
+                  color={order.customerName || order.customer?.name ? 'success' : 'default'}
+                  size="small"
+                  sx={{ ml: 1 }}
+                />
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>Satış Personeli ID:</strong> {order.salesPersonId}
+                <strong>Satış Personeli:</strong>
+                <Chip
+                  label={order.salesPersonName || order.salesPerson?.username || 'Atanmamış'}
+                  color={order.salesPersonName || order.salesPerson?.username || order.salesPersonId ? 'success' : 'default'}
+                  size="small"
+                  sx={{ ml: 1 }}
+                />
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
                 <strong>Operasyon Personeli:</strong>
                 <Chip
-                  label={order.operationPersonId || 'Atanmamış'}
+                  label={order.operationPersonName || order.operationPerson?.username || 'Atanmamış'}
                   color={order.operationPersonId ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
@@ -492,7 +504,7 @@ const OrderDetail = () => {
               <Typography variant="body2" sx={{ mb: 1 }}>
                 <strong>Filo Personeli:</strong>
                 <Chip
-                  label={order.fleetPersonId || 'Atanmamış'}
+                  label={order.fleetPersonName || order.fleetPerson?.username || 'Atanmamış'}
                   color={order.fleetPersonId ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
@@ -534,7 +546,7 @@ const OrderDetail = () => {
               <Typography variant="body2" sx={{ mb: 1, mt: 1 }}>
                 <strong>Atanan Şoför:</strong>
                 <Chip
-                  label={order.assignedDriverId || order.driverId || order.driver?.name || 'Atanmamış'}
+                  label={order.assignedDriverName || order.driver?.name || 'Atanmamış'}
                   color={order.assignedDriverId || order.driverId || order.driver ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
@@ -543,7 +555,7 @@ const OrderDetail = () => {
               <Typography variant="body2" sx={{ mb: 1, mt: 1 }}>
                 <strong>Atanan Tır:</strong>
                 <Chip
-                  label={order.assignedTruckId || order.truckId || order.vehicleId || order.truck?.plateNumber || order.vehicle?.plateNumber || 'Atanmamış'}
+                  label={order.assignedTruckPlateNo || order.truck?.plateNumber || order.vehicle?.plateNumber || 'Atanmamış'}
                   color={order.assignedTruckId || order.truckId || order.vehicleId || order.truck || order.vehicle ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
@@ -552,7 +564,7 @@ const OrderDetail = () => {
               <Typography variant="body2" sx={{ mb: 2 }}>
                 <strong>Atanan Romork:</strong>
                 <Chip
-                  label={order.assignedTrailerId || order.trailerId || order.trailer?.plateNumber || 'Atanmamış'}
+                  label={order.assignedTrailerNo || order.trailer?.plateNumber || 'Atanmamış'}
                   color={order.assignedTrailerId || order.trailerId || order.trailer ? 'success' : 'default'}
                   size="small"
                   sx={{ ml: 1 }}
