@@ -181,44 +181,44 @@ const ApprovedOffers = () => {
       </Typography>
 
       {/* Statistics Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-                        <Typography color="textSecondary" gutterBottom>
-              Toplam Teklif
-            </Typography>
-            <Typography variant="h4" component="div" color="primary.main">
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="primary" fontWeight="bold">
               {offers.length}
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Toplam Teklif
+            </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography color="textSecondary" gutterBottom>
-              Yolda Olan
-            </Typography>
-            <Typography variant="h4" component="div" color="warning.main">
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="warning.main" fontWeight="bold">
               {offers.filter(o => (o.tripStatus || o.status) === 'in_transit').length}
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Yolda Olan
+            </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography color="textSecondary" gutterBottom>
-              Teslim Edilen
-            </Typography>
-            <Typography variant="h4" component="div" color="success.main">
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="success.main" fontWeight="bold">
               {offers.filter(o => (o.tripStatus || o.status) === 'delivered').length}
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Teslim Edilen
+            </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography color="textSecondary" gutterBottom>
-              Toplam Değer
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="success.main" fontWeight="bold">
+              {offers.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0).toLocaleString()}
             </Typography>
-            <Typography variant="h4" component="div" color="primary.main">
-              ₺{offers.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0).toLocaleString()}
+            <Typography variant="body2" color="text.secondary">
+              Toplam Değer
             </Typography>
           </Paper>
         </Grid>

@@ -402,10 +402,10 @@ const OfferList = () => {
                 <TableCell>
                   <strong>Müşteri</strong>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ minWidth: 180 }}>
                   <strong>Nereden</strong>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ minWidth: 180 }}>
                   <strong>Nereye</strong>
                 </TableCell>
                 <TableCell>
@@ -441,18 +441,28 @@ const OfferList = () => {
                   <TableCell>{offer.customerName || offer.customer?.name || 'N/A'}</TableCell>
                   <TableCell>
                     <Typography variant="body2">
-                      {offer.departureCity || offer.departureAddress || 'N/A'}
+                      {offer.departureCity}, {offer.departureCountry}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {offer.departureAddress}
                     </Typography>
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2">
-                      {offer.arrivalCity || offer.arrivalAddress || 'N/A'}
+                      {offer.arrivalCity}, {offer.arrivalCountry}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {offer.arrivalAddress}
                     </Typography>
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2">{offer.cargoType || 'N/A'}</Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {offer.cargoWeightKg ? `${offer.cargoWeightKg} kg` : 'N/A'}
+                      {offer.cargoWeightKg} kg
+                      {offer.cargoWidth &&
+                        offer.cargoLength &&
+                        offer.cargoHeight &&
+                        ` • ${offer.cargoWidth}x${offer.cargoLength}x${offer.cargoHeight}m`}
                     </Typography>
                   </TableCell>
                   <TableCell>{renderResourceIcons(offer)}</TableCell>
@@ -465,9 +475,16 @@ const OfferList = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    {offer.createdAt
-                      ? new Date(offer.createdAt).toLocaleDateString('tr-TR')
-                      : 'N/A'}
+                    <Typography variant="body2">
+                      {offer.createdAt
+                        ? new Date(offer.createdAt).toLocaleDateString('tr-TR')
+                        : 'N/A'}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {offer.createdAt
+                        ? new Date(offer.createdAt).toLocaleTimeString('tr-TR')
+                        : ''}
+                    </Typography>
                   </TableCell>
                   <TableCell>
                     {offer.estimatedDeliveryDate

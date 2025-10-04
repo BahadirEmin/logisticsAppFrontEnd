@@ -29,6 +29,7 @@ import {
   Divider,
   FormControlLabel,
   Switch,
+  InputAdornment,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -200,44 +201,44 @@ const OfferList = () => {
       </Box>
 
       {/* Statistics Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography color="textSecondary" gutterBottom>
-              Toplam Teklif
-            </Typography>
-            <Typography variant="h4" component="div" color="primary.main">
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="primary" fontWeight="bold">
               {offers.length}
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Toplam Teklif
+            </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography color="textSecondary" gutterBottom>
-              Teklif Aşamasında
-            </Typography>
-            <Typography variant="h4" component="div" color="warning.main">
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="warning.main" fontWeight="bold">
               {offers.filter(o => o.tripStatus === 'TEKLIF_ASAMASI').length}
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Teklif Aşamasında
+            </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography color="textSecondary" gutterBottom>
-              Onaylanan
-            </Typography>
-            <Typography variant="h4" component="div" color="success.main">
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="success.main" fontWeight="bold">
               {offers.filter(o => o.tripStatus === 'ONAYLANAN_TEKLIF').length}
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Onaylanan
+            </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography color="textSecondary" gutterBottom>
-              Reddedilen
-            </Typography>
-            <Typography variant="h4" component="div" color="error.main">
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" color="error.main" fontWeight="bold">
               {offers.filter(o => o.tripStatus === 'REDDEDILDI').length}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Reddedilen
             </Typography>
           </Paper>
         </Grid>
@@ -275,7 +276,11 @@ const OfferList = () => {
               onChange={e => setSearchTerm(e.target.value)}
               sx={{ width: 300 }}
               InputProps={{
-                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
               }}
             />
             <FormControl size="small" sx={{ width: 200 }}>
@@ -375,9 +380,6 @@ const OfferList = () => {
                     <TableCell>
                       <Typography variant="body2" fontWeight="medium">
                         {offer.customerName}
-                      </Typography>
-                      <Typography variant="caption" color="textSecondary">
-                        ID: {offer.customerId}
                       </Typography>
                     </TableCell>
                     <TableCell>
